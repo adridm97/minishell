@@ -1,7 +1,6 @@
 NAME 			= minishell
 CC 				= gcc
-CFLAGS 			= #-Wall -Wextra -Werror
-
+CFLAGS 			= -lreadline
 SOURCES 		= minishell.c
 OBJS_PATH		= ./build
 HEADER			= minishell.h
