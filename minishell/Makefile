@@ -14,7 +14,7 @@ makes:
 
 OBJS = $(addprefix $(OBJS_PATH)/, ${SOURCES:.c=.o})
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) $(LIBFT)
 	$(CC) $(CFLAGS) $^ -o $@ $(OSFLAG)
 
 $(LIBFT):
