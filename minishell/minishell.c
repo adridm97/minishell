@@ -5,7 +5,12 @@
 #include <string.h>
 #include <unistd.h>
 
-int es_comando_valido(char *comando) {
+int main(int argc, char *argv[], char *env[])
+{
+	return (0);
+}
+
+/*int es_comando_valido(char *comando) {
     // Aquí podrías implementar una lógica para verificar si el comando es válido
     // Por ejemplo, verificar si el archivo ejecutable existe en el sistema
     if (access(comando, X_OK) != -1) {
@@ -32,4 +37,4 @@ int main(int argc, char *argv[], char *env[])
     //    return 1;
 //    }		
     }
-}
+}*/
