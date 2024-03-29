@@ -6,7 +6,7 @@
 /*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/03/29 10:13:59 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/03/29 10:54:19 by kluna-bo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,15 @@
 # include <readline/history.h>
 
 //TODO ahora son int
-# define PIPE		"|"
-# define MAJOR		">"
-# define MINOR		"<"
-# define D_MAJOR	">>"
-# define D_MINOR	"<<"
-# define DOLLAR		"$"
+# define PIPE		0 // |
+# define MAJOR		1 // >
+# define MINOR		2 // <
+# define D_MAJOR	3 // >>
+# define D_MINOR	4 // <<
+# define D_QUOTE	5 // "
+# define QUOTE		6 // '
+# define SPACE		7 // ' '
+
 
 typedef struct s_mini
 {
@@ -57,9 +60,10 @@ typedef struct s_token
 //	esta struct es la utilizada por Adrian
 typedef struct s_data
 {
-	t_token	*token;
-	char	*comand;
-	char	*args[];
+	t_token			*token;
+	char			*comand;
+	char			**args;
+	struct s_data	*next;
 }	t_data;
 
 #endif
