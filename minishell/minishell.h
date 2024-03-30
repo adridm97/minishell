@@ -21,7 +21,7 @@
 # include <readline/history.h>
 # include "libft/libft.h"
 
-# define SPACE		0 // ' '
+# define ERROR		0
 # define PIPE		1 // |
 # define MAJOR		2 // >
 # define MINOR		3 // <
@@ -30,9 +30,6 @@
 # define NO_QUOTE	6 // string sin comillas
 # define QUOTE		7 // string con comillas simples
 # define D_QUOTE	8 // string con comillas dobles
-
-# define ERROR		0
-
 
 
 typedef struct s_mini

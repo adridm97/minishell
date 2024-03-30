@@ -13,7 +13,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
-#include <libc.h>
 
 void	*ft_memcpy(void *dst, const void *src, size_t length)
 {

@@ -4,8 +4,8 @@ CFLAGS 			= #-Wall -Wextra -Werror
 SOURCES 		= minishell.c
 OBJS_PATH		= ./build
 HEADER			= minishell.h
-LIBFT_PATH = ./LIBFT
-LIBFT = $(LIBFT_PATH)/libft.a
+LIBFT_PATH 		= ./libft
+LIBFT			 = $(LIBFT_PATH)/libft.a
 
 all: makes $(NAME)
 

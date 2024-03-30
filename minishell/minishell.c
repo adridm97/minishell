@@ -1,13 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
+/*   Updated: 2024/03/29 16:59:17 by kluna-bo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
-
-int	ft_isspecial(int c)
-{
-	if ((c >= 0 && c <= 127))
-		return (1);
-	else
-		return (0);
-}
 
 void	new_token(char *input, int start, int end, t_token **token)
 {
@@ -18,15 +21,17 @@ void	new_token(char *input, int start, int end, t_token **token)
 	*token = &new;
 }
 
-void	add_token(char *input, int start, int end, t_token *token)
+void	add_token(char *input, int start, int end, t_token **token)
 {
 	t_token	new;
+	t_token	*lst;
 
-	while (token->next)
-		token = token->next;
+	lst = *token;
+	while (lst->next)
+		lst = lst->next;
 	new.next = NULL;
 	new.value = ft_substr(input, start, end);
-	token->next = &new;
+	lst->next = &new;
 }
 
 int	is_special(char c)
@@ -35,7 +40,7 @@ int	is_special(char c)
 		return (1);
 	return (0);
 }
-
+/*Por algun motivo solo imprimer la utima palabra pero debería imprimir la primera*/
 int	lexer(char *input, t_data *data)
 {
 	t_token	*token;
@@ -43,6 +48,7 @@ int	lexer(char *input, t_data *data)
 	int		start;
 	int		end;
 
+	token = NULL;
 	i = -1;
 	while (input[++i])
 	{
@@ -53,14 +59,18 @@ int	lexer(char *input, t_data *data)
 			{
 				end = i;
 			}
-			if (token)
+			if (!token)
 			{
-				printf("start: %i, end: %i, %c, %c\n", start, end, input[start], input[end]);
+			//	printf("start: %i, end: %i, %c, %c\n", start, end, input[start], input[end]);
 				new_token(input, start, end + 1, &token);
 			}
-			// else
-			// 	add_token(input, start, end, token);
+			else
+			 	add_token(input, start, end, &token);
 		}
+	}
+	if (!token)
+	{
+		return (1);
 	}
 	data->token = token;
 	printf("%s\n", data->token->value);
@@ -80,7 +90,7 @@ int	main(int argc, char *argv[], char *env[])
 			free (input);
 			input = (char *) NULL;
 		}
-		input = readline("\x1b[34m""Minishell:""\x1b[0m");
+		input = readline("\x1b[34m""Minishell: ""\x1b[0m");
 		if (!strcmp(input, "exit"))
 			break ;
 		if (input && *input)
