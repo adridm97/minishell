@@ -47,10 +47,9 @@ typedef struct s_error
 
 typedef struct s_redir
 {
-	struct s_token	*token;
-	char			*comand;
-	char			**args;
-	struct s_data	*next;
+	int		type;
+	char		*path;
+	struct s_redir	*next;
 }	t_redir;
 
 /*
@@ -80,7 +79,6 @@ typedef struct s_token
 //	esta struct es la utilizada por Adrian
 typedef struct s_data
 {
-	t_token			*token;
 	char			*comand;
 	char			**args;
 	struct s_data	*next;
