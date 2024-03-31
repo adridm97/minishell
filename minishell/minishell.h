@@ -6,7 +6,7 @@
 /*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/03/31 21:18:38 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/03/31 22:42:08 by kluna-bo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,12 +84,12 @@ typedef struct s_data
 	char			**args;
 	struct s_data	*next;
 	struct s_redir	*redir;
+	struct s_error	*error;
 }	t_data;
 
 // lexer.c
-int		new_token(char c, int type, t_token **token, int *open);
-int		add_token(char c, int type, t_token **token, int *open);
-int		is_special(char c);
+int		new_token(char c, int type, t_token **token);
+int		add_token(char c, int type, t_token **token);
 int		lexer(char *input, t_data *data);
 int		typeing(char c, char *base);
 
