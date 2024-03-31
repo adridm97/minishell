@@ -6,7 +6,7 @@
 /*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/03/31 13:21:11 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/03/31 21:18:38 by kluna-bo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,17 @@
 # include <readline/history.h>
 # include "libft/libft.h"
 
-# define ERROR		0
+# define SPACE		0 // ' '
 # define PIPE		1 // |
 # define MAJOR		2 // >
 # define MINOR		3 // <
-# define D_MAJOR	4 // >>
-# define D_MINOR	5 // <<
+# define QUOTE		4 // string con comillas simples
+# define D_QUOTE	5 // string con comillas dobles
 # define NO_QUOTE	6 // string sin comillas
-# define QUOTE		7 // string con comillas simples
-# define D_QUOTE	8 // string con comillas dobles
+# define D_MAJOR	7 // >>
+# define D_MINOR	8 // <<
 
+# define ERROR		0
 
 typedef struct s_mini
 {
@@ -47,8 +48,8 @@ typedef struct s_error
 
 typedef struct s_redir
 {
-	int		type;
-	char		*path;
+	int				type;
+	char			*path;
 	struct s_redir	*next;
 }	t_redir;
 
@@ -65,8 +66,8 @@ Structure:
 */
 typedef struct s_token
 {
-	int				key;
-	char			*value;
+	int				type;
+	char			value;
 	struct s_token	*next;
 }	t_token;
 
@@ -86,10 +87,10 @@ typedef struct s_data
 }	t_data;
 
 // lexer.c
-void	new_token(char *input, int start, int end, t_token **token);
-void	add_token(char *input, int start, int end, t_token **token);
+int		new_token(char c, int type, t_token **token, int *open);
+int		add_token(char c, int type, t_token **token, int *open);
 int		is_special(char c);
 int		lexer(char *input, t_data *data);
-
+int		typeing(char c, char *base);
 
 #endif

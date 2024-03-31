@@ -6,7 +6,7 @@
 /*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/03/31 13:19:49 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/03/31 15:35:11 by kluna-bo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,9 @@ int	main(int argc, char *argv[], char *env[])
 	static char	*input;
 	t_data		data;
 
+	(void)env;
+	(void)argc;
+	(void)argv;
 	while (1)
 	{
 		if (input)

@@ -6,83 +6,99 @@
 /*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/03/31 13:21:14 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/03/31 21:17:39 by kluna-bo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	new_token(char *input, int start, int end, t_token **token)
+int	new_token(char c, int type, t_token **token, int *open)
 {
-	t_token	new;
+	t_token	*new;
 
-	printf("start: %i, end: %i\n", start, end);
-	new.next = NULL;
-	new.value = ft_substr(input, start, end);
-	*token = &new;
-	printf("EN NEW AL FINAL: %s\n", (*token)->value);
+	(void)open;
+	new = (t_token *)malloc(sizeof(t_token));
+	if (!new)
+		return (0);
+	(*new).next = NULL;
+	(*new).value = c;
+	(*new).type = type;
+	*token = new;
+	return (1);
 }
 
-void	add_token(char *input, int start, int end, t_token **token)
+int	add_token(char c, int type, t_token **token, int *open)
 {
-	t_token	new;
 	t_token	*lst;
+	t_token	*new;
 
-	printf("start: %i, end: %i\n", start, end);
-	printf("value de token: %s\n", (*token)->value);
+	new = NULL;
 	lst = *token;
-	printf("value de token: %s\n", lst->value);
 	while (lst->next)
 	{
-		printf("AGADGASDRGAERWGARG\n");
 		lst = lst->next;
 	}
-	new.next = NULL;
-	printf("EN ADD AL FINAL: %s\n",lst->value);
-	new.value = ft_substr(input, start, end);
-	printf("EN ADD AL FINAL: %s\n",lst->value);
-	lst->next = &new;
+	if (!new_token(c, type, &new, open))
+		return (0);
+	lst->next = new;
+	return (1);
 }
 
 int	is_special(char c)
 {
-	if (c == '|' || c == ' ' || !c)
+	if (c == '|' || c == ' ' || c == '\0')
 		return (1);
 	return (0);
 }
-/*Por algun motivo solo imprimer la utima palabra pero debería imprimir la primera*/
+
+int	typeing(char c, char *base)
+{
+	int	i;
+
+	i = -1;
+	while (++i <= 5)
+	{
+		if (c == base[i])
+			return (i);
+	}
+	return (6);
+}
+
+static void	print_token(t_token *token)
+{
+	while(token->next)
+	{
+		printf("type: %i, value: %c\n", token->type, token->value);
+		token = token->next;
+	}
+	printf("type: %i, value: %c\n", token->type, token->value);
+}
+
+
 int	lexer(char *input, t_data *data)
 {
 	t_token	*token;
 	int		i;
-	int		start;
-	int		end;
+	int		open;
 
-	token = NULL;
+	(void)data;
+	open = 0;
 	i = -1;
+	token = NULL;
 	while (input[++i])
 	{
-		if (!is_special(input[i]))
+		if (!token)
 		{
-			start = i;
-			while (!is_special(input[++i]))
-			{
-				end = i;
-			}
-			if (!token)
-			{
-			//	printf("start: %i, end: %i, %c, %c\n", start, end, input[start], input[end]);
-				new_token(input, start, end + 1, &token);
-			}
-			else
-			 	add_token(input, start, end, &token);
+			if (!new_token(input[i], typeing(input[i], " |><\'\""), &token, &open))
+				return (0);
+		}
+		else
+		{
+			if (!add_token(input[i], typeing(input[i], " |><\'\""), &token, &open))
+				return (0);
 		}
 	}
-	if (!token)
-	{
-		return (1);
-	}
-	token = token;
-	printf("%s\n", token->value);
+	if (token)
+		print_token(token);
 	return (1);
 }
