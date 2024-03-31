@@ -21,7 +21,7 @@
 # include <readline/history.h>
 # include "libft/libft.h"
 
-# define SPACE		0 // ' '
+# define SPACES		0 // ' '
 # define PIPE		1 // |
 # define MAJOR		2 // >
 # define MINOR		3 // <
@@ -84,7 +84,7 @@ typedef struct s_data
 	char			**args;
 	struct s_data	*next;
 	struct s_redir	*redir;
-	struct s_error	*error;
+	struct s_error	error;
 }	t_data;
 
 // lexer.c
@@ -92,5 +92,15 @@ int		new_token(char c, int type, t_token **token);
 int		add_token(char c, int type, t_token **token);
 int		lexer(char *input, t_data *data);
 int		typeing(char c, char *base);
+
+// Regular Colors
+# define BLACK "\x1b[0m"
+# define RED "\x1b[31m"
+# define GREEN "\x1b[32m"
+# define YELLOW "\x1b[33m"
+# define BLUE "\x1b[34m"
+# define MAGENTA "\x1b[35m"
+# define CYAN "\x1b[36m"
+# define WHITE "\x1b[37m"
 
 #endif

@@ -12,7 +12,20 @@
 
 #include "minishell.h"
 
-int	check_closed(t_token *token)
+int	lexer_error(t_error *error)
+{
+	if(error->is_error)
+	{
+		printf(RED"Minishell: %s\n"BLACK, error->error);
+		free(error->error);
+		error->error = NULL;
+		error->is_error = 0;
+		return (1);
+	}
+	return (0);
+}
+
+int	check_closed(t_token *token, t_data **data)
 {
 	int	q;
 	int	dq;
@@ -32,7 +45,11 @@ int	check_closed(t_token *token)
 			dq++;
 	}
 	if (q % 2 || dq % 2)
+	{
+		(*data)->error.error = ft_strdup("Syntax error");
+		(*data)->error.is_error = 1;
 		return (ERROR);
+	}
 	else
 		return (1);
 }
@@ -96,10 +113,7 @@ int	lexer(char *input, t_data *data)
 {
 	t_token	*token;
 	int		i;
-	int		open;
-
 	(void)data;
-	open = 0;
 	i = -1;
 	token = NULL;
 	while (input[++i])
@@ -116,9 +130,12 @@ int	lexer(char *input, t_data *data)
 		}
 	}
 	if (token)
+	{
+
 		print_token(token);
-	if (lexer_error(data->error))
-		return (0);
+		check_closed(token, &data);
+		lexer_error(&data->error);
+	}
 	//clean_list();
 	return (1);
 }

@@ -23,6 +23,7 @@ int	main(int argc, char *argv[], char *env[])
 	(void)env;
 	(void)argc;
 	(void)argv;
+	data.error.is_error = 0;
 	while (1)
 	{
 		if (input)
@@ -30,7 +31,7 @@ int	main(int argc, char *argv[], char *env[])
 			free (input);
 			input = (char *) NULL;
 		}
-		input = readline("\x1b[34m""Minishell: ""\x1b[0m");
+		input = readline(BLUE"Minishell: "BLACK);
 		if (!strcmp(input, "exit"))
 			break ;
 		if (input && *input)
