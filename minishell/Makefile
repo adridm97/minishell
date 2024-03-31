@@ -1,7 +1,7 @@
 NAME 			= minishell
 CC 				= gcc
 CFLAGS 			= #-Wall -Wextra -Werror
-SOURCES 		= minishell.c
+SOURCES 		= minishell.c lexer.c
 OBJS_PATH		= ./build
 HEADER			= minishell.h
 LIBFT_PATH 		= ./libft
