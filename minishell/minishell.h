@@ -92,6 +92,7 @@ int		new_token(char c, int type, t_token **token);
 int		add_token(char c, int type, t_token **token);
 int		lexer(char *input, t_data *data);
 int		typeing(char c, char *base);
+void	lexer_error(t_error *error);
 
 // Regular Colors
 # define BLACK "\x1b[0m"

@@ -12,7 +12,54 @@
 
 #include "minishell.h"
 
-int	lexer_error(t_error *error)
+int	check_error(t_token *token, char type)
+{
+	if (token->next && (type == token->next->type || (MINOR == type && \
+			MAJOR == token->next->type)) && type != PIPE)
+		token = token->next;
+	while (token->next)
+	{
+		token = token->next;
+		if (token->type != SPACES)
+		{
+			if (token->type >= PIPE && token->type <= MINOR)
+				return (1);
+			else
+			return (0);
+		}
+	}
+	return (1);
+}
+
+int	check_gramathic(t_token *token, t_data **data)
+{
+	char	flag;
+	char	type;
+
+	flag = 0;
+	while (token)
+	{
+		if (token->type >= PIPE && token->type <= MINOR && !flag)
+		{
+			flag = 1; 
+			type = token->type;
+		}
+		if (flag)
+		{
+			if (check_error(token, type))
+			{
+				(*data)->error.error = ft_strdup("Syntax error");
+				(*data)->error.is_error = 1;
+				return (ERROR);
+			}
+			flag = 0;
+		}
+		token = token->next;
+	}
+		return (1);
+}
+
+void	lexer_error(t_error *error)
 {
 	if(error->is_error)
 	{
@@ -20,38 +67,33 @@ int	lexer_error(t_error *error)
 		free(error->error);
 		error->error = NULL;
 		error->is_error = 0;
-		return (1);
 	}
-	return (0);
 }
 
 int	check_closed(t_token *token, t_data **data)
 {
-	int	q;
-	int	dq;
+	int quote;
+	char open;
 
-	q = 0;
-	dq = 0;
-	if (token->type == QUOTE)
-		q++;
-	if (token->type == D_QUOTE)
-		dq++;
-	while (token->next)
+	open = 0;
+	while (token)
 	{
+		if ((token->type == QUOTE || token->type == D_QUOTE) && !open)
+		{
+			open = 1;	
+			quote = token->type;
+		}
+		else if (token->type == quote && open)
+			open = 0;
 		token = token->next;
-		if (token->type == QUOTE)
-			q++;
-		if (token->type == D_QUOTE)
-			dq++;
 	}
-	if (q % 2 || dq % 2)
+		printf("%i\n", open);
+	if (open)
 	{
 		(*data)->error.error = ft_strdup("Syntax error");
 		(*data)->error.is_error = 1;
-		return (ERROR);
 	}
-	else
-		return (1);
+	return (!open);
 }
 
 int	new_token(char c, int type, t_token **token)
@@ -130,12 +172,8 @@ int	lexer(char *input, t_data *data)
 		}
 	}
 	if (token)
-	{
-
-		print_token(token);
-		check_closed(token, &data);
-		lexer_error(&data->error);
-	}
+		(print_token(token), check_closed(token, &data), \
+			check_gramathic(token, &data), lexer_error(&data->error));
 	//clean_list();
 	return (1);
 }
