@@ -6,16 +6,44 @@
 /*   By: aduenas- <aduenas-@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/03/31 17:33:50 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/02 21:40:49 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+void execute_command(char *command, char *command_path)
+{
+	pid_t pid = fork();
+
+	if (pid == -1)
+	{
+		perror("fork");
+		exit(EXIT_FAILURE);
+	}
+	else if (pid == 0)
+	{
+		char *args[] = {command, "executor.c", NULL};
+		if (execve(command_path, args, NULL) == -1)
+		{
+			perror("execve");
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		int	status;
+		if (waitpid(pid, &status, 0) == -1)
+		{
+			perror("waitpid");
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+
 int is_valid_command(char *command)
 {
 	int		i;
-	char	*res;
 	char	*path;
 	char	*command_path;
    
@@ -26,19 +54,21 @@ int is_valid_command(char *command)
 		fprintf(stderr, "No se pudo obtener el valor de PATH\n");
 		exit(EXIT_FAILURE);
 	}
-	char **token = ft_split(path, ":");
+	char **token = ft_split(path, ':');
 	while (token[i] != NULL)
 	{
-		command_path = ft_strjoin(path, "/");
+		command_path = ft_strjoin(token[i], "/");
 		command_path = ft_strjoin(command_path, command);
-		printf("%s/%s\n", token, command);
-		if (access(token, X_OK) == 0)
+		printf("%s/%s\n", token[i], command);
+		if (access(command_path, X_OK) == 0)
 		{
-			printf("El comando \"%s\" es válido en la ruta: %s\n", command, token);
-			free(path_copy);
+			execute_command(command, command_path);
+			printf("El comando \"%s\" es válido en la ruta: %s\n", command, command_path);
+			free(command_path);
 			return 1;
 		}
+		i++;
 	}
-	free(path_copy);
+	free(command_path);
 	return 0;
 }

@@ -6,7 +6,7 @@
 /*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/03/31 22:42:08 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/04/02 19:35:54 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,5 +92,8 @@ int		new_token(char c, int type, t_token **token);
 int		add_token(char c, int type, t_token **token);
 int		lexer(char *input, t_data *data);
 int		typeing(char c, char *base);
+
+//executor.c
+int		is_valid_command(char *command);
 
 #endif

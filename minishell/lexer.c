@@ -6,7 +6,7 @@
 /*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/03/31 22:42:28 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/04/02 19:37:45 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,8 +117,8 @@ int	lexer(char *input, t_data *data)
 	}
 	if (token)
 		print_token(token);
-	if (lexer_error(data->error))
-		return (0);
+//	if (lexer_error(data->error))
+//		return (0);
 	//clean_list();
 	return (1);
 }
