@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/03 21:16:02 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/03 22:29:09 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,12 +154,37 @@ static void	print_token(t_token *token, char **comands)
 		printf("comand: %s\n", *comands++);
 	}
 }
+int	count_redir(char **splited)
+{
+	int i;
+
+	i = 0;
+	while (splited[i])
+		i++;
+		return i;
+}
+redir_init(char **splited, char **comands, int n_redir)
+{
+	t_redir *list;
+
+	while ()
+	{
+	list = (t_redir*)malloc(sizeof(t_redir));
+
+	}
+
+}
 
 void	go_data(t_data **data, char **comands)
 {
 	char **splited;
 	(void)data;
+	t_redir *redir;
+
 	splited = special_split(*comands);
+	(*data)->comand = splited[0];
+	(*data)->args = splited;
+	(*data)->redir = redir_init(data, splited, comands, count_redir(splited));
 	while (*splited)
 	{
 		printf("splited: %s\n", *splited++);

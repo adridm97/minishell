@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/04/03 21:51:07 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/03 22:16:06 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ static int	count_words(char const *s)
 	in_word = 0;
 	while (s[++i])
 	{
-		if (s[i] == '<' || s[i] == '>' || s[i] == '|')
+		if (s[i] == '<' || s[i] == '>')
 			in_word = 0;
 		else
 		{
@@ -44,7 +44,7 @@ static int	lenword(char *s, int start)
 
 	i = start;
 	count = 0;
-	while (((s[i] != '<' && s[i] != '>' && s[i] != '|') && s[i] != '\0'))
+	while (((s[i] != '<' && s[i] != '>') && s[i] != '\0'))
 	{
 		i++;
 		count++;
@@ -69,7 +69,7 @@ static int	fill_mat(char **mat, char *s, int n_words)
 	c_word = 0;
 	while (c_word < n_words - 1)
 	{
-		while (s[start] == '<' || s[start] == '>' || s[start] == '|')
+		while (s[start] == '<' || s[start] == '>')
 			start++;
 		end = lenword(s, start);
 		mat[c_word] = ft_substr(s, start, end);
