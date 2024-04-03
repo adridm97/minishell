@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/03/31 22:42:08 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/04/03 21:15:35 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,10 +72,11 @@ typedef struct s_token
 }	t_token;
 
 // Structure:
-	// t_token			*token;
 	// char			*comand;
 	// char			**args;
 	// struct s_data	*next;
+	// struct s_redir	*redir;
+	// struct s_error	error;
 // args ha de uncluir NULL su ultima posicion, 
 //	esta struct es la utilizada por Adrian
 typedef struct s_data
@@ -93,6 +94,7 @@ int		add_token(char c, int type, t_token **token);
 int		lexer(char *input, t_data *data);
 int		typeing(char c, char *base);
 void	lexer_error(t_error *error);
+char	**special_split(char const *s);
 
 // Regular Colors
 # define BLACK "\x1b[0m"

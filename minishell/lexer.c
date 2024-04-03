@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/03/31 22:42:28 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/04/03 21:16:02 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,7 @@ int	typeing(char c, char *base)
 	return (6);
 }
 
-static void	print_token(t_token *token)
+static void	print_token(t_token *token, char **comands)
 {
 	while (token->next)
 	{
@@ -148,14 +148,38 @@ static void	print_token(t_token *token)
 		token = token->next;
 	}
 	printf("type: %i, value: %c\n", token->type, token->value);
+
+	while (*comands)
+	{
+		printf("comand: %s\n", *comands++);
+	}
 }
 
+void	go_data(t_data **data, char **comands)
+{
+	char **splited;
+	(void)data;
+	splited = special_split(*comands);
+	while (*splited)
+	{
+		printf("splited: %s\n", *splited++);
+	}
+}
+
+void	parser(t_data **data, t_token **token, char *input)
+{
+	char **comands;
+	(void)data;
+	comands = ft_split(input, '|');
+	go_data(data, comands);
+	print_token(*token, comands);
+}
 
 int	lexer(char *input, t_data *data)
 {
 	t_token	*token;
 	int		i;
-	(void)data;
+
 	i = -1;
 	token = NULL;
 	while (input[++i])
@@ -172,8 +196,15 @@ int	lexer(char *input, t_data *data)
 		}
 	}
 	if (token)
-		(print_token(token), check_closed(token, &data), \
-			check_gramathic(token, &data), lexer_error(&data->error));
+	{
+		(check_closed(token, &data), check_gramathic(token, &data));
+		if (data->error.is_error)
+			lexer_error(&data->error);
+		else
+			parser(&data, &token, input);
+	}
 	//clean_list();
 	return (1);
 }
+
+
