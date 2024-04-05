@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/03 22:29:09 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/06 00:21:16 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ int	check_closed(t_token *token, t_data **data)
 			open = 0;
 		token = token->next;
 	}
-		printf("%i\n", open);
 	if (open)
 	{
 		(*data)->error.error = ft_strdup("Syntax error");
@@ -140,20 +139,47 @@ int	typeing(char c, char *base)
 	return (6);
 }
 
-static void	print_token(t_token *token, char **comands)
+static void	print_data(t_data *data)
 {
-	while (token->next)
-	{
-		printf("type: %i, value: %c\n", token->type, token->value);
-		token = token->next;
-	}
-	printf("type: %i, value: %c\n", token->type, token->value);
+	int i;
+	int j;
 
-	while (*comands)
+	i = 0;
+	j = -1;
+	while (data)
 	{
-		printf("comand: %s\n", *comands++);
+		printf("data %i\nComand: %s\n",i, data->comand);
+		while(data->args[++j])
+			printf("arg[%i]: %s\n", j, data->args[j]);
+		j = -1;
+		while(data->redir)
+		{
+			printf("Redirs\n");
+			printf("path: %s, type: %i\n", data->redir->path, data->redir->type);
+			data->redir = data->redir->next;
+		}
+		data = data->next;
+		j = -1;
+		i++;
+		printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	}
 }
+
+// static void	print_token(t_token *token, char **comands)
+// {
+// 	while (token->next)
+// 	{
+// 		printf("type: %i, value: %c\n", token->type, token->value);
+// 		token = token->next;
+// 	}
+// 	printf("type: %i, value: %c\n", token->type, token->value);
+
+// 	while (*comands)
+// 	{
+// 		printf("comand: %s\n", *comands++);
+// 	}
+// }
+
 int	count_redir(char **splited)
 {
 	int i;
@@ -161,43 +187,128 @@ int	count_redir(char **splited)
 	i = 0;
 	while (splited[i])
 		i++;
-		return i;
+	return i;
 }
-redir_init(char **splited, char **comands, int n_redir)
+/*TODO Gestionar la redirección <>*/
+int	search_special(char *comands, int j)
 {
-	t_redir *list;
+	int type;
 
-	while ()
+	while (*comands)
 	{
-	list = (t_redir*)malloc(sizeof(t_redir));
-
+		if (j >= 0)
+		{
+			if (*comands == '<')
+			{
+				comands++;
+				if (*comands == '<')
+					type = D_MINOR;
+				else
+				{
+					type = MINOR;
+					comands--;
+				}
+				j--;
+			}
+			else if (*comands == '>')
+			{
+				comands++;
+				if (*comands == '>')
+					type = D_MAJOR;
+				else
+				{
+					type = MAJOR;
+					comands--;
+				}
+				j--;
+			}
+		}
+		comands++;
 	}
+	return (type);
+}
 
+void	add_redir(t_redir **res, t_redir **list)
+{	
+	t_redir *last;
+
+	if (!*res)
+	{
+		(*res) = *list;
+		(*res)->next = NULL;
+		return ;	
+	}
+	last = *res;
+	while (last->next)
+		last = last->next;
+	last->next = *list;
+	(*list)->next = NULL;
+}
+void	add_data(t_data **data, t_data **data_lst)
+{	
+	t_data *last;
+	if (!*data)
+	{
+		*data = *data_lst;
+		return ;
+	}
+	last = *data;
+	while (last->next)
+		last = last->next;
+	last->next = *data_lst;
+}
+
+void	redir_init(t_data **data, char **splited, char *comands, int n_redir)
+{
+	t_redir *res;
+	t_redir *list;
+	int	i;
+
+	i = 0;
+	res = NULL;
+	while (i < n_redir)
+	{
+		list = (t_redir*)malloc(sizeof(t_redir));
+		if (!list)
+			return ;
+		list->path = splited[i];
+		list->type = search_special(comands, i);
+		add_redir(&res, &list);
+		i++;
+	}
+	(*data)->redir = res;
 }
 
 void	go_data(t_data **data, char **comands)
 {
-	char **splited;
-	(void)data;
-	t_redir *redir;
+	char	**splited;
+	char	**args;
+	t_data	*data_lst;
+	int		i;
 
-	splited = special_split(*comands);
-	(*data)->comand = splited[0];
-	(*data)->args = splited;
-	(*data)->redir = redir_init(data, splited, comands, count_redir(splited));
-	while (*splited)
+	i = -1;
+	while (comands[++i])
 	{
-		printf("splited: %s\n", *splited++);
+		data_lst = (t_data *)malloc(sizeof(t_data));
+		splited = special_split(comands[i]);
+		args = ft_split(splited[0], ' ');
+		data_lst->comand = args[0];
+		data_lst->args = args;
+		splited++;
+		redir_init(&data_lst, splited, comands[i], count_redir(splited));
+		data_lst->next = NULL;
+		add_data(data, &data_lst);
 	}
+	print_data(*data);
+
 }
 
 void	parser(t_data **data, t_token **token, char *input)
 {
 	char **comands;
-	(void)data;
+	(void)token;
 	comands = ft_split(input, '|');
 	go_data(data, comands);
-	print_token(*token, comands);
 }
 
 int	lexer(char *input, t_data *data)
@@ -223,9 +334,9 @@ int	lexer(char *input, t_data *data)
 	if (token)
 	{
 		(check_closed(token, &data), check_gramathic(token, &data));
-		if (data->error.is_error)
-			lexer_error(&data->error);
-		else
+		// if ((*data)->error.is_error)
+		// 	lexer_error(&(*data)->error);
+		// else
 			parser(&data, &token, input);
 	}
 	//clean_list();

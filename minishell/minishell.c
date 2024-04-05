@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/03 21:40:57 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/06 00:14:34 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@
 int	main(int argc, char *argv[], char *env[])
 {
 	static char	*input;
-	t_data		data;
+	t_data		*data;
 
 	(void)env;
 	(void)argc;
 	(void)argv;
-	data.error.is_error = 0;
+	data = NULL;
 	while (1)
 	{
 		if (input)
@@ -36,7 +36,7 @@ int	main(int argc, char *argv[], char *env[])
 			break ;
 		if (input && *input)
 			add_history (input);
-		if (!lexer(input, &data))
+		if (!lexer(input, data))
 			exit(EXIT_FAILURE);
 		// printf("%s\n", data.token->value);
 	}

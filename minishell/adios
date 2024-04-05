@@ -1,23 +1,0 @@
-(lldb) target create "minishell"
-Current executable set to '/home/kevin/Escritorio/minishell/minishell/minishell' (x86_64).
-(lldb) settings set -- target.run-args  "hola"
-Process 23923 launched: '/home/kevin/Escritorio/minishell/minishell/minishell' (x86_64)
-[?2004h[34mMinishell: [0mq
-[?2004l0
-splited: q
-type: 6, value: q
-comand: q
-[?2004h[34mMinishell: [0mq
-[?2004l0
-splited: q
-type: 6, value: q
-comand: q
-[?2004h[34mMinishell: [0mq
-[?2004l0
-splited: q
-type: 6, value: q
-comand: q
-[?2004h[34mMinishell: [0mProcess 23923 stopped
-* thread #1, name = 'minishell', stop reason = signal SIGSTOP
-    frame #0: 0x00007ffff7d1b744 libc.so.6`__pselect at pselect.c:34:10
-^C
