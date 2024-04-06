@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/03/31 15:35:11 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/04/06 00:14:34 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,12 @@
 int	main(int argc, char *argv[], char *env[])
 {
 	static char	*input;
-	t_data		data;
+	t_data		*data;
 
 	(void)env;
 	(void)argc;
 	(void)argv;
+	data = NULL;
 	while (1)
 	{
 		if (input)
@@ -30,12 +31,12 @@ int	main(int argc, char *argv[], char *env[])
 			free (input);
 			input = (char *) NULL;
 		}
-		input = readline("\x1b[34m""Minishell: ""\x1b[0m");
+		input = readline(BLUE"Minishell: "BLACK);
 		if (!strcmp(input, "exit"))
 			break ;
 		if (input && *input)
 			add_history (input);
-		if (!lexer(input, &data))
+		if (!lexer(input, data))
 			exit(EXIT_FAILURE);
 		// printf("%s\n", data.token->value);
 	}

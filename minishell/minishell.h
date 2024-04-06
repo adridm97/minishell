@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/03/31 22:42:08 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/04/06 00:14:16 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # include <readline/history.h>
 # include "libft/libft.h"
 
-# define SPACE		0 // ' '
+# define SPACES		0 // ' '
 # define PIPE		1 // |
 # define MAJOR		2 // >
 # define MINOR		3 // <
@@ -72,10 +72,11 @@ typedef struct s_token
 }	t_token;
 
 // Structure:
-	// t_token			*token;
 	// char			*comand;
 	// char			**args;
 	// struct s_data	*next;
+	// struct s_redir	*redir;
+	// struct s_error	error;
 // args ha de uncluir NULL su ultima posicion, 
 //	esta struct es la utilizada por Adrian
 typedef struct s_data
@@ -84,7 +85,7 @@ typedef struct s_data
 	char			**args;
 	struct s_data	*next;
 	struct s_redir	*redir;
-	struct s_error	*error;
+	struct s_error	error;
 }	t_data;
 
 // lexer.c
@@ -92,5 +93,17 @@ int		new_token(char c, int type, t_token **token);
 int		add_token(char c, int type, t_token **token);
 int		lexer(char *input, t_data *data);
 int		typeing(char c, char *base);
+void	lexer_error(t_error *error);
+char	**special_split(char const *s);
+
+// Regular Colors
+# define BLACK "\x1b[0m"
+# define RED "\x1b[31m"
+# define GREEN "\x1b[32m"
+# define YELLOW "\x1b[33m"
+# define BLUE "\x1b[34m"
+# define MAGENTA "\x1b[35m"
+# define CYAN "\x1b[36m"
+# define WHITE "\x1b[37m"
 
 #endif
