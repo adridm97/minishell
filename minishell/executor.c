@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/04/02 21:40:49 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/06 12:25:59 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void execute_command(char *command, char *command_path)
 	}
 	else if (pid == 0)
 	{
-		char *args[] = {command, "executor.c", NULL};
+		char *args[] = {command, "-la", "libft", NULL};
 		if (execve(command_path, args, NULL) == -1)
 		{
 			perror("execve");
