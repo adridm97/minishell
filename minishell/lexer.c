@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/06 13:40:37 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/06 23:10:29 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	check_error(t_token *token, char type)
 	return (1);
 }
 
-int	check_gramathic(t_token *token, t_data **data)
+int	check_gramathic(t_token *token, t_error *error)
 {
 	char	flag;
 	char	type;
@@ -48,8 +48,8 @@ int	check_gramathic(t_token *token, t_data **data)
 		{
 			if (check_error(token, type))
 			{
-				(*data)->error.error = ft_strdup("Syntax error");
-				(*data)->error.is_error = 1;
+				error->error = ft_strdup("Syntax error");
+				error->is_error = 1;
 				return (ERROR);
 			}
 			flag = 0;
@@ -64,13 +64,12 @@ void	lexer_error(t_error *error)
 	if(error->is_error)
 	{
 		printf(RED"Minishell: %s\n"BLACK, error->error);
-		free(error->error);
 		error->error = NULL;
 		error->is_error = 0;
 	}
 }
 
-int	check_closed(t_token *token, t_data **data)
+int	check_closed(t_token *token, t_error *error)
 {
 	int quote;
 	char open;
@@ -89,8 +88,8 @@ int	check_closed(t_token *token, t_data **data)
 	}
 	if (open)
 	{
-		(*data)->error.error = ft_strdup("Syntax error");
-		(*data)->error.is_error = 1;
+		error->error = ft_strdup("Syntax error");
+		error->is_error = 1;
 	}
 	return (!open);
 }
@@ -229,7 +228,7 @@ int	search_special(char *comands, int j)
 }
 
 void	add_redir(t_redir **res, t_redir **list)
-{	
+{
 	t_redir *last;
 
 	if (!*res)
@@ -244,8 +243,44 @@ void	add_redir(t_redir **res, t_redir **list)
 	last->next = *list;
 	(*list)->next = NULL;
 }
+
+void	free_redir(t_redir **redir)
+{
+	t_redir *i;
+	t_redir *last;
+
+	i = *redir;
+	if (!i->next && i)
+	{
+		if (i->path)
+			free(i->path);
+		free(i);
+	}
+	else
+	{
+		while (i)
+		{
+			while (i->next)
+			{
+				last = i;
+				i = i->next;
+			}
+			if (i->path)
+				free(i->path);
+			free(i);
+			i = *redir;	
+			last->next = NULL;
+		}
+	}
+}
+
+void	free_data(t_data **data)
+{
+	(void)data;
+}
+
 void	add_data(t_data **data, t_data **data_lst)
-{	
+{
 	t_data *last;
 	if (!*data)
 	{
@@ -258,7 +293,7 @@ void	add_data(t_data **data, t_data **data_lst)
 	last->next = *data_lst;
 }
 
-void	redir_init(t_data **data, char **splited, char *comands, int n_redir)
+int	redir_init(t_data **data, char **splited, char *comands, int n_redir)
 {
 	t_redir *res;
 	t_redir *list;
@@ -270,16 +305,17 @@ void	redir_init(t_data **data, char **splited, char *comands, int n_redir)
 	{
 		list = (t_redir*)malloc(sizeof(t_redir));
 		if (!list)
-			return ;
+			return (free_redir(&res), lexer_error(&(t_error){"Memory error",1}), ERROR);
 		list->path = splited[i];
 		list->type = search_special(comands, i);
 		add_redir(&res, &list);
 		i++;
 	}
 	(*data)->redir = res;
+	return (1);
 }
 
-void	go_data(t_data **data, char **comands)
+int	go_data(t_data **data, char **comands)
 {
 	char	**splited;
 	char	**args;
@@ -290,60 +326,62 @@ void	go_data(t_data **data, char **comands)
 	while (comands[++i])
 	{
 		data_lst = (t_data *)malloc(sizeof(t_data));
+		if (!data_lst)
+			return (free_data(data), lexer_error(&(t_error){"Memory error", 1}), ERROR);
 		splited = special_split(comands[i]);
+		if (!splited)
+			return (free_data(data), lexer_error(&(t_error){"Memory error", 1}), ERROR);
 		args = ft_split(splited[0], ' ');
 		data_lst->comand = args[0];
 		data_lst->args = args;
 		splited++;
-		redir_init(&data_lst, splited, comands[i], count_redir(splited));
+		if (!redir_init(&data_lst, splited, comands[i], count_redir(splited)))
+			return (ERROR);
 		data_lst->next = NULL;
 		add_data(data, &data_lst);
 	}
 	print_data(*data);
-
+	return (1);
 }
 
-void	parser(t_data **data, t_token **token, char *input)
+int	parser(t_data **data, t_token **token, char *input)
 {
 	char **comands;
 	(void)token;
 	comands = ft_split(input, '|');
-	go_data(data, comands);
+	if (go_data(data, comands))
+		return (ERROR);
+	return (1);
 }
 
 t_data	*lexer(char *input, t_data *data)
 {
 	t_token	*token;
+	t_error	error;
 	int		i;
 
 	i = -1;
 	token = NULL;
+	error.is_error = 0;
 	while (input[++i])
 	{
 		if (!token)
 		{
 			if (!new_token(input[i], typeing(input[i], " |><\'\""), &token))
-				return (NULL);
+				return (lexer_error(&(t_error){"Memory error",1}), NULL);
 		}
 		else
 		{
 			if (!add_token(input[i], typeing(input[i], " |><\'\""), &token))
-				return (NULL);
+				return (lexer_error(&(t_error){"Memory error",1}), NULL);
 		}
 	}
-//	if (token)
-//		print_token(token);
-//	if (lexer_error(data->error))
-//		return (0);
-	{
-		(check_closed(token, &data), check_gramathic(token, &data));
-		// if ((*data)->error.is_error)
-		// 	lexer_error(&(*data)->error);
-		// else	
-		parser(&data, &token, input);
-	}
+	(check_closed(token, &error), check_gramathic(token, &error));
+	if (error.is_error)
+		lexer_error(&error);
+	else	
+	if (parser(&data, &token, input))
+		data = NULL;
 	//clean_list();
 	return (data);
 }
-
-
