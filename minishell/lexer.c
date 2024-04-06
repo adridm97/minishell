@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/06 12:47:06 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/06 13:40:37 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -311,7 +311,7 @@ void	parser(t_data **data, t_token **token, char *input)
 	go_data(data, comands);
 }
 
-int	lexer(char *input, t_data *data)
+t_data	*lexer(char *input, t_data *data)
 {
 	t_token	*token;
 	int		i;
@@ -323,12 +323,12 @@ int	lexer(char *input, t_data *data)
 		if (!token)
 		{
 			if (!new_token(input[i], typeing(input[i], " |><\'\""), &token))
-				return (0);
+				return (NULL);
 		}
 		else
 		{
 			if (!add_token(input[i], typeing(input[i], " |><\'\""), &token))
-				return (0);
+				return (NULL);
 		}
 	}
 //	if (token)
@@ -339,11 +339,11 @@ int	lexer(char *input, t_data *data)
 		(check_closed(token, &data), check_gramathic(token, &data));
 		// if ((*data)->error.is_error)
 		// 	lexer_error(&(*data)->error);
-		// else
-			parser(&data, &token, input);
+		// else	
+		parser(&data, &token, input);
 	}
 	//clean_list();
-	return (1);
+	return (data);
 }
 
 

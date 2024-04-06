@@ -6,13 +6,13 @@
 /*   By: aduenas- <aduenas-@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/04/06 12:25:59 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/06 13:40:20 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void execute_command(char *command, char *command_path)
+void execute_command(t_data *data, char *command_path)
 {
 	pid_t pid = fork();
 
@@ -23,8 +23,8 @@ void execute_command(char *command, char *command_path)
 	}
 	else if (pid == 0)
 	{
-		char *args[] = {command, "-la", "libft", NULL};
-		if (execve(command_path, args, NULL) == -1)
+		//char *args[] = {command,  "-la", "libft", NULL};
+		if (execve(command_path, data->args, NULL) == -1)
 		{
 			perror("execve");
 			exit(EXIT_FAILURE);
@@ -41,12 +41,13 @@ void execute_command(char *command, char *command_path)
 	}
 }
 
-int is_valid_command(char *command)
+int is_valid_command(t_data *data)
 {
 	int		i;
 	char	*path;
-	char	*command_path;
-   
+	char	*comand_path;
+	//char	**token;
+
 	path = getenv("PATH");
 	i = 0;
 	if (path == NULL)
@@ -57,18 +58,18 @@ int is_valid_command(char *command)
 	char **token = ft_split(path, ':');
 	while (token[i] != NULL)
 	{
-		command_path = ft_strjoin(token[i], "/");
-		command_path = ft_strjoin(command_path, command);
-		printf("%s/%s\n", token[i], command);
-		if (access(command_path, X_OK) == 0)
+		comand_path = ft_strjoin(token[i], "/");
+		comand_path = ft_strjoin(comand_path, data->comand);
+		printf("%s/%s\n", token[i], data->comand);
+		if (access(comand_path, X_OK) == 0)
 		{
-			execute_command(command, command_path);
-			printf("El comando \"%s\" es válido en la ruta: %s\n", command, command_path);
-			free(command_path);
+			execute_command(data, comand_path);
+			printf("El comando \"%s\" es válido en la ruta: %s\n", data->comand, comand_path);
+			free(comand_path);
 			return 1;
 		}
 		i++;
 	}
-	free(command_path);
+	free(comand_path);
 	return 0;
 }
