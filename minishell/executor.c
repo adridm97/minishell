@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/04/06 13:40:20 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/07 20:53:30 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,31 @@ void execute_command(t_data *data, char *command_path)
 	}
 }
 
+void	handle_redir(t_data *data)
+{
+	int fd;
+
+	printf("el tipo de redireccion es: %d\n", data->redir->type);
+	if (data->redir != NULL)
+	{
+		if (data->redir->type == MAJOR)
+		{
+			fd = open("hola", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			if (fd == -1)
+			{
+				perror("open");
+				exit(EXIT_FAILURE);
+			}
+			if (dup2(fd, STDOUT_FILENO) == -1)
+			{
+				perror("dup2");
+				exit(EXIT_FAILURE);
+			}
+			close(fd);
+		}
+	}
+}
+
 int is_valid_command(t_data *data)
 {
 	int		i;
@@ -48,6 +73,7 @@ int is_valid_command(t_data *data)
 	char	*comand_path;
 	//char	**token;
 
+	handle_redir(data);
 	path = getenv("PATH");
 	i = 0;
 	if (path == NULL)

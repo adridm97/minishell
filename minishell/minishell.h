@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/06 13:36:13 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/07 20:24:13 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft/libft.h"
+# include <fcntl.h>
 
 # define SPACES		0 // ' '
 # define PIPE		1 // |
@@ -108,5 +109,6 @@ char	**special_split(char const *s);
 
 //executor.c
 int		is_valid_command(t_data *data);
-
+void	execute_command(t_data *data, char *command_path);
+void	handle_redir(t_data *data);
 #endif
