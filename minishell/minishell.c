@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/07 13:00:13 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/07 21:13:29 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +35,12 @@ int	main(int argc, char *argv[], char *env[])
 		if (input && *input)
 			add_history (input);
 		data = lexer(input, data);
-		// if (!data)
-		// 	exit(EXIT_FAILURE);
-		// is_valid_command(data);
+		 if (!data)
+		 	exit(EXIT_FAILURE);
+		 is_valid_command(data);
 		// printf("%s\n", data.token->value);
 		free_data(&data);
+		data = NULL;
 	}
 	return (0);
 }

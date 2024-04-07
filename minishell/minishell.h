@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/06 23:12:45 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/07 21:05:06 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include "libft/libft.h"
 # include <sys/types.h>
 # include <sys/wait.h>
+#include <fcntl.h>
 
 # define SPACES		0 // ' '
 # define PIPE		1 // |
@@ -109,8 +110,8 @@ void	free_data(t_data **data);
 
 //executor.c
 int		is_valid_command(t_data *data);
-
-
+void	execute_command(t_data *data, char *command_path);
+void	handle_redir(t_data *data);
 
 // Regular Colors
 # define BLACK "\x1b[0m"
