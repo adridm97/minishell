@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/07 21:28:54 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/07 22:06:04 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ int	main(int argc, char *argv[], char *env[])
 	data = NULL;
 	while (1)
 	{
+		if (data)
+			data = NULL;
 		if (input)
 		{
 			free (input);
