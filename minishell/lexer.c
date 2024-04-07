@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/06 23:10:29 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/07 13:02:06 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,36 +247,49 @@ void	add_redir(t_redir **res, t_redir **list)
 void	free_redir(t_redir **redir)
 {
 	t_redir *i;
-	t_redir *last;
+	if (!(*redir))
+		return ;
+	while ((*redir)->next)
+	{
+		i = *redir;
+		free((*redir)->path);
+		free(*redir);
+		(*redir) = i;
+	}
+	free((*redir)->path);
+	free(*redir);
+}
 
-	i = *redir;
-	if (!i->next && i)
+void	free_args(char **args)
+{
+	int	i;
+
+	i = -1;
+	while (args[++i])
 	{
-		if (i->path)
-			free(i->path);
-		free(i);
+		if (args[i])
+			free(args[i]);
 	}
-	else
-	{
-		while (i)
-		{
-			while (i->next)
-			{
-				last = i;
-				i = i->next;
-			}
-			if (i->path)
-				free(i->path);
-			free(i);
-			i = *redir;	
-			last->next = NULL;
-		}
-	}
+	if (args)
+	free(args);
 }
 
 void	free_data(t_data **data)
 {
-	(void)data;
+	t_data *del;
+
+	while ((*data)->next)
+	{
+		del = (*data)->next;
+		free_args((*data)->args);
+		free_redir(&(*data)->redir);
+		free(*data);
+		*data = del;
+	}
+	free_args((*data)->args);
+	free_redir(&(*data)->redir);
+	free(*data);
+	*data = NULL;
 }
 
 void	add_data(t_data **data, t_data **data_lst)
@@ -315,7 +328,24 @@ int	redir_init(t_data **data, char **splited, char *comands, int n_redir)
 	return (1);
 }
 
-int	go_data(t_data **data, char **comands)
+int	search_quotes(t_token *token)
+{
+	while (token)
+	{
+		if (token->type == QUOTE || token->type == D_QUOTE)
+			return (1);
+		token = token->next;
+	}
+	return (0);
+}
+
+char	**repair_quots(char **args, t_token *token)
+{
+	if (!search_quotes(token))
+		return(args);
+	return (args);
+}
+int	go_data(t_data **data, char **comands, t_token *token)
 {
 	char	**splited;
 	char	**args;
@@ -333,8 +363,8 @@ int	go_data(t_data **data, char **comands)
 			return (free_data(data), lexer_error(&(t_error){"Memory error", 1}), ERROR);
 		args = ft_split(splited[0], ' ');
 		data_lst->comand = args[0];
-		data_lst->args = args;
-		splited++;
+		data_lst->args = repair_quots(args, token);
+		(free(splited[0]), splited++);
 		if (!redir_init(&data_lst, splited, comands[i], count_redir(splited)))
 			return (ERROR);
 		data_lst->next = NULL;
@@ -347,13 +377,14 @@ int	go_data(t_data **data, char **comands)
 int	parser(t_data **data, t_token **token, char *input)
 {
 	char **comands;
+
 	(void)token;
 	comands = ft_split(input, '|');
-	if (go_data(data, comands))
+	if (go_data(data, comands, *token))
 		return (ERROR);
 	return (1);
 }
-
+/*TODO Este caso rompe con segfault: ahola>adios|adios>ee||*/
 t_data	*lexer(char *input, t_data *data)
 {
 	t_token	*token;
