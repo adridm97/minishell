@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/04/13 11:48:07 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/13 11:53:15 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void	handle_redir(t_data *data)
 		printf("redir es null\n");
 	if (data->redir != NULL)
 	{
+		printf("entra");
 		if (data->redir->type == MAJOR)
 		{
 			fd = open("hola", O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -74,6 +75,7 @@ int is_valid_command(t_data *data)
 	char	*comand_path;
 	//char	**token;
 
+	printf("%d\n", data->redir->type);
 	handle_redir(data);
 	path = getenv("PATH");
 	i = 0;
