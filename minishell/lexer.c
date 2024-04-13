@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/08 22:04:55 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/13 16:49:33 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -388,10 +388,11 @@ int	parser(t_data **data, t_token **token, char *input)
 {
 	char **comands;
 
-	(void)token;
+	(void)data;
 	comands = split_token(input, *token);
-	if (!go_data(data, comands, *token))
-		return (ERROR);
+	(void)comands;
+	// if (!go_data(data, comands, *token))
+	// 	return (ERROR);
 	return (1);
 }
 /*TODO Este caso rompe con segfault: ahola>adios|adios>ee||*/
