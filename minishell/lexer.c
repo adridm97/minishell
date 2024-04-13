@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/07 23:29:56 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/08 22:04:55 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ int	check_closed(t_token *token, t_error *error)
 	return (!open);
 }
 
-int	new_token(char c, int type, t_token **token)
+int	new_token(char c, int type, t_token **token, int index)
 {
 	t_token	*new;
 
@@ -104,6 +104,7 @@ int	new_token(char c, int type, t_token **token)
 	(*new).next = NULL;
 	(*new).value = c;
 	(*new).type = type;
+	(*new).index = index;
 	*token = new;
 	return (1);
 }
@@ -119,7 +120,7 @@ int	add_token(char c, int type, t_token **token)
 	{
 		lst = lst->next;
 	}
-	if (!new_token(c, type, &new))
+	if (!new_token(c, type, &new, lst->index + 1))
 		return (0);
 	lst->next = new;
 	return (1);
@@ -349,6 +350,10 @@ char	**repair_quots(char **args, t_token *token)
 {
 	if (!search_quotes(token))
 		return(args);
+	while (token->type != QUOTE && token->type != D_QUOTE)
+	{
+
+	}
 	return (args);
 }
 int	go_data(t_data **data, char **comands, t_token *token)
@@ -378,13 +383,13 @@ int	go_data(t_data **data, char **comands, t_token *token)
 	}
 	return (1);
 }
-
+/*falta proteger split*/
 int	parser(t_data **data, t_token **token, char *input)
 {
 	char **comands;
 
 	(void)token;
-	comands = ft_split(input, '|');
+	comands = split_token(input, *token);
 	if (!go_data(data, comands, *token))
 		return (ERROR);
 	return (1);
@@ -403,7 +408,7 @@ t_data	*lexer(char *input, t_data *data)
 	{
 		if (!token)
 		{
-			if (!new_token(input[i], typeing(input[i], " |><\'\""), &token))
+			if (!new_token(input[i], typeing(input[i], " |><\'\""), &token, 0))
 				return (lexer_error(&(t_error){"Memory error",1}), NULL);
 		}
 		else
@@ -419,6 +424,5 @@ t_data	*lexer(char *input, t_data *data)
 	if (!parser(&data, &token, input))
 		data = NULL;
 	print_data(data);
-	//clean_list();
 	return (data);
 }

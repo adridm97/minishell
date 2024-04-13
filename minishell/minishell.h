@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/07 22:06:54 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/09 09:56:47 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ Structure:
 */
 typedef struct s_token
 {
+	int				index;
 	int				type;
 	char			value;
 	struct s_token	*next;
@@ -100,13 +101,16 @@ typedef struct s_data
 }	t_data;
 
 // lexer.c
-int		new_token(char c, int type, t_token **token);
+int		new_token(char c, int type, t_token **token, int index);
 int		add_token(char c, int type, t_token **token);
 t_data	*lexer(char *input, t_data *data);
 int		typeing(char c, char *base);
 void	lexer_error(t_error *error);
-char	**special_split(char const *s);
 void	free_data(t_data **data);
+
+// split things
+char	**special_split(char const *s);
+char	**split_token(char const *s, t_token *token);
 
 //executor.c
 int		is_valid_command(t_data *data);
