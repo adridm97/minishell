@@ -6,11 +6,13 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/04/13 11:53:15 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/13 16:40:45 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void handle_redir(t_data *data);
 
 void execute_command(t_data *data, char *command_path)
 {
@@ -24,6 +26,8 @@ void execute_command(t_data *data, char *command_path)
 	else if (pid == 0)
 	{
 		//char *args[] = {command,  "-la", "libft", NULL};
+		if (data->redir != NULL)
+			handle_redir(data);
 		if (execve(command_path, data->args, NULL) == -1)
 		{
 			perror("execve");
@@ -44,15 +48,16 @@ void execute_command(t_data *data, char *command_path)
 void	handle_redir(t_data *data)
 {
 	int fd;
-	
+	char	buf[1024];
+	ssize_t	bytes_read;
+
 	if (data->redir == NULL)
 		printf("redir es null\n");
 	if (data->redir != NULL)
 	{
-		printf("entra");
 		if (data->redir->type == MAJOR)
 		{
-			fd = open("hola", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			fd = open(data->redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			if (fd == -1)
 			{
 				perror("open");
@@ -65,6 +70,54 @@ void	handle_redir(t_data *data)
 			}
 			close(fd);
 		}
+		else if (data->redir->type == D_MAJOR)
+		{
+			fd = open(data->redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			if (fd == -1)
+			{
+				perror("open");
+				exit(EXIT_FAILURE);
+			}
+			if (dup2(fd, STDOUT_FILENO) == -1)
+			{
+				perror("dup2");
+				exit(EXIT_FAILURE);
+			}
+			close(fd);
+		}
+		else if (data->redir->type == MINOR)
+		{
+			fd = open(data->redir->path, O_RDONLY);
+			if (fd == -1)
+			{
+				perror("open");
+				exit(EXIT_FAILURE);
+			}
+			if (dup2(fd, STDIN_FILENO) == -1)
+			{
+				perror("dup2");
+				exit(EXIT_FAILURE);
+			}
+			close(fd);
+		}
+		else if (data->redir->type == D_MINOR)
+		{
+			while ((bytes_read = read(STDIN_FILENO, buf, sizeof(buf))) > 0)
+			{
+				if (write(STDIN_FILENO, buf, bytes_read) == -1)
+				{
+					perror("write");
+					exit(EXIT_FAILURE);
+				}
+				if (!ft_strncmp(buf, data->redir->path, ft_strlen(data->redir->path)))
+					break ;
+			}
+			if (bytes_read == -1)
+			{
+				perror("read");
+				exit(EXIT_FAILURE);
+			}
+		}
 	}
 }
 
@@ -75,8 +128,6 @@ int is_valid_command(t_data *data)
 	char	*comand_path;
 	//char	**token;
 
-	printf("%d\n", data->redir->type);
-	handle_redir(data);
 	path = getenv("PATH");
 	i = 0;
 	if (path == NULL)
