@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/04/13 19:58:09 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/14 01:15:53 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ char *next_word(t_token *token, int *start)
 	{
 		if (ctoken->type >= QUOTE && ctoken->type <= D_QUOTE && ctoken)
 		{
-			if (ctoken->type != type && type >= 0 && ctoken)
+			if (ctoken && type >= 0 && ctoken->type != type)
 			{
 				*start += 1;
 				if (!ctoken)
@@ -63,32 +63,37 @@ char *next_word(t_token *token, int *start)
 				else
 					str = ft_substr(&ctoken->value,0,1);				
 				ctoken = ctoken->next;
-				break;
 			}
-			type = ctoken->type;
-			*start += 1;
-			ctoken = ctoken->next;
-			if (!is_coma)
-				is_coma = 1;
 			else
 			{
-				is_coma = 0;
-				type = -1;
+				type = ctoken->type;
+				*start += 1;
+				ctoken = ctoken->next;
+				if (!is_coma)
+					is_coma = 1;
+				else
+				{
+					is_coma = 0;
+					type = -1;
+				}
 			}
 		}
-		if (!ctoken)
-			break;
-		if (str)
-			str = ft_strjoin(str, ft_substr(&ctoken->value,0,1));
 		else
-			str = ft_substr(&ctoken->value,0,1);
-		ctoken = ctoken->next;
-		*start += 1;
+		{
+			if (!ctoken)
+				break;
+			if (str)
+				str = ft_strjoin(str, ft_substr(&ctoken->value,0,1));
+			else
+				str = ft_substr(&ctoken->value,0,1);
+			ctoken = ctoken->next;
+			*start += 1;
+		}
 	}
 	printf("start= %i, str= %s\n", *start, str);
 	return (str);
 }
-/*TODO hola adios|hola>>cola no esta funcionando este caso. "hola afi""dada'" este tampoco*/
+/*TODO "hola afi""dada'" no funciona*/
 void	advance_special(t_token *token, int *start)
 {
 	t_token *ctoken;
@@ -101,16 +106,24 @@ void	advance_special(t_token *token, int *start)
 	if (ctoken && ctoken->type == MINOR)
 	{
 		*start += 1;
-		ctoken = token;
+		ctoken = ctoken->next;
 		if (ctoken->type == MINOR)
 			*start += 1;
 	}
 	else if (ctoken && ctoken->type == MAJOR)
 	{
 		*start += 1;
-		ctoken = token;
+		ctoken = ctoken->next;
 		if (ctoken->type == MAJOR)
 			*start += 1;
+	}
+	else if (ctoken && ctoken->type == SPACES)
+	{
+		while(ctoken->type == SPACES)
+		{
+			*start += 1;
+			ctoken = ctoken->next;
+		}
 	}
 	else
 		*start += 1;
