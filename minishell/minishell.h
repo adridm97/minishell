@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/07 21:20:08 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/13 11:47:30 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include "libft/libft.h"
 # include <sys/types.h>
 # include <sys/wait.h>
-#include <fcntl.h>
+# include <fcntl.h>
 
 # define SPACES		0 // ' '
 # define PIPE		1 // |

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/07 13:02:06 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/07 23:29:56 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,18 @@ int	typeing(char c, char *base)
 	return (6);
 }
 
+void	print_redir(t_redir *redir)
+{
+	if (!redir)
+		return;
+	while(redir)
+	{
+		printf("Redirs\n");
+		printf("path: %s, type: %i\n", redir->path, redir->type);
+		redir = redir->next;
+	}
+}
+
 static void	print_data(t_data *data)
 {
 	int i;
@@ -151,12 +163,7 @@ static void	print_data(t_data *data)
 		while(data->args[++j])
 			printf("arg[%i]: %s\n", j, data->args[j]);
 		j = -1;
-		while(data->redir)
-		{
-			printf("Redirs\n");
-			printf("path: %s, type: %i\n", data->redir->path, data->redir->type);
-			data->redir = data->redir->next;
-		}
+		print_redir(data->redir);
 		data = data->next;
 		j = -1;
 		i++;
@@ -227,21 +234,19 @@ int	search_special(char *comands, int j)
 	return (type);
 }
 
-void	add_redir(t_redir **res, t_redir **list)
+void	add_redir(t_redir **res, t_redir *list)
 {
-	t_redir *last;
+	t_redir *temporal;
 
-	if (!*res)
+	temporal = (*res);
+	if ((*res))
 	{
-		(*res) = *list;
-		(*res)->next = NULL;
-		return ;	
+		while (temporal->next != NULL)
+			temporal = temporal->next;
+		temporal->next = list;
 	}
-	last = *res;
-	while (last->next)
-		last = last->next;
-	last->next = *list;
-	(*list)->next = NULL;
+	if (!(*res))
+		((*res) = list);
 }
 
 void	free_redir(t_redir **redir)
@@ -277,7 +282,8 @@ void	free_args(char **args)
 void	free_data(t_data **data)
 {
 	t_data *del;
-
+	if (!*data)
+		return ;
 	while ((*data)->next)
 	{
 		del = (*data)->next;
@@ -295,6 +301,7 @@ void	free_data(t_data **data)
 void	add_data(t_data **data, t_data **data_lst)
 {
 	t_data *last;
+	
 	if (!*data)
 	{
 		*data = *data_lst;
@@ -308,23 +315,22 @@ void	add_data(t_data **data, t_data **data_lst)
 
 int	redir_init(t_data **data, char **splited, char *comands, int n_redir)
 {
-	t_redir *res;
 	t_redir *list;
 	int	i;
 
 	i = 0;
-	res = NULL;
+	(*data)->redir = NULL;
 	while (i < n_redir)
 	{
 		list = (t_redir*)malloc(sizeof(t_redir));
 		if (!list)
-			return (free_redir(&res), lexer_error(&(t_error){"Memory error",1}), ERROR);
+			return (free_redir(&(*data)->redir), lexer_error(&(t_error){"Memory error",1}), ERROR);
 		list->path = splited[i];
 		list->type = search_special(comands, i);
-		add_redir(&res, &list);
+		list->next = NULL;
+		add_redir(&(*data)->redir, list);
 		i++;
 	}
-	(*data)->redir = res;
 	return (1);
 }
 
@@ -370,7 +376,6 @@ int	go_data(t_data **data, char **comands, t_token *token)
 		data_lst->next = NULL;
 		add_data(data, &data_lst);
 	}
-	print_data(*data);
 	return (1);
 }
 
@@ -380,7 +385,7 @@ int	parser(t_data **data, t_token **token, char *input)
 
 	(void)token;
 	comands = ft_split(input, '|');
-	if (go_data(data, comands, *token))
+	if (!go_data(data, comands, *token))
 		return (ERROR);
 	return (1);
 }
@@ -411,8 +416,9 @@ t_data	*lexer(char *input, t_data *data)
 	if (error.is_error)
 		lexer_error(&error);
 	else	
-	if (parser(&data, &token, input))
+	if (!parser(&data, &token, input))
 		data = NULL;
+	print_data(data);
 	//clean_list();
 	return (data);
 }
