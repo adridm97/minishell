@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/04/07 21:03:13 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/07 21:47:57 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,9 @@ void execute_command(t_data *data, char *command_path)
 void	handle_redir(t_data *data)
 {
 	int fd;
-
-	printf("el tipo de redireccion es: %d\n", data->redir->type);
+	
+	if (data->redir == NULL)
+		printf("redir es null\n");
 	if (data->redir != NULL)
 	{
 		if (data->redir->type == MAJOR)
