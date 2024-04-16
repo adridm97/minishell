@@ -6,13 +6,38 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/04/13 16:40:45 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/16 21:38:10 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 void handle_redir(t_data *data);
+
+void	here_doc(char *limiter, int fd_out)
+{
+	char	*line;
+
+	line = NULL;
+	printf("ta dentro\n");
+	while(1)
+	{
+		get_next_line(fd_out);
+		if (ft_strncmp(line, limiter, ft_strlen(limiter) == 0))
+		{
+			printf("el compare\n");
+			free(line);
+			break ;
+		}
+		if (write(fd_out, line, ft_strlen(line)) == -1)
+		{
+			perror("write");
+			exit(EXIT_FAILURE);
+		}
+		free(line);
+		line = NULL;
+	}
+}
 
 void execute_command(t_data *data, char *command_path)
 {
@@ -48,8 +73,8 @@ void execute_command(t_data *data, char *command_path)
 void	handle_redir(t_data *data)
 {
 	int fd;
-	char	buf[1024];
-	ssize_t	bytes_read;
+	int	fd_pipe[2];
+	pid_t reader_pid;
 
 	if (data->redir == NULL)
 		printf("redir es null\n");
@@ -102,20 +127,33 @@ void	handle_redir(t_data *data)
 		}
 		else if (data->redir->type == D_MINOR)
 		{
-			while ((bytes_read = read(STDIN_FILENO, buf, sizeof(buf))) > 0)
+			if (pipe(fd_pipe) == -1)
 			{
-				if (write(STDIN_FILENO, buf, bytes_read) == -1)
+				perror("pipe");
+				exit(EXIT_FAILURE);
+			}
+			reader_pid = fork();
+			if (reader_pid == -1)
+			{
+				perror("fork");
+				exit(EXIT_FAILURE);
+			}
+			else if (reader_pid == 0)
+			{
+				close(fd_pipe[0]);
+				here_doc(data->redir->path, fd_pipe[1]);
+				close(fd_pipe[1]);
+				exit(EXIT_SUCCESS);
+			}
+			else
+			{
+				close(fd_pipe[1]);
+				if (dup2(fd_pipe[0], STDIN_FILENO) == -1)
 				{
-					perror("write");
+					perror("dup2");
 					exit(EXIT_FAILURE);
 				}
-				if (!ft_strncmp(buf, data->redir->path, ft_strlen(data->redir->path)))
-					break ;
-			}
-			if (bytes_read == -1)
-			{
-				perror("read");
-				exit(EXIT_FAILURE);
+				close(fd_pipe[0]);
 			}
 		}
 	}

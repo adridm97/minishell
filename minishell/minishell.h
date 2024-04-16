@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/13 16:45:57 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/16 21:23:48 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft/libft.h"
+# include "libft/get_next_line.h"
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <fcntl.h>
@@ -33,7 +34,6 @@
 # define NO_QUOTE	6 // string sin comillas
 # define D_MAJOR	7 // >>
 # define D_MINOR	8 // <<
-# define BUFFER_SIZE 1024
 
 # define ERROR		0
 
@@ -113,6 +113,8 @@ void	free_data(t_data **data);
 int		is_valid_command(t_data *data);
 void	execute_command(t_data *data, char *command_path);
 void	handle_redir(t_data *data);
+void	here_doc(char *limiter, int fd_out);
+
 // Regular Colors
 # define BLACK "\x1b[0m"
 # define RED "\x1b[31m"
