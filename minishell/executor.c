@@ -14,28 +14,93 @@
 
 void handle_redir(t_data *data);
 
-void	here_doc(char *limiter, int fd_out)
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	size_t			i;
+	unsigned char	*str1;
+	unsigned char	*str2;
+
+	str1 = (unsigned char *)s1;
+	str2 = (unsigned char *)s2;
+	i = 0;
+	while (str1[i] && str2[i] && str1[i] == str2[i])
+		i++;
+	return (str1[i] - str2[i]);
+}
+
+void	*ft_realloc(void *ptr, size_t size)
+{
+	void	*new_ptr;
+
+	new_ptr = malloc(size);
+	if (!new_ptr)
+		return (NULL);
+	if (ptr)
+	{
+		ft_memcpy(new_ptr, ptr, size);
+		free (ptr);
+	}
+	return (new_ptr);
+}
+
+void	check_buffer_size(char **input_buffer, char *line)
+{
+	size_t	current_len;
+	size_t	new_len;
+
+	current_len = 0;
+	new_len = 0;
+	if (*input_buffer == NULL)
+		*input_buffer = ft_strdup(line);
+	else
+	{
+		current_len = ft_strlen(*input_buffer);
+		new_len = current_len + ft_strlen(line) + 2;
+		*input_buffer = ft_realloc(*input_buffer, new_len);
+		ft_strlcat(*input_buffer, "\n", new_len);
+		ft_strlcat(*input_buffer, line, new_len);
+	}
+}
+
+static void	handle_siginthc(int sig)
+{
+	if (sig == SIGINT)
+	{
+		printf("\n");
+		exit(EXIT_SUCCESS);
+	}
+	else if (sig == SIGQUIT)
+	{
+		printf("\b\b  \b\b");
+		fflush(stdout);
+	}
+}
+
+void	here_doc(t_data *data)
 {
 	char	*line;
+	char	*input_buffer;
 
-	line = NULL;
-	printf("ta dentro\n");
-	while(1)
+	signal(SIGINT, handle_siginthc);
+	signal(SIGQUIT, handle_siginthc);
+	printf("> ");
+	if (!data->redir->path)
+		return (printf("Error: no delimiter\n"), (void)(0));
+	line = "";
+	signal(SIGQUIT, SIG_IGN);
+	while (1)
 	{
-		get_next_line(fd_out);
-		if (ft_strncmp(line, limiter, ft_strlen(limiter) == 0))
+		line = readline("");
+		if (!line)
+			exit(1);
+		if (ft_strcmp(line, data->redir->path) == 0)
 		{
-			printf("el compare\n");
 			free(line);
 			break ;
 		}
-		if (write(fd_out, line, ft_strlen(line)) == -1)
-		{
-			perror("write");
-			exit(EXIT_FAILURE);
-		}
+		check_buffer_size(&input_buffer, line);
 		free(line);
-		line = NULL;
+		printf("> ");
 	}
 }
 
@@ -73,8 +138,6 @@ void execute_command(t_data *data, char *command_path)
 void	handle_redir(t_data *data)
 {
 	int fd;
-	int	fd_pipe[2];
-	pid_t reader_pid;
 
 	if (data->redir == NULL)
 		printf("redir es null\n");
@@ -127,34 +190,7 @@ void	handle_redir(t_data *data)
 		}
 		else if (data->redir->type == D_MINOR)
 		{
-			if (pipe(fd_pipe) == -1)
-			{
-				perror("pipe");
-				exit(EXIT_FAILURE);
-			}
-			reader_pid = fork();
-			if (reader_pid == -1)
-			{
-				perror("fork");
-				exit(EXIT_FAILURE);
-			}
-			else if (reader_pid == 0)
-			{
-				close(fd_pipe[0]);
-				here_doc(data->redir->path, fd_pipe[1]);
-				close(fd_pipe[1]);
-				exit(EXIT_SUCCESS);
-			}
-			else
-			{
-				close(fd_pipe[1]);
-				if (dup2(fd_pipe[0], STDIN_FILENO) == -1)
-				{
-					perror("dup2");
-					exit(EXIT_FAILURE);
-				}
-				close(fd_pipe[0]);
-			}
+			here_doc(data);
 		}
 	}
 }

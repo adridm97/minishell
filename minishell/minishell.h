@@ -113,7 +113,7 @@ void	free_data(t_data **data);
 int		is_valid_command(t_data *data);
 void	execute_command(t_data *data, char *command_path);
 void	handle_redir(t_data *data);
-void	here_doc(char *limiter, int fd_out);
+void	here_doc(t_data *data);
 
 // Regular Colors
 # define BLACK "\x1b[0m"
