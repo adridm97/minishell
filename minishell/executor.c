@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/04/16 21:38:10 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/21 03:15:49 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,94 +14,31 @@
 
 void handle_redir(t_data *data);
 
-int	ft_strcmp(const char *s1, const char *s2)
+static void	sig_handler_def(int signum)
 {
-	size_t			i;
-	unsigned char	*str1;
-	unsigned char	*str2;
-
-	str1 = (unsigned char *)s1;
-	str2 = (unsigned char *)s2;
-	i = 0;
-	while (str1[i] && str2[i] && str1[i] == str2[i])
-		i++;
-	return (str1[i] - str2[i]);
-}
-
-void	*ft_realloc(void *ptr, size_t size)
-{
-	void	*new_ptr;
-
-	new_ptr = malloc(size);
-	if (!new_ptr)
-		return (NULL);
-	if (ptr)
-	{
-		ft_memcpy(new_ptr, ptr, size);
-		free (ptr);
-	}
-	return (new_ptr);
-}
-
-void	check_buffer_size(char **input_buffer, char *line)
-{
-	size_t	current_len;
-	size_t	new_len;
-
-	current_len = 0;
-	new_len = 0;
-	if (*input_buffer == NULL)
-		*input_buffer = ft_strdup(line);
-	else
-	{
-		current_len = ft_strlen(*input_buffer);
-		new_len = current_len + ft_strlen(line) + 2;
-		*input_buffer = ft_realloc(*input_buffer, new_len);
-		ft_strlcat(*input_buffer, "\n", new_len);
-		ft_strlcat(*input_buffer, line, new_len);
-	}
-}
-
-static void	handle_siginthc(int sig)
-{
-	if (sig == SIGINT)
+	if (signum == CTRL_C)
 	{
 		printf("\n");
-		exit(EXIT_SUCCESS);
-	}
-	else if (sig == SIGQUIT)
-	{
-		printf("\b\b  \b\b");
-		fflush(stdout);
+		rl_replace_line("", 1);
+		rl_on_new_line();
+		rl_redisplay();
 	}
 }
 
-void	here_doc(t_data *data)
+static void	sig_handler_childs(int signum)
 {
-	char	*line;
-	char	*input_buffer;
+	if (signum == CTRL_C)
+		printf("\n");
+}
 
-	signal(SIGINT, handle_siginthc);
-	signal(SIGQUIT, handle_siginthc);
-	printf("> ");
-	if (!data->redir->path)
-		return (printf("Error: no delimiter\n"), (void)(0));
-	line = "";
-	signal(SIGQUIT, SIG_IGN);
-	while (1)
-	{
-		line = readline("");
-		if (!line)
-			exit(1);
-		if (ft_strcmp(line, data->redir->path) == 0)
-		{
-			free(line);
-			break ;
-		}
-		check_buffer_size(&input_buffer, line);
-		free(line);
-		printf("> ");
-	}
+int	init_signals(int mode)
+{
+	if (mode == DEFAULT)
+		signal(CTRL_C, sig_handler_def);
+	else if (mode == CHILDS)
+		signal(CTRL_C, sig_handler_childs);
+	signal(CTRL_SLASH, sig_handler_def);
+	retu rn (1);
 }
 
 void execute_command(t_data *data, char *command_path)
@@ -133,6 +70,62 @@ void execute_command(t_data *data, char *command_path)
 			exit(EXIT_FAILURE);
 		}
 	}
+}
+
+void	create_heredoc(char *delimiter, char *path)
+{
+	char	*str;
+	int		fd;
+
+	fd = open(path, O_CREAT | O_WRONLY | O_TRUNC, 0666);
+	str = readline("> ");
+	while (str && ft_strcmp(delimiter, str) != 0)
+	{
+		str = ft_strjoin(str, "\n");
+		ft_putstr_fd(str, fd);
+		free(str);
+		str = readline("> ");
+	}
+	close(fd);
+	free(str);
+	init_signals(DEFAULT);
+}
+
+void	do_heredoc(int i, t_heredoc *aux)
+{
+	char	*num;
+	char	*path;
+
+	num = ft_itoa(i);
+	path = ft_strjoin("/tmp/minishell", num);
+	free(num);
+	create_heredoc(aux->file, path);
+	free(aux->file);
+	aux->file = ft_strdup(path);
+	free(path);
+}
+
+void	heredoc(t_data *data)
+{
+	t_heredoc *aux;
+	int		i;
+
+	i = 0;
+	while (data)
+	{
+		aux = data->redir;
+		while (aux)
+		{
+			if (aux->file == D_MINOR)
+			{
+				do_heredoc(i, aux);
+				i++;
+			}
+			aux = aux->next;
+		}
+		data = data->next;
+	}
+	return (0);
 }
 
 void	handle_redir(t_data *data)
@@ -190,7 +183,7 @@ void	handle_redir(t_data *data)
 		}
 		else if (data->redir->type == D_MINOR)
 		{
-			here_doc(data);
+			heredoc(data);
 		}
 	}
 }

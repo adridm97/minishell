@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/16 21:23:48 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/22 12:54:09 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,14 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <fcntl.h>
+
+// Signals
+# define CTRL_C SIGINT
+# define CTRL_SLASH SIGQUIT
+
+// Mode
+# define DEFAULT 0
+# define CHILDS 1
 
 # define SPACES		0 // ' '
 # define PIPE		1 // |
@@ -64,6 +72,13 @@ typedef struct s_redir
 	char			*path;
 	struct s_redir	*next;
 }	t_redir;
+
+typedef struct s_heredoc
+{
+	int					type;
+	char				*file;
+	struct s_heredoc	*next;
+}	t_heredoc;
 
 /*
 Structure:
