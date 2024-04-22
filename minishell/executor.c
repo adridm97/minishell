@@ -14,12 +14,31 @@
 
 void handle_redir(t_data *data);
 
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	size_t			i;
+	unsigned char	*str;
+	unsigned char	*str1;
+
+	i = 0;
+	str = (unsigned char *)s1;
+	str1 = (unsigned char *)s2;
+	while ((str[i] != '\0' || str1[i] != '\0'))
+	{
+		if (str[i] != str1[i])
+			return (str[i] - str1[i]);
+		i++;
+	}
+	return (0);
+}
+
+
 static void	sig_handler_def(int signum)
 {
 	if (signum == CTRL_C)
 	{
 		printf("\n");
-		rl_replace_line("", 1);
+		//rl_replace_line("", 1);
 		rl_on_new_line();
 		rl_redisplay();
 	}
@@ -38,38 +57,7 @@ int	init_signals(int mode)
 	else if (mode == CHILDS)
 		signal(CTRL_C, sig_handler_childs);
 	signal(CTRL_SLASH, sig_handler_def);
-	retu rn (1);
-}
-
-void execute_command(t_data *data, char *command_path)
-{
-	pid_t pid = fork();
-
-	if (pid == -1)
-	{
-		perror("fork");
-		exit(EXIT_FAILURE);
-	}
-	else if (pid == 0)
-	{
-		//char *args[] = {command,  "-la", "libft", NULL};
-		if (data->redir != NULL)
-			handle_redir(data);
-		if (execve(command_path, data->args, NULL) == -1)
-		{
-			perror("execve");
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		int	status;
-		if (waitpid(pid, &status, 0) == -1)
-		{
-			perror("waitpid");
-			exit(EXIT_FAILURE);
-		}
-	}
+	return (1);
 }
 
 void	create_heredoc(char *delimiter, char *path)
@@ -91,7 +79,7 @@ void	create_heredoc(char *delimiter, char *path)
 	init_signals(DEFAULT);
 }
 
-void	do_heredoc(int i, t_heredoc *aux)
+void	do_heredoc(int i, t_redir *aux)
 {
 	char	*num;
 	char	*path;
@@ -99,15 +87,15 @@ void	do_heredoc(int i, t_heredoc *aux)
 	num = ft_itoa(i);
 	path = ft_strjoin("/tmp/minishell", num);
 	free(num);
-	create_heredoc(aux->file, path);
-	free(aux->file);
-	aux->file = ft_strdup(path);
+	create_heredoc(aux->path, path);
+	free(aux->path);
+	aux->path = ft_strdup(path);
 	free(path);
 }
 
 void	heredoc(t_data *data)
 {
-	t_heredoc *aux;
+	t_redir *aux;
 	int		i;
 
 	i = 0;
@@ -116,7 +104,7 @@ void	heredoc(t_data *data)
 		aux = data->redir;
 		while (aux)
 		{
-			if (aux->file == D_MINOR)
+			if (aux->type == D_MINOR)
 			{
 				do_heredoc(i, aux);
 				i++;
@@ -125,20 +113,19 @@ void	heredoc(t_data *data)
 		}
 		data = data->next;
 	}
-	return (0);
+	//return (0);
 }
 
 void	handle_redir(t_data *data)
 {
 	int fd;
+	t_redir *redir = data->redir;
 
-	if (data->redir == NULL)
-		printf("redir es null\n");
-	if (data->redir != NULL)
+	while (redir != NULL)
 	{
-		if (data->redir->type == MAJOR)
+		if (redir->type == MAJOR)
 		{
-			fd = open(data->redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			if (fd == -1)
 			{
 				perror("open");
@@ -149,11 +136,10 @@ void	handle_redir(t_data *data)
 				perror("dup2");
 				exit(EXIT_FAILURE);
 			}
-			close(fd);
 		}
-		else if (data->redir->type == D_MAJOR)
+		else if (redir->type == D_MAJOR)
 		{
-			fd = open(data->redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
 			if (fd == -1)
 			{
 				perror("open");
@@ -164,11 +150,10 @@ void	handle_redir(t_data *data)
 				perror("dup2");
 				exit(EXIT_FAILURE);
 			}
-			close(fd);
 		}
-		else if (data->redir->type == MINOR)
+		else if (redir->type == MINOR)
 		{
-			fd = open(data->redir->path, O_RDONLY);
+			fd = open(redir->path, O_RDONLY);
 			if (fd == -1)
 			{
 				perror("open");
@@ -179,11 +164,42 @@ void	handle_redir(t_data *data)
 				perror("dup2");
 				exit(EXIT_FAILURE);
 			}
-			close(fd);
 		}
-		else if (data->redir->type == D_MINOR)
+		else if (redir->type == D_MINOR)
 		{
 			heredoc(data);
+		}
+		redir = redir->next;
+		close(fd);
+	}
+}
+
+void execute_command(t_data *data, char *command_path)
+{
+	pid_t pid = fork();
+
+	if (pid == -1)
+	{
+		perror("fork");
+		exit(EXIT_FAILURE);
+	}
+	else if (pid == 0)
+	{
+		if (data->redir != NULL)
+			handle_redir(data);
+		if (execve(command_path, data->args, NULL) == -1)
+		{
+			perror("execve");
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		int	status;
+		if (waitpid(pid, &status, 0) == -1)
+		{
+			perror("waitpid");
+			exit(EXIT_FAILURE);
 		}
 	}
 }
@@ -210,6 +226,7 @@ int is_valid_command(t_data *data)
 		printf("%s/%s\n", token[i], data->comand);
 		if (access(comand_path, X_OK) == 0)
 		{
+			printf("aqui entra bien \n");
 			execute_command(data, comand_path);
 			printf("El comando \"%s\" es válido en la ruta: %s\n", data->comand, comand_path);
 			free(comand_path);

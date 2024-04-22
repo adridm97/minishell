@@ -36,13 +36,12 @@ int	main(int argc, char *argv[], char *env[])
 			break ;
 		if (input && *input)
 			add_history (input);
-		printf("aqui entra");
 		data = lexer(input, data);
 		//if (!data)
 		// 	exit(EXIT_FAILURE);	
 		is_valid_command(data);
 		// printf("%s\n", data.token->value);
-		free_data(&data);
+		//free_data(&data);
 		data = NULL;
 	}
 	return (0);
