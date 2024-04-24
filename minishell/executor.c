@@ -123,7 +123,7 @@ void	handle_redir(t_data *data)
 
 	while (redir != NULL)
 	{
-		if (redir->type == MAJOR)
+		if (redir->type == MAJOR && redir->next == NULL)
 		{
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			if (fd == -1)
@@ -226,7 +226,6 @@ int is_valid_command(t_data *data)
 		printf("%s/%s\n", token[i], data->comand);
 		if (access(comand_path, X_OK) == 0)
 		{
-			printf("aqui entra bien \n");
 			execute_command(data, comand_path);
 			printf("El comando \"%s\" es válido en la ruta: %s\n", data->comand, comand_path);
 			free(comand_path);
