@@ -32,70 +32,136 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (0);
 }
 
-void	heredoc(t_data *data)
+void heredoc(t_data *data)
 {
-	int	fd;
-	t_redir *aux;
-	int	i;
-	char	*str;
+    int     fd;
+    int     i;
+    char    *line;
+    char    *filename; 
+    t_redir *aux;
+    t_data  *iterator;
+
+    i = 0;
+    iterator = data;
+    while (iterator)
+    {
+        aux = iterator->redir;
+        if (aux && aux->path)
+        {
+            if (aux->type == D_MINOR)
+            {
+                filename = "/tmp/heredoc";
+                fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+                if (fd == -1)
+                {
+                    perror("open");
+                    exit(EXIT_FAILURE);
+                }
+                line = readline("> ");
+                while (line)
+                {
+                    
+                    if (ft_strcmp(line, aux->path) == 0)
+                    {
+                        free(line);
+                        break;
+                    }
+                    ft_putstr_fd(line, fd);
+                    ft_putstr_fd("\n", fd);
+                    free(line);
+                    line = readline("> ");
+                }
+                close(fd);
+                // Crear un nuevo arreglo de punteros con espacio adicional
+                char **new_args = malloc((i + 2) * sizeof(char *));
+                if (new_args == NULL)
+                {
+                    perror("malloc");
+                    exit(EXIT_FAILURE);
+                }
+                // Copiar los elementos del arreglo original al nuevo arreglo
+                i = 0;
+                while (iterator->args[i] != NULL)
+                {
+                    new_args[i] = iterator->args[i];
+                    i++;
+                }
+                // Agregar el nombre del archivo al final del nuevo arreglo
+                new_args[i] = filename;
+                new_args[i + 1] = NULL;  // Asegurarse de que el nuevo arreglo esté terminado con NULL
+                // Liberar el arreglo original
+                free(iterator->args);
+                // Actualizar el puntero args para apuntar al nuevo arreglo
+                iterator->args = new_args;
+
+                // Salir si no hay más delimitadores
+                if (aux->next == NULL)
+                    break;
+            }
+            if(aux->next != NULL)
+                iterator->redir = aux->next;
+        }
+        if(iterator->next != NULL)
+            iterator = iterator->next;
+        if (line == NULL)
+            break;
+    }
 }
 
-void	handle_redir(t_data *data)
+void handle_redir(t_data *data)
 {
-	int fd;
-	t_redir *redir
+    int fd;
+    t_redir *redir;
 
-	redir = data->redir;
+    redir = data->redir;
 
-	if (redir->type == D_MAJOR)
-		heredoc(data);
-	while (redir != NULL)
-	{
-		if (redir->type == MAJOR)
-		{
-			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			if (fd == -1)
-			{
-				perror("open");
-				exit(EXIT_FAILURE);
-			}
-			if (dup2(fd, STDOUT_FILENO) == -1)
-			{
-				perror("dup2");
-				exit(EXIT_FAILURE);
-			}
-		}
-		else if (redir->type == D_MAJOR)
-		{
-			fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
-			if (fd == -1)
-			{
-				perror("open");
-				exit(EXIT_FAILURE);
-			}
-			if (dup2(fd, STDOUT_FILENO) == -1)
-			{
-				perror("dup2");
-				exit(EXIT_FAILURE);
-			}
-		}
-		else if (redir->type == MINOR)
-		{
-			fd = open(redir->path, O_RDONLY);
-			if (fd == -1)
-			{
-				perror("open");
-				exit(EXIT_FAILURE);
-			}
-			if (dup2(fd, STDIN_FILENO) == -1)
-			{
-				perror("dup2");
-				exit(EXIT_FAILURE);
-			}
-		}
-		redir = redir->next;
-		close(fd);
-	}
+    while (redir != NULL)
+    {
+        if (redir->type == MAJOR)
+        {
+            fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (fd == -1)
+            {
+                perror("open");
+                exit(EXIT_FAILURE);
+            }
+            if (dup2(fd, STDOUT_FILENO) == -1)
+            {
+                perror("dup2");
+                exit(EXIT_FAILURE);
+            }
+        }
+        else if (redir->type == D_MAJOR)
+        {
+            fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+            if (fd == -1)
+            {
+                perror("open");
+                exit(EXIT_FAILURE);
+            }
+            if (dup2(fd, STDOUT_FILENO) == -1)
+            {
+                perror("dup2");
+                exit(EXIT_FAILURE);
+            }
+        }
+        else if (redir->type == MINOR)
+        {
+            fd = open(redir->path, O_RDONLY);
+            if (fd == -1)
+            {
+                perror("open");
+                exit(EXIT_FAILURE);
+            }
+            if (dup2(fd, STDIN_FILENO) == -1)
+            {
+                perror("dup2");
+                exit(EXIT_FAILURE);
+            }
+        }
+        redir = redir->next;
+        close(fd); // Cerrar el descriptor de archivo
+    }
 }
 
 void execute_command(t_data *data, char *command_path)
@@ -109,6 +175,8 @@ void execute_command(t_data *data, char *command_path)
 	}
 	else if (pid == 0)
 	{
+		if (data->redir->type == D_MINOR)
+			heredoc(data);
 		if (data->redir != NULL)
 			handle_redir(data);
 		if (execve(command_path, data->args, NULL) == -1)
