@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/04/24 23:58:08 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/04/28 21:40:24 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,9 +108,40 @@ void heredoc(t_data *data)
     }
 }
 
+/*void	child_process(t_data *data, int *fd)
+{
+	int	filein;
+
+	filein = open();
+}*/
+
+void	pipex(/*t_data *data*/)
+{
+	pid_t	pid;
+	int		fd[2];
+
+	if (pipe(fd) == -1)
+	{
+		perror("pipe");
+		exit(EXIT_FAILURE);
+	}
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("pid");
+		exit(EXIT_FAILURE);
+	}
+	if (pid == 0)
+	{
+//		child_process(data, fd);
+	}
+	else
+		close(fd[0]);
+}
+
 void handle_redir(t_data *data)
 {
-    int fd;
+    int 	fd;
     t_redir *redir;
 
     redir = data->redir;
@@ -127,9 +158,11 @@ void handle_redir(t_data *data)
             }
             if (dup2(fd, STDOUT_FILENO) == -1)
             {
+				
                 perror("dup2");
                 exit(EXIT_FAILURE);
             }
+			close(fd);
         }
         else if (redir->type == D_MAJOR)
         {
@@ -144,6 +177,7 @@ void handle_redir(t_data *data)
                 perror("dup2");
                 exit(EXIT_FAILURE);
             }
+			close(fd);
         }
         else if (redir->type == MINOR)
         {
@@ -158,9 +192,13 @@ void handle_redir(t_data *data)
                 perror("dup2");
                 exit(EXIT_FAILURE);
             }
+			close(fd);
         }
+		else if (redir->type == PIPE)
+		{
+			pipex(/*data*/);
+		}
         redir = redir->next;
-        close(fd); // Cerrar el descriptor de archivo
     }
 }
 
@@ -175,10 +213,6 @@ void execute_command(t_data *data, char *command_path)
 	}
 	else if (pid == 0)
 	{
-		if (data->redir->type == D_MINOR)
-			heredoc(data);
-		if (data->redir != NULL)
-			handle_redir(data);
 		if (execve(command_path, data->args, NULL) == -1)
 		{
 			perror("execve");
@@ -218,6 +252,10 @@ int is_valid_command(t_data *data)
 		printf("%s/%s\n", token[i], data->comand);
 		if (access(comand_path, X_OK) == 0)
 		{
+			if (data->redir != NULL && data->redir->type == D_MINOR)
+				heredoc(data);
+			if (data->redir != NULL)
+				handle_redir(data);
 			execute_command(data, comand_path);
 			printf("El comando \"%s\" es válido en la ruta: %s\n", data->comand, comand_path);
 			free(comand_path);
