@@ -72,37 +72,48 @@ void heredoc(t_data *data)
                     line = readline("> ");
                 }
                 close(fd);
-                // Crear un nuevo arreglo de punteros con espacio adicional
-                char **new_args = malloc((i + 2) * sizeof(char *));
-                if (new_args == NULL)
+                int arg_count = 0;
+                while (data->args[arg_count] != NULL)
+                    arg_count++;
+                if(arg_count < 2)
                 {
-                    perror("malloc");
-                    exit(EXIT_FAILURE);
+                    // Crear un nuevo arreglo de punteros con espacio adicional
+                    char **new_args = malloc((i + 2) * sizeof(char *));
+                    if (new_args == NULL)
+                    {
+                        perror("malloc");
+                        exit(EXIT_FAILURE);
+                    }
+                    // Copiar los elementos del arreglo original al nuevo arreglo
+                    i = 0;
+                    while (iterator->args[i] != NULL)
+                    {
+                        new_args[i] = iterator->args[i];
+                        i++;
+                    }
+                    // Agregar el nombre del archivo al final del nuevo arreglo
+                    new_args[i] = filename;
+                    new_args[i + 1] = NULL;  // Asegurarse de que el nuevo arreglo esté terminado con NULL
+                    // Liberar el arreglo original
+                    free(iterator->args);
+                    // Actualizar el puntero args para apuntar al nuevo arreglo
+                    iterator->args = new_args;
                 }
-                // Copiar los elementos del arreglo original al nuevo arreglo
-                i = 0;
-                while (iterator->args[i] != NULL)
-                {
-                    new_args[i] = iterator->args[i];
-                    i++;
-                }
-                // Agregar el nombre del archivo al final del nuevo arreglo
-                new_args[i] = filename;
-                new_args[i + 1] = NULL;  // Asegurarse de que el nuevo arreglo esté terminado con NULL
-                // Liberar el arreglo original
-                free(iterator->args);
-                // Actualizar el puntero args para apuntar al nuevo arreglo
-                iterator->args = new_args;
-
                 // Salir si no hay más delimitadores
                 if (aux->next == NULL)
+                {
                     break;
+                }
             }
             if(aux->next != NULL)
+            {
                 iterator->redir = aux->next;
+            }
         }
         if(iterator->next != NULL)
+        {
             iterator = iterator->next;
+        }
         if (line == NULL)
             break;
     }
@@ -204,6 +215,7 @@ void handle_redir(t_data *data)
 
 void execute_command(t_data *data, char *command_path)
 {
+    
 	pid_t pid = fork();
 
 	if (pid == -1)
@@ -213,6 +225,10 @@ void execute_command(t_data *data, char *command_path)
 	}
 	else if (pid == 0)
 	{
+        if (data->redir != NULL && data->redir->type == D_MINOR)
+			heredoc(data);
+	    if (data->redir != NULL)
+		handle_redir(data);
 		if (execve(command_path, data->args, NULL) == -1)
 		{
 			perror("execve");
@@ -252,10 +268,7 @@ int is_valid_command(t_data *data)
 		printf("%s/%s\n", token[i], data->comand);
 		if (access(comand_path, X_OK) == 0)
 		{
-			if (data->redir != NULL && data->redir->type == D_MINOR)
-				heredoc(data);
-			if (data->redir != NULL)
-				handle_redir(data);
+			
 			execute_command(data, comand_path);
 			printf("El comando \"%s\" es válido en la ruta: %s\n", data->comand, comand_path);
 			free(comand_path);
