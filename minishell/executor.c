@@ -119,14 +119,26 @@ void heredoc(t_data *data)
     }
 }
 
-/*void	child_process(t_data *data, int *fd)
+/*void	child_process(t_data *data, int *fd, char *comand_path)
 {
 	int	filein;
+    t_redir *aux;
 
-	filein = open();
-}*/
+    aux = data->redir;
+	filein = open(aux->path, O_RDONLY, 0644);
+    if (filein == -1)
+    {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+    dup2(fd[1], STDOUT_FILENO);
+    dup2(filein, STDIN_FILENO);
+    close(fd[0]);
+    execute_command(data,comand_path);
+}
 
-void	pipex(/*t_data *data*/)
+
+void	pipex(t_data *data, char *comand_path)
 {
 	pid_t	pid;
 	int		fd[2];
@@ -143,12 +155,10 @@ void	pipex(/*t_data *data*/)
 		exit(EXIT_FAILURE);
 	}
 	if (pid == 0)
-	{
-//		child_process(data, fd);
-	}
-	else
-		close(fd[0]);
-}
+		child_process(data, fd, comand_path);
+    waitpid(pid, NULL, 0);
+    parent_process(data, fd, comand_path);
+}*/
 
 void handle_redir(t_data *data)
 {
@@ -205,10 +215,6 @@ void handle_redir(t_data *data)
             }
 			close(fd);
         }
-		else if (redir->type == PIPE)
-		{
-			pipex(/*data*/);
-		}
         redir = redir->next;
     }
 }
@@ -268,7 +274,8 @@ int is_valid_command(t_data *data)
 		printf("%s/%s\n", token[i], data->comand);
 		if (access(comand_path, X_OK) == 0)
 		{
-			
+			/*if (data->redir != NULL && data->redir->type == PIPE)
+			    pipex(data, comand_path);*/
 			execute_command(data, comand_path);
 			printf("El comando \"%s\" es válido en la ruta: %s\n", data->comand, comand_path);
 			free(comand_path);
