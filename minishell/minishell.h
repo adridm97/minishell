@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/09 09:56:47 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/01 19:07:48 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ typedef struct s_token
 typedef struct s_data
 {
 	char			*comand;
+	char			*path;
 	char			**args;
 	struct s_data	*next;
 	struct s_redir	*redir;
@@ -103,18 +104,27 @@ typedef struct s_data
 // lexer.c
 int		new_token(char c, int type, t_token **token, int index);
 int		add_token(char c, int type, t_token **token);
-t_data	*lexer(char *input, t_data *data);
+t_data	*lexer(char *input, t_data *data, char **env);
 int		typeing(char c, char *base);
 void	lexer_error(t_error *error);
 void	free_data(t_data **data);
+int		init_data(t_data **data);
+void	free_redir(t_redir **redir);
+
 
 // split things
 char	**special_split(char const *s);
-char	**split_token(char const *s, t_token *token);
+void	split_token(t_token *token, char **env, t_data **data);
 
 //executor.c
 int		is_valid_command(t_data *data);
 
+//split_token
+void	is_expandsor(t_token **token, t_data **data, char **str, char **env);
+void	is_expandsor_str_simple(t_token **token, t_data **data, char **str, char **env);
+void	switch_case(t_token **token, char **env, t_data **data, char **str);
+int		add_args(char ***arg, char **str);
+void	add_last_data(t_data **data, char **str);
 
 
 // Regular Colors

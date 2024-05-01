@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/04/13 16:49:33 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/01 11:11:00 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,9 +160,9 @@ static void	print_data(t_data *data)
 	j = -1;
 	while (data)
 	{
-		printf("data %i\nComand: %s\n",i, data->comand);
-		while(data->args[++j])
-			printf("arg[%i]: %s\n", j, data->args[j]);
+		printf("data %i\nComand: %s|\n",i, data->comand);
+		while(data->args && data->args[++j])
+			printf("arg[%i]: %s|\n", j, data->args[j]);
 		j = -1;
 		print_redir(data->redir);
 		data = data->next;
@@ -293,8 +293,10 @@ void	free_data(t_data **data)
 		free(*data);
 		*data = del;
 	}
-	free_args((*data)->args);
-	free_redir(&(*data)->redir);
+	if ((*data)->args)
+		free_args((*data)->args);
+	if ((*data)->redir)
+		free_redir(&(*data)->redir);
 	free(*data);
 	*data = NULL;
 }
@@ -383,20 +385,32 @@ int	go_data(t_data **data, char **comands, t_token *token)
 	}
 	return (1);
 }
-/*falta proteger split*/
-int	parser(t_data **data, t_token **token, char *input)
-{
-	char **comands;
 
-	(void)data;
-	comands = split_token(input, *token);
-	(void)comands;
+int	init_data(t_data **data)
+{
+	*data = (t_data *)malloc(sizeof(t_data));
+	if(!*data)
+		return (0);
+	(*data)->args = NULL;
+	(*data)->comand = NULL;
+	(*data)->next = NULL;
+	(*data)->path = NULL;
+	(*data)->redir = NULL;
+	return (1);
+}
+
+/*falta proteger split*/
+int	parser(t_data **data, t_token **token, char *input, char **env)
+{
+	split_token(*token, env, data);
+	(void)input;
 	// if (!go_data(data, comands, *token))
 	// 	return (ERROR);
 	return (1);
 }
-/*TODO Este caso rompe con segfault: ahola>adios|adios>ee||*/
-t_data	*lexer(char *input, t_data *data)
+/*TODO Este caso rompe con segfault: ahola>adios|adios>ee||
+TODO falta gestionar el \' y el \" como comilla*/
+t_data	*lexer(char *input, t_data *data, char **env)
 {
 	t_token	*token;
 	t_error	error;
@@ -422,7 +436,7 @@ t_data	*lexer(char *input, t_data *data)
 	if (error.is_error)
 		lexer_error(&error);
 	else	
-	if (!parser(&data, &token, input))
+	if (!parser(&data, &token, input, env))
 		data = NULL;
 	print_data(data);
 	return (data);
