@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/01 19:07:48 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/02 07:57:49 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,8 +120,8 @@ void	split_token(t_token *token, char **env, t_data **data);
 int		is_valid_command(t_data *data);
 
 //split_token
-void	is_expandsor(t_token **token, t_data **data, char **str, char **env);
-void	is_expandsor_str_simple(t_token **token, t_data **data, char **str, char **env);
+void	is_expandsor(t_token **token, char **str, char **env);
+void	is_expandsor_str_simple(t_token **token, char **str, char **env);
 void	switch_case(t_token **token, char **env, t_data **data, char **str);
 int		add_args(char ***arg, char **str);
 void	add_last_data(t_data **data, char **str);

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/05/01 19:36:40 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/02 08:08:28 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ int	is_special(char c, char *comp)
 }
 
 // save in str the string
-void	is_simple_string(t_token **token, char **env, t_data **data, char **str)
+void	is_simple_string(t_token **token, char **env, char **str)
 {
 	char	*res;
 
@@ -76,7 +76,7 @@ void	is_simple_string(t_token **token, char **env, t_data **data, char **str)
 	{
 		if ((*token)->value == '$')
 		{
-			is_expandsor(token, data, &res, env);
+			is_expandsor(token, &res, env);
 			break;	
 		}
 		res = new_str(&res, (*token)->value);
@@ -91,7 +91,7 @@ void	is_simple_string(t_token **token, char **env, t_data **data, char **str)
 
 
 // save in str the string
-void	is_double_string(t_token **token, char **env, t_data **data, char **str)
+void	is_double_string(t_token **token, char **env, char **str)
 {
 	char	*res;
 
@@ -103,7 +103,7 @@ void	is_double_string(t_token **token, char **env, t_data **data, char **str)
 	{
 		if ((*token)->value == '$')
 		{
-			is_expandsor(token, data, &res, env);
+			is_expandsor(token, &res, env);
 			break;	
 		}
 		res = new_str(&res, (*token)->value);
@@ -116,54 +116,118 @@ void	is_double_string(t_token **token, char **env, t_data **data, char **str)
 	*str = res;
 }
 
-void	add_redir(t_data **data, t_redir **redir)
-{
+// void	add_redir(t_data **data, t_redir **redir)
+// {
 
+// }
+void	switch_case_redir(t_token **token, char **str, char **env)
+{
+	if ((*token)->value == '\'')
+		is_simple_string(token, env, str);
+	else if ((*token)->value == '"')
+		is_double_string(token, env, str);
+	else if ((*token)->value == '$')
+		is_expandsor(token, str, env);
 }
-
-void	init_redir(t_token **token, t_data **data, t_redir **redir, int type)
+void	init_redir(t_token **token, t_data **data, char **env, int type)
 {
-	int	*str;
+	char	*str;
+	t_redir *redir;
+	t_redir	*l_redir;
 
+	redir = (t_redir *)malloc(sizeof(t_redir));
+	redir->next = NULL;
+	redir->type = type;
+	redir->path = NULL;
 	str = charstr((*token)->value);
-	*redir = (t_redir *)malloc(sizeof(t_redir));
-	(*redir)->next = NULL;
-	(*redir)->type = type;
-	(*redir)->path = NULL;
+	*token = (*token)->next;
+	while ((*token))
+	{
+		if (is_special((*token)->value, "'\"$"))
+			switch_case_redir(token, &str, env);
+		else if (is_special((*token)->value, "| <>"))
+		{
+			//TODO logica para incluir el redir e incluir str Puedo ayudarme de la func add_args
+			redir->path = str;
+			printf("en path%s\n", redir->path);
+			l_redir = (*data)->redir;
+			if (!l_redir)
+			{
+				(*data)->redir = redir;
+				return;
+			}
+			while (l_redir->next)
+				l_redir = l_redir->next;
+			l_redir->next = redir;
+			return;
+		}
+		else
+		{
+			str = new_str(&str, (*token)->value);
+			*token = (*token)->next;
+		}
+	}
+	redir->path = str;
+	printf("en path%s\n", redir->path);
+	l_redir = (*data)->redir;
+	if (!l_redir)
+	{
+		(*data)->redir = redir;
+		return;
+	}
+	while (l_redir->next)
+		l_redir = l_redir->next;
+	l_redir->next = redir;
+	return;
 }
 
 // split the redirection and put in data
-void	is_redir_input(t_token **token, t_data **data, char **str)
+void	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 {
-	t_redir	*redir;
 	t_data	*last_data;
 
 	last_data = (*data);
 	while (last_data->next)
 		last_data = last_data->next;
 	add_args(&last_data->args, str);
-	redir = NULL;
 	*token = (*token)->next;
 	if ((*token)->value == '<')
-		init_redir(token, data, &redir, D_MINOR);
+	{
+		*token = (*token)->next;
+		init_redir(token, data, env, D_MINOR);
+	}
 	else if ((*token)->value == '>')
-		init_redir(token, data, &redir, SPACES);
+	{
+		*token = (*token)->next;
+		init_redir(token, data, env, SPACES);
+	}
 	else
-		init_redir(token, data, &redir, MINOR);
-
-	(void)token;
-	(void)data;
-	(void)str;
+		init_redir(token, data, env, MINOR);
 }
 
 
 // split the redirection and put in data
-void	is_redir_output(t_token **token, t_data **data, char **str)
+void	is_redir_output(t_token **token, t_data **data, char **str, char **env)
 {
-	(void)token;
-	(void)data;
-	(void)str;
+	t_data	*last_data;
 
+	last_data = (*data);
+	while (last_data->next)
+		last_data = last_data->next;
+	add_args(&last_data->args, str);
+	*token = (*token)->next;
+	if ((*token)->value == '>')
+	{
+		*token = (*token)->next;
+		init_redir(token, data, env, D_MAJOR);
+	}
+	else if ((*token)->value == '>')
+	{
+		*token = (*token)->next;
+		init_redir(token, data, env, SPACES);
+	}
+	else
+		init_redir(token, data, env, MAJOR);
 }
 
 
@@ -220,7 +284,7 @@ char	*key_to_res(char **key, char **env)
 }
 
 // Expand the $ with env
-void	is_expandsor(t_token **token, t_data **data, char **str, char **env)
+void	is_expandsor(t_token **token, char **str, char **env)
 {
 	char	*key;
 	char	*res;
@@ -232,12 +296,12 @@ void	is_expandsor(t_token **token, t_data **data, char **str, char **env)
 	else if ((*token)->value == '"')
 	{
 		*token = (*token)->next;
-		is_double_string(token, env, data, str);
+		is_double_string(token, env, str);
 	}
 	else if ((*token)->value == '\'')
 	{
 		*token = (*token)->next;
-		is_simple_string(token, env, data, str);
+		is_simple_string(token, env, str);
 	}
 	else
 	{
@@ -323,17 +387,17 @@ void	is_space(t_token **token, t_data **data, char **str)
 void	switch_case(t_token **token, char **env, t_data **data, char **str)
 {
 	if ((*token)->value == '\'')
-		is_simple_string(token, env, data, str);
+		is_simple_string(token, env, str);
 	else if ((*token)->value == '"')
-		is_double_string(token, env, data, str);
+		is_double_string(token, env, str);
 	else if ((*token)->value == '<')
-		is_redir_input(token, data, str);
+		is_redir_input(token, data, str, env);
 	else if ((*token)->value == '>')
-		is_redir_output(token, data, str);
+		is_redir_output(token, data, str, env);
 	else if ((*token)->value == '|')
 		is_pipe(token, data, str);
 	else if ((*token)->value == '$')
-		is_expandsor(token, data, str, env);
+		is_expandsor(token, str, env);
 	else if ((*token)->value == ' ')
 		is_space(token, data, str);
 }
