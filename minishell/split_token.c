@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/05/03 13:02:41 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/03 13:16:04 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,10 +116,6 @@ void	is_double_string(t_token **token, char **env, char **str)
 	*str = res;
 }
 
-// void	add_redir(t_data **data, t_redir **redir)
-// {
-
-// }
 void	switch_case_redir(t_token **token, char **str, char **env)
 {
 	if ((*token)->value == '\'')
