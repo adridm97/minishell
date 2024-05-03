@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/05/02 08:08:28 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/03 11:42:54 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,13 +149,15 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 		{
 			//TODO logica para incluir el redir e incluir str Puedo ayudarme de la func add_args
 			redir->path = str;
-			printf("en path%s\n", redir->path);
-			l_redir = (*data)->redir;
-			if (!l_redir)
+			printf("al inicio en path %s\n", redir->path);
+			if (!(*data)->redir)
 			{
+				printf("ENTRE?\n");
 				(*data)->redir = redir;
+				printf("SALGA\n");
 				return;
 			}
+			l_redir = (*data)->redir;
 			while (l_redir->next)
 				l_redir = l_redir->next;
 			l_redir->next = redir;
@@ -168,7 +170,7 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 		}
 	}
 	redir->path = str;
-	printf("en path%s\n", redir->path);
+	printf("al final en path %s\n", redir->path);
 	l_redir = (*data)->redir;
 	if (!l_redir)
 	{
@@ -189,7 +191,9 @@ void	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 	last_data = (*data);
 	while (last_data->next)
 		last_data = last_data->next;
-	add_args(&last_data->args, str);
+	if(*str)
+	printf("antes de add args\n"), add_args(&last_data->args, str);
+	printf("segunda vuelta\n");
 	*token = (*token)->next;
 	if ((*token)->value == '<')
 	{
@@ -203,6 +207,7 @@ void	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 	}
 	else
 		init_redir(token, data, env, MINOR);
+	printf("Saliendo de is_redir_input\n");
 }
 
 
@@ -426,6 +431,8 @@ void	split_token(t_token *token, char **env, t_data **data)
 		if (is_special(token->value, " |\"'<>$"))
 		{
 			switch_case(&token, env, data, &str);
+			// printf("despues del SC\n");
+			// printf("EN STR=%s, en value=%c\n", str, (*token).value);
 		}
 		else
 		{
@@ -435,7 +442,7 @@ void	split_token(t_token *token, char **env, t_data **data)
 			// 	return (ERROR);
 		}
 	}
-	// printf("str EN SPLIT_TOKEN: %s\n", str);
+	printf("str EN SPLIT_TOKEN: %s\n", str);
 	if(str)
 	{
 		add_last_data(data, &str);
