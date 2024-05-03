@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/05/03 11:42:54 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/03 13:02:41 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,12 +129,16 @@ void	switch_case_redir(t_token **token, char **str, char **env)
 	else if ((*token)->value == '$')
 		is_expandsor(token, str, env);
 }
+
+/*TODO Hay que hacerla más corta*/
 void	init_redir(t_token **token, t_data **data, char **env, int type)
 {
 	char	*str;
 	t_redir *redir;
 	t_redir	*l_redir;
+	t_data	*c_data;
 
+	c_data = *data;
 	redir = (t_redir *)malloc(sizeof(t_redir));
 	redir->next = NULL;
 	redir->type = type;
@@ -147,17 +151,15 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 			switch_case_redir(token, &str, env);
 		else if (is_special((*token)->value, "| <>"))
 		{
-			//TODO logica para incluir el redir e incluir str Puedo ayudarme de la func add_args
+			while (c_data->next)
+				c_data = c_data->next;
 			redir->path = str;
-			printf("al inicio en path %s\n", redir->path);
-			if (!(*data)->redir)
+			if (!c_data->redir)
 			{
-				printf("ENTRE?\n");
-				(*data)->redir = redir;
-				printf("SALGA\n");
+				c_data->redir = redir;
 				return;
 			}
-			l_redir = (*data)->redir;
+			l_redir = c_data->redir;
 			while (l_redir->next)
 				l_redir = l_redir->next;
 			l_redir->next = redir;
@@ -169,18 +171,18 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 			*token = (*token)->next;
 		}
 	}
+	while (c_data->next)
+			c_data = c_data->next;
 	redir->path = str;
-	printf("al final en path %s\n", redir->path);
-	l_redir = (*data)->redir;
+	l_redir = c_data->redir;
 	if (!l_redir)
 	{
-		(*data)->redir = redir;
+		c_data->redir = redir;
 		return;
 	}
 	while (l_redir->next)
 		l_redir = l_redir->next;
 	l_redir->next = redir;
-	return;
 }
 
 // split the redirection and put in data
@@ -191,10 +193,8 @@ void	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 	last_data = (*data);
 	while (last_data->next)
 		last_data = last_data->next;
-	if(*str)
-	printf("antes de add args\n"), add_args(&last_data->args, str);
-	printf("segunda vuelta\n");
-	*token = (*token)->next;
+	if(*token && *str)
+		*token = (*token)->next;
 	if ((*token)->value == '<')
 	{
 		*token = (*token)->next;
@@ -207,7 +207,6 @@ void	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 	}
 	else
 		init_redir(token, data, env, MINOR);
-	printf("Saliendo de is_redir_input\n");
 }
 
 
@@ -219,14 +218,14 @@ void	is_redir_output(t_token **token, t_data **data, char **str, char **env)
 	last_data = (*data);
 	while (last_data->next)
 		last_data = last_data->next;
-	add_args(&last_data->args, str);
-	*token = (*token)->next;
+	if(*token && *str)
+		*token = (*token)->next;
 	if ((*token)->value == '>')
 	{
 		*token = (*token)->next;
 		init_redir(token, data, env, D_MAJOR);
 	}
-	else if ((*token)->value == '>')
+	else if ((*token)->value == '<')
 	{
 		*token = (*token)->next;
 		init_redir(token, data, env, SPACES);
@@ -371,21 +370,10 @@ int add_args(char ***arg, char **str)
 
 void	is_space(t_token **token, t_data **data, char **str)
 {
-	*token = (*token)->next;
-	add_last_data(data, str);
-	// if(*str)
-	// {
-	// 	if(!add_args(&(*data)->args, str))
-	// 		(void)str; //TODO Controlar error
-	// }
-	// if ((*token))
-	// 	(*token) = (*token)->next;
-	// printf("Estoy despues de add args\n");
-	// if ((*token) && is_special((*token)->value, " |\"'<>$"))
-	// {
-	// 	switch_case(token, env, data, str);
-	// }
-	// printf("DESPUES DEL SWITCH\n");
+	if(*token)
+		*token = (*token)->next;
+	if (*str)
+		add_last_data(data, str);
 }
 
 //switch case en funcion delcaracter
@@ -418,403 +406,40 @@ void	add_last_data(t_data **data, char **str)
 		(void)str; //TODO Controlar error
 }
 
-/*TODO Poner en path el path || OJOOOO $PATH hola Pierde la h*/
+/*TODO Poner en path el path || OJOOOO $PATH hola Pierde la h
+¿El siguiente comando da este resultado. Es correcto?
+a>a a>a hola
+data 0
+Comand: (null)|
+arg[0]: a|
+arg[1]: a|
+arg[2]: hola|
+Redirs
+path: a, type: 2
+Redirs
+path: a, type: 2
+*/
 void	split_token(t_token *token, char **env, t_data **data)
 {
 	char	*str;
 
 	if(!init_data(data))
-		(void)data; //falta gestionar errores
+		(void)data; //TODO falta gestionar errores
 	str = NULL;
 	while (token)
 	{
 		if (is_special(token->value, " |\"'<>$"))
 		{
 			switch_case(&token, env, data, &str);
-			// printf("despues del SC\n");
-			// printf("EN STR=%s, en value=%c\n", str, (*token).value);
 		}
 		else
 		{
 			str = new_str(&str, token->value);
 			token = token->next;
-			// TODO if (!str)
-			// 	return (ERROR);
 		}
 	}
-	printf("str EN SPLIT_TOKEN: %s\n", str);
 	if(str)
 	{
 		add_last_data(data, &str);
 	}
-	// if((*data)->args)
-	// {
-	// 	if ((*data)->args[0])
-	// 		printf("data EN SPLIT_TOKEN: %s\n", (*data)->args[0]);
-	// 	if ((*data)->args[1])
-	// 		printf("data EN SPLIT_TOKEN: %s\n", (*data)->args[1]);
-	// }
 }
-
-/*
-void	advance_token_list(t_token **token, t_list **lst, int *i)
-{
-	char	*str;
-	if((*token))
-		(*token) = (*token)->next;
-	printf("DENTRO\n");
-	str = (char *)(*lst)->content;
-	if(!str[*i])
-	{
-		*i = 0;
-		(*lst) = (*lst)->next;
-	}
-	else
-	*i += 1;
-	printf("FINAL\n");
-}
-
-int	token_len(t_token *token)
-{
-	int len;
-	t_token *ctoken;
-
-	len = 0;
-	ctoken = token;
-	while(ctoken)
-	{
-		ctoken = ctoken->next;
-		len++;
-	}
-	return (len);
-}
-
-char **list_to_matrix(t_list *lst)
-{
-	while (lst)
-	{
-		printf("-%s-\n", (char *)lst->content);
-		lst = lst->next;
-	}
-	return (NULL);
-}
-
-char *next_word(t_token *token, int *start)
-{
-	t_token *ctoken;
-	int		len;
-	int		is_coma;
-	char	*str;
-	int		type;
-	
-	len = *start;
-	ctoken = token;
-	is_coma = 0;
-	str = NULL;
-	type = -1;
-	while (--len >= 0)
-		ctoken = ctoken->next;
-	while (ctoken && (!(ctoken->type >= SPACES && ctoken->type <= MINOR) || is_coma))
-	{
-		if (ctoken->type >= QUOTE && ctoken->type <= D_QUOTE && ctoken)
-		{
-			if (ctoken && type >= 0 && ctoken->type != type)
-			{
-				*start += 1;
-				if (!ctoken)
-					break;
-				if (str)
-					str = ft_strjoin(str, ft_substr(&ctoken->value,0,1));
-				else
-					str = ft_substr(&ctoken->value,0,1);				
-				ctoken = ctoken->next;
-			}
-			else
-			{
-				type = ctoken->type;
-				*start += 1;
-				ctoken = ctoken->next;
-				if (!is_coma)
-					is_coma = 1;
-				else
-				{
-					is_coma = 0;
-					type = -1;
-				}
-			}
-		}
-		else
-		{
-			if (!ctoken)
-				break;
-			if (str)
-				str = ft_strjoin(str, ft_substr(&ctoken->value,0,1));
-			else
-				str = ft_substr(&ctoken->value,0,1);
-			ctoken = ctoken->next;
-			*start += 1;
-		}
-	}
-	// printf("start= %i, str= %s\n", *start, str);
-	return (str);
-}
-
-void	advance_special(t_token *token, int *start)
-{
-	t_token *ctoken;
-	int	j;
-	
-	j = *start;
-	ctoken = token;
-	while (ctoken && --j >= 0)
-		ctoken = ctoken->next;
-	if (ctoken && ctoken->type == MINOR)
-	{
-		*start += 1;
-		ctoken = ctoken->next;
-		if (ctoken->type == MINOR)
-			*start += 1;
-	}
-	else if (ctoken && ctoken->type == MAJOR)
-	{
-		*start += 1;
-		ctoken = ctoken->next;
-		if (ctoken->type == MAJOR)
-			*start += 1;
-	}
-	else if (ctoken && ctoken->type == SPACES)
-	{
-		while(ctoken && ctoken->type == SPACES)
-		{
-			*start += 1;
-			ctoken = ctoken->next;
-		}
-	}
-	else
-		*start += 1;
-}
-
-int	have_expansor(t_token *token)
-{
-	t_token *ctoken;
-
-	ctoken = token;
-
-	while (ctoken)
-	{
-		if (ctoken->value == '$')
-			return (1);
-		ctoken = ctoken->next;
-	}
-	return (0);
-}
-
-//ya paso el inicio del string, comilla incluida para saber cómo avanzar
-void	expand_string(t_token **token, t_list **lst, int *i)
-{
-	t_list *clst;
-	char	*str;
-	char	*res;
-	char	*s_lst;
-
-	s_lst = (char *)(*lst)->content;
-	clst = (*lst);
-	printf("token: %c, s_lst c: %c, s_lst %s", (*token)->value, s_lst[*i], s_lst);
-	while (0)
-	{
-		if (ft_strchr((char *)clst->content, '$'))
-		{
-			str = ft_substr((char *)clst->content, 0, ft_strchr((char *)clst->content, '$') - (char *)clst->content);
-			res = ft_strjoin(str, ft_strchr((char *)clst->content, '$') + 1);
-			free (str);
-			free (clst->content);
-			clst->content = res;
-			return ;
-		}
-		else
-			clst = clst->next;
-	}
-
-	// t_list *clst;
-	// char	*str;
-	// char	*res;
-
-	// clst = lst;
-	// while (clst)
-	// {
-	// 	if (ft_strchr((char *)clst->content, '$'))
-	// 	{
-	// 		str = ft_substr((char *)clst->content, 0, ft_strchr((char *)clst->content, '$') - (char *)clst->content);
-	// 		res = ft_strjoin(str, ft_strchr((char *)clst->content, '$') + 1);
-	// 		free (str);
-	// 		free (clst->content);
-	// 		clst->content = res;
-	// 		return ;
-	// 	}
-	// 	else
-	// 		clst = clst->next;
-	// }
-}
-
-void	free_matrix(char **mat)
-{
-	int	i;
-
-	i = -1;
-	if (!mat)
-		return;
-	while (mat[++i])
-		free(mat[i]);
-	free(mat);
-	mat = NULL;
-}
-
-// TODO No está funcionando como se espera, no devuelve el path adecuado
-int	search_key_env(char **env, char *res)
-{
-	int	i;
-	char **key_value;
-
-	i = -1;
-	printf("RES = %s", res);
-	while (env[++i])
-	{
-		key_value = ft_split(env[i], '=');
-		if (!key_value)
-			return (-1);
-		// printf("env %i = %s\n", i, env[i]);
-		// printf("%i qui: %s\n", i, key_value[0]);
-		if (!ft_strncmp(key_value[0], res, ft_strlen(key_value[0])))
-			return (free_matrix(key_value), i);
-		free_matrix(key_value);
-	}
-	return (-1);
-}
-
-char	*expandsor(char **env, t_token *token, int iter)
-{
-	t_token *ctoken;
-	char	*str;
-	char	*res;
-	int		i;
-
-	ctoken = token;
-	str = ft_strdup("");
-	while (ctoken->value && ctoken->value != '$' && iter > 0)
-	{
-		if (iter && ctoken->value == '$')
-			iter--;
-		ctoken = ctoken->next;	
-	}
-	ctoken = ctoken->next;
-		if (ctoken->value != '"' && ctoken->value != '\'')
-		{
-			while (ctoken && ft_isalnum(ctoken->value))
-			{
-				res = ft_strjoin(str, &ctoken->value);
-				free(str);
-				str = res;
-				ctoken = ctoken->next;
-			}
-		}
-		i = search_key_env(env, res);
-		// printf("OJOOO %i\n", i);
-		if (i >= 0)
-			str = ft_strdup(ft_strchr(env[i],'='));
-		// printf("hhhhhhhhhh:%s\n", str);
-		if (!str)
-			return (NULL);
-	return (str);
-}
-
-void	expand_env(t_list *lst, char **env, t_token *token)
-{
-	t_list *clst;
-	int		iter;
-	char	*str;
-	char	*exp;
-	char	*res;
-
-	clst = lst;
-	iter = 0;
-	exp = NULL;
-	while (clst)
-	{
-		if (ft_strchr((char *)clst->content, '$'))
-		{
-			exp = expandsor(env, token, iter);
-			iter++;
-			str = ft_substr((char *)clst->content, 0, ft_strchr((char *)clst->content, '$') - (char *)clst->content);
-			//TODO peta aquí
-			res = ft_strjoin(str, exp);
-			free (str);
-			free (clst->content);
-			free (exp);
-			exp = NULL;
-			clst->content = res;
-			return ;
-		}
-		else
-			clst = clst->next;
-	}
-}
-
-// TODO ojo que no expanda si el $ esta dentro de las ""
-void	add_expansor(t_token *token, char **env, t_list *lst)
-{
-	t_token *ctoken;
-	int		i;
-	char	*content;
-
-	content = (char*)lst->content;
-	ctoken = token;
-	i = 0;
-	printf("ANTES token: %c, s_lst c: %c, s_lst %s\n", ctoken->value, content[i], (char*)lst->content);
-	advance_token_list(&ctoken, &lst, &i);
-	printf("DESPUES token: %c, s_lst c: %c, s_lst %s\n", ctoken->value, content[i], (char*)lst->content);
-	while (ctoken)
-	{
-		if (ctoken->value == '$')
-		{
-			// ctoken = ctoken->next;
-			advance_token_list(&ctoken, &lst, &i);
-			if (ctoken->value == '\'' || ctoken->value == '"')
-				{
-					expand_string(&ctoken, &lst, &i);
-					// TODO avanzar token hasta encontrar las comillas
-				}
-			else
-				expand_env(lst, env, token);
-		}
-		ctoken = ctoken->next;
-	}
-}
-
-//TODO no funciona: hola adios col> dedo guarda 1 null que no debería
-char	**split_token(char const *s, t_token *token, char **env)
-{
-	t_list	*lst;
-	int		start;
-	int		lenth;
-	void	*str;
-
-	if (1)
-		return (NULL);
-	(void)s;
-	start = 0;
-	lenth = token_len(token);
-	lst = NULL;
-	// ft_lstadd_back(&lst, ft_lstnew((char const *)next_word(token, &start)));
-	while (start < lenth)
-	{
-		str = next_word(token, &start);
-		if (str)
-			ft_lstadd_back(&lst, ft_lstnew((char const *)str));
-		advance_special(token, &start);
-	}
-	if (have_expansor(token))
-		add_expansor(token, env, lst);
-	return (list_to_matrix(lst));
-}
-
-*/

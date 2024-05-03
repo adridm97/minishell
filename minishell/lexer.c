@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/02 07:56:01 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/03 13:13:28 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,98 +172,19 @@ static void	print_data(t_data *data)
 	}
 }
 
-// static void	print_token(t_token *token, char **comands)
-// {
-// 	while (token->next)
-// 	{
-// 		printf("type: %i, value: %c\n", token->type, token->value);
-// 		token = token->next;
-// 	}
-// 	printf("type: %i, value: %c\n", token->type, token->value);
-
-// 	while (*comands)
-// 	{
-// 		printf("comand: %s\n", *comands++);
-// 	}
-// }
-
-int	count_redir(char **splited)
-{
-	int i;
-
-	i = 0;
-	while (splited[i])
-		i++;
-	return i;
-}
-/*TODO Gestionar la redirección <>*/
-int	search_special(char *comands, int j)
-{
-	int type;
-
-	while (*comands)
-	{
-		if (j >= 0)
-		{
-			if (*comands == '<')
-			{
-				comands++;
-				if (*comands == '<')
-					type = D_MINOR;
-				else
-				{
-					type = MINOR;
-					comands--;
-				}
-				j--;
-			}
-			else if (*comands == '>')
-			{
-				comands++;
-				if (*comands == '>')
-					type = D_MAJOR;
-				else
-				{
-					type = MAJOR;
-					comands--;
-				}
-				j--;
-			}
-		}
-		comands++;
-	}
-	return (type);
-}
-
-void	add_redir(t_redir **res, t_redir *list)
-{
-	t_redir *temporal;
-
-	temporal = (*res);
-	if ((*res))
-	{
-		while (temporal->next != NULL)
-			temporal = temporal->next;
-		temporal->next = list;
-	}
-	if (!(*res))
-		((*res) = list);
-}
-
 void	free_redir(t_redir **redir)
 {
 	t_redir *i;
+
 	if (!(*redir))
 		return ;
-	while ((*redir)->next)
+	while ((*redir))
 	{
-		i = *redir;
+		i = (*redir)->next;
 		free((*redir)->path);
 		free(*redir);
 		(*redir) = i;
 	}
-	free((*redir)->path);
-	free(*redir);
 }
 
 void	free_args(char **args)
@@ -301,91 +222,6 @@ void	free_data(t_data **data)
 	*data = NULL;
 }
 
-void	add_data(t_data **data, t_data **data_lst)
-{
-	t_data *last;
-	
-	if (!*data)
-	{
-		*data = *data_lst;
-		return ;
-	}
-	last = *data;
-	while (last->next)
-		last = last->next;
-	last->next = *data_lst;
-}
-
-int	redir_init(t_data **data, char **splited, char *comands, int n_redir)
-{
-	t_redir *list;
-	int	i;
-
-	i = 0;
-	(*data)->redir = NULL;
-	while (i < n_redir)
-	{
-		list = (t_redir*)malloc(sizeof(t_redir));
-		if (!list)
-			return (free_redir(&(*data)->redir), lexer_error(&(t_error){"Memory error",1}), ERROR);
-		list->path = splited[i];
-		list->type = search_special(comands, i);
-		list->next = NULL;
-		add_redir(&(*data)->redir, list);
-		i++;
-	}
-	return (1);
-}
-
-int	search_quotes(t_token *token)
-{
-	while (token)
-	{
-		if (token->type == QUOTE || token->type == D_QUOTE)
-			return (1);
-		token = token->next;
-	}
-	return (0);
-}
-
-char	**repair_quots(char **args, t_token *token)
-{
-	if (!search_quotes(token))
-		return(args);
-	while (token->type != QUOTE && token->type != D_QUOTE)
-	{
-
-	}
-	return (args);
-}
-int	go_data(t_data **data, char **comands, t_token *token)
-{
-	char	**splited;
-	char	**args;
-	t_data	*data_lst;
-	int		i;
-
-	i = -1;
-	while (comands[++i])
-	{
-		data_lst = (t_data *)malloc(sizeof(t_data));
-		if (!data_lst)
-			return (free_data(data), lexer_error(&(t_error){"Memory error", 1}), ERROR);
-		splited = special_split(comands[i]);
-		if (!splited)
-			return (free_data(data), lexer_error(&(t_error){"Memory error", 1}), ERROR);
-		args = ft_split(splited[0], ' ');
-		data_lst->comand = args[0];
-		data_lst->args = repair_quots(args, token);
-		(free(splited[0]), splited++);
-		if (!redir_init(&data_lst, splited, comands[i], count_redir(splited)))
-			return (ERROR);
-		data_lst->next = NULL;
-		add_data(data, &data_lst);
-	}
-	return (1);
-}
-
 int	init_data(t_data **data)
 {
 	*data = (t_data *)malloc(sizeof(t_data));
@@ -404,8 +240,6 @@ int	parser(t_data **data, t_token **token, char *input, char **env)
 {
 	split_token(*token, env, data);
 	(void)input;
-	// if (!go_data(data, comands, *token))
-	// 	return (ERROR);
 	return (1);
 }
 /*TODO Este caso rompe con segfault: ahola>adios|adios>ee||
