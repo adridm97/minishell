@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/05/03 13:16:04 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/04 12:29:24 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,11 +74,12 @@ void	is_simple_string(t_token **token, char **env, char **str)
 	*token = (*token)->next;
 	while (*token && (*token)->value != '\'')
 	{
-		if ((*token)->value == '$')
-		{
-			is_expandsor(token, &res, env);
-			break;	
-		}
+		(void)env;
+		// if ((*token)->value == '$')
+		// {
+		// 	is_expandsor(token, &res, env);
+		// 	break;	
+		// }
 		res = new_str(&res, (*token)->value);
 		if (*token)
 			*token = (*token)->next;
@@ -232,22 +233,24 @@ void	is_redir_output(t_token **token, t_data **data, char **str, char **env)
 
 
 // split the pipe and put in data
-void	is_pipe(t_token **token, t_data **data, char **str)
+int	is_pipe(t_token **token, t_data **data, char **str)
 {
 	t_data	*n_data;
 	t_data	*last_data;
 
-	init_data(&n_data);
+	if (init_data(&n_data))
+		return (free(*str), 0);
 	last_data = (*data);
 	while (last_data->next)
 		last_data = last_data->next;
 	if(*str)
 	{
 		if(!add_args(&(last_data)->args, str))
-			(void)str; //TODO Controlar error
+			return (0);
 	}
 	last_data->next = n_data;
 	*token = (*token)->next;
+	return (1);
 }
 
 int	take_key(t_token **token, char **key, char *str)
@@ -295,12 +298,12 @@ void	is_expandsor(t_token **token, char **str, char **env)
 		*str = new_str(str, '$');
 	else if ((*token)->value == '"')
 	{
-		*token = (*token)->next;
+		// *token = (*token)->next;
 		is_double_string(token, env, str);
 	}
 	else if ((*token)->value == '\'')
 	{
-		*token = (*token)->next;
+		// *token = (*token)->next;
 		is_simple_string(token, env, str);
 	}
 	else
@@ -333,7 +336,21 @@ int	count_args(char **args)
 	return (i);
 }
 
-/*TODO OJO si falla malloc no se esta liberando arg*/
+void	free_args_triple(char ***arg)
+{
+	int	i;
+
+	i = -1;
+	if (!*arg)
+		return ;
+	while((*arg)[++i])
+	{
+		free((*arg)[i]);
+	}
+	free(*arg);
+	*arg = NULL;
+}
+
 int add_args(char ***arg, char **str)
 {
 	char	**args;
@@ -345,20 +362,19 @@ int add_args(char ***arg, char **str)
 	else
 		args = (char **)malloc(sizeof(char *) * 2);
 	if (!args)
-		return (0);
+		return (free_args_triple(arg), 0);
 	while((*arg) && (*arg)[i])
 	{
 		args[i] = ft_strdup((*arg)[i]);
-		if(args[i])
-			i = i;//TODO GESTIONAR ERROR con return
-		free((*arg)[i]);
+		if(!args[i])
+			return(free_args_triple(&args), free_args_triple(arg), 0);
 		i++;
 	}
 	args[i] = ft_strdup(*str);
-	if(args[i])
-		i = i;//TODO GESTIONAR ERROR con return
+	if(!args[i])
+		return(free_args_triple(&args), free_args_triple(arg), 0);
 	args[i + 1] = NULL;
-	free(*str), free(*arg);
+	free(*str), free_args_triple(arg);
 	*str = NULL;
 	*arg = args;
 	return (1);
@@ -373,7 +389,7 @@ void	is_space(t_token **token, t_data **data, char **str)
 }
 
 //switch case en funcion delcaracter
-void	switch_case(t_token **token, char **env, t_data **data, char **str)
+int	switch_case(t_token **token, char **env, t_data **data, char **str)
 {
 	if ((*token)->value == '\'')
 		is_simple_string(token, env, str);
@@ -384,14 +400,15 @@ void	switch_case(t_token **token, char **env, t_data **data, char **str)
 	else if ((*token)->value == '>')
 		is_redir_output(token, data, str, env);
 	else if ((*token)->value == '|')
-		is_pipe(token, data, str);
+		return (is_pipe(token, data, str));
 	else if ((*token)->value == '$')
 		is_expandsor(token, str, env);
 	else if ((*token)->value == ' ')
 		is_space(token, data, str);
+	return (1);
 }
 
-void	add_last_data(t_data **data, char **str)
+int	add_last_data(t_data **data, char **str)
 {
 	t_data *n_data;
 
@@ -399,7 +416,8 @@ void	add_last_data(t_data **data, char **str)
 	while (n_data->next)
 		n_data = n_data->next;
 	if (!add_args(&n_data->args, str))
-		(void)str; //TODO Controlar error
+		return (0);
+	return (1);
 }
 
 /*TODO Poner en path el path || OJOOOO $PATH hola Pierde la h
@@ -415,7 +433,7 @@ path: a, type: 2
 Redirs
 path: a, type: 2
 */
-void	split_token(t_token *token, char **env, t_data **data)
+int	split_token(t_token *token, char **env, t_data **data)
 {
 	char	*str;
 
@@ -436,6 +454,8 @@ void	split_token(t_token *token, char **env, t_data **data)
 	}
 	if(str)
 	{
-		add_last_data(data, &str);
+		if (!add_last_data(data, &str))
+			return (0);
 	}
+	return (1);
 }

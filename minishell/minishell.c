@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/01 11:03:52 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/04 12:40:28 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,10 @@ int	main(int argc, char *argv[], char *env[])
 			break ;
 		if (input && *input)
 			add_history (input);
+		//TODO si hay un error de sintaxis data es null y se acaba el programa, hay que gestionarlo.
 		data = lexer(input, data, env);
-		// if (!data)
-		// 	exit(EXIT_FAILURE);
+		if (!data)
+			exit(EXIT_FAILURE);
 		// is_valid_command(data);
 		// printf("%s\n", data.token->value);
 		free_data(&data);

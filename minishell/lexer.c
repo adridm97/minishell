@@ -6,11 +6,27 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/03 13:13:28 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/04 12:40:57 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	free_token(t_token **token)
+{
+	t_token *c_token;
+	if (*token)
+	{
+		c_token = (*token)->next;
+		while (*token)
+		{
+			free (*token);
+			*token = c_token;
+			if (*token)
+				c_token = (*token)->next;
+		}
+	}
+}
 
 int	check_error(t_token *token, char type)
 {
@@ -59,7 +75,7 @@ int	check_gramathic(t_token *token, t_error *error)
 		return (1);
 }
 
-void	lexer_error(t_error *error)
+void	is_error(t_error *error)
 {
 	if(error->is_error)
 	{
@@ -185,6 +201,7 @@ void	free_redir(t_redir **redir)
 		free(*redir);
 		(*redir) = i;
 	}
+	redir = NULL;
 }
 
 void	free_args(char **args)
@@ -192,13 +209,16 @@ void	free_args(char **args)
 	int	i;
 
 	i = -1;
-	while (args[++i])
+	if (*args)
 	{
-		if (args[i])
-			free(args[i]);
+		while (args[++i])
+		{
+			if (args[i])
+				free(args[i]);
+		}
+		free(args);
 	}
-	if (args)
-	free(args);
+	args = NULL;
 }
 
 void	free_data(t_data **data)
@@ -235,15 +255,6 @@ int	init_data(t_data **data)
 	return (1);
 }
 
-/*falta proteger split*/
-int	parser(t_data **data, t_token **token, char *input, char **env)
-{
-	split_token(*token, env, data);
-	(void)input;
-	return (1);
-}
-/*TODO Este caso rompe con segfault: ahola>adios|adios>ee||
-TODO falta gestionar el \' y el \" como comilla*/
 t_data	*lexer(char *input, t_data *data, char **env)
 {
 	t_token	*token;
@@ -258,20 +269,19 @@ t_data	*lexer(char *input, t_data *data, char **env)
 		if (!token)
 		{
 			if (!new_token(input[i], typeing(input[i], " |><\'\""), &token, 0))
-				return (lexer_error(&(t_error){"Memory error",1}), NULL);
+				return (is_error(&(t_error){"Memory error",1}), free_token(&token), NULL);
 		}
 		else
 		{
 			if (!add_token(input[i], typeing(input[i], " |><\'\""), &token))
-				return (lexer_error(&(t_error){"Memory error",1}), NULL);
+				return (is_error(&(t_error){"Memory error",1}), free_token(&token), NULL);
 		}
 	}
 	(check_closed(token, &error), check_gramathic(token, &error));
 	if (error.is_error)
-		lexer_error(&error);
-	else	
-	if (!parser(&data, &token, input, env))
-		data = NULL;
+		is_error(&error), free_data(&data), free_token(&token);
+	else if (!split_token(token, env, &data))
+		return (is_error(&(t_error){"Memory error",1}), free_data(&data), free_token(&token), NULL);
 	print_data(data);
 	return (data);
 }
