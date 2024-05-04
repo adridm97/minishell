@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/04 12:40:57 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/04 16:58:01 by kluna-bo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 void	free_token(t_token **token)
 {
-	t_token *c_token;
+	t_token	*c_token;
+
 	if (*token)
 	{
 		c_token = (*token)->next;
@@ -41,7 +42,7 @@ int	check_error(t_token *token, char type)
 			if (token->type >= PIPE && token->type <= MINOR)
 				return (1);
 			else
-			return (0);
+				return (0);
 		}
 	}
 	return (1);
@@ -57,14 +58,15 @@ int	check_gramathic(t_token *token, t_error *error)
 	{
 		if (token->type >= PIPE && token->type <= MINOR && !flag)
 		{
-			flag = 1; 
+			flag = 1;
 			type = token->type;
 		}
 		if (flag)
 		{
 			if (check_error(token, type))
 			{
-				error->error = ft_strdup("Syntax error");
+				if (!error->error)
+					error->error = ft_strdup("Syntax error");
 				error->is_error = 1;
 				return (ERROR);
 			}
@@ -72,12 +74,12 @@ int	check_gramathic(t_token *token, t_error *error)
 		}
 		token = token->next;
 	}
-		return (1);
+	return (1);
 }
 
 void	is_error(t_error *error)
 {
-	if(error->is_error)
+	if (error->is_error)
 	{
 		printf(RED"Minishell: %s\n"BLACK, error->error);
 		error->error = NULL;
@@ -87,26 +89,23 @@ void	is_error(t_error *error)
 
 int	check_closed(t_token *token, t_error *error)
 {
-	int quote;
-	char open;
+	int		quote;
+	char	open;
 
 	open = 0;
 	while (token)
 	{
 		if ((token->type == QUOTE || token->type == D_QUOTE) && !open)
 		{
-			open = 1;	
+			open = 1;
 			quote = token->type;
 		}
 		else if (token->type == quote && open)
 			open = 0;
 		token = token->next;
 	}
-	if (open)
-	{
-		error->error = ft_strdup("Syntax error");
+	if (open && !error->error)
 		error->is_error = 1;
-	}
 	return (!open);
 }
 
@@ -158,8 +157,8 @@ int	typeing(char c, char *base)
 void	print_redir(t_redir *redir)
 {
 	if (!redir)
-		return;
-	while(redir)
+		return ;
+	while (redir)
 	{
 		printf("Redirs\n");
 		printf("path: %s, type: %i\n", redir->path, redir->type);
@@ -169,28 +168,28 @@ void	print_redir(t_redir *redir)
 
 static void	print_data(t_data *data)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 0;
 	j = -1;
 	while (data)
 	{
-		printf("data %i\nComand: %s|\n",i, data->comand);
-		while(data->args && data->args[++j])
+		printf("data %i\nComand: %s|\n", i, data->comand);
+		while (data->args && data->args[++j])
 			printf("arg[%i]: %s|\n", j, data->args[j]);
 		j = -1;
 		print_redir(data->redir);
 		data = data->next;
 		j = -1;
 		i++;
-		printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	}
 }
 
 void	free_redir(t_redir **redir)
 {
-	t_redir *i;
+	t_redir	*i;
 
 	if (!(*redir))
 		return ;
@@ -223,7 +222,8 @@ void	free_args(char **args)
 
 void	free_data(t_data **data)
 {
-	t_data *del;
+	t_data	*del;
+
 	if (!*data)
 		return ;
 	while ((*data)->next)
@@ -245,7 +245,7 @@ void	free_data(t_data **data)
 int	init_data(t_data **data)
 {
 	*data = (t_data *)malloc(sizeof(t_data));
-	if(!*data)
+	if (!*data)
 		return (0);
 	(*data)->args = NULL;
 	(*data)->comand = NULL;
@@ -264,6 +264,7 @@ t_data	*lexer(char *input, t_data *data, char **env)
 	i = -1;
 	token = NULL;
 	error.is_error = 0;
+	error.error = NULL;
 	while (input[++i])
 	{
 		if (!token)
@@ -277,11 +278,13 @@ t_data	*lexer(char *input, t_data *data, char **env)
 				return (is_error(&(t_error){"Memory error",1}), free_token(&token), NULL);
 		}
 	}
-	(check_closed(token, &error), check_gramathic(token, &error));
+	check_closed(token, &error);
+	check_gramathic(token, &error);
 	if (error.is_error)
-		is_error(&error), free_data(&data), free_token(&token);
+		return(is_error(&(t_error){"Syntax error",1}), free(error.error), free_data(&data), free_token(&token), NULL);
 	else if (!split_token(token, env, &data))
 		return (is_error(&(t_error){"Memory error",1}), free_data(&data), free_token(&token), NULL);
 	print_data(data);
+	free_token(&token);
 	return (data);
 }

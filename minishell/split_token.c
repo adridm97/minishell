@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   split_token.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/05/04 12:29:24 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/04 21:21:30 by kluna-bo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,22 @@
 
 char	*charstr(char c)
 {
-		char	*res;
+	char	*res;
 
-		res = (char *)malloc(sizeof(char) * 2);
-		if (!res)
-			return (NULL);
-		res[0] = c;
-		res[1] = 0;
-		return (res);
+	res = (char *)malloc(sizeof(char) * 2);
+	if (!res)
+		return (NULL);
+	res[0] = c;
+	res[1] = 0;
+	return (res);
 }
 
 // return NULL if error, add 
-char *new_str(char **str, char c)
+char	*new_str(char **str, char c)
 {
 	char	*res;
 	char	*letter;
+
 	if (!*str)
 	{
 		res = charstr(c);
@@ -57,7 +58,7 @@ int	is_special(char c, char *comp)
 	char	*str;
 
 	str = ft_strchr(comp, c);
-	if(str)
+	if (str)
 		return (1);
 	else
 		return (0);
@@ -105,7 +106,7 @@ void	is_double_string(t_token **token, char **env, char **str)
 		if ((*token)->value == '$')
 		{
 			is_expandsor(token, &res, env);
-			break;	
+			break ;	
 		}
 		res = new_str(&res, (*token)->value);
 		if (*token)
@@ -125,13 +126,15 @@ void	switch_case_redir(t_token **token, char **str, char **env)
 		is_double_string(token, env, str);
 	else if ((*token)->value == '$')
 		is_expandsor(token, str, env);
+	// else if ((*token)->value == ' ')
+	// 	*token = (*token)->next;
 }
 
 /*TODO Hay que hacerla más corta*/
 void	init_redir(t_token **token, t_data **data, char **env, int type)
 {
 	char	*str;
-	t_redir *redir;
+	t_redir	*redir;
 	t_redir	*l_redir;
 	t_data	*c_data;
 
@@ -154,13 +157,13 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 			if (!c_data->redir)
 			{
 				c_data->redir = redir;
-				return;
+				return ;
 			}
 			l_redir = c_data->redir;
 			while (l_redir->next)
 				l_redir = l_redir->next;
 			l_redir->next = redir;
-			return;
+			return ;
 		}
 		else
 		{
@@ -169,13 +172,13 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 		}
 	}
 	while (c_data->next)
-			c_data = c_data->next;
+		c_data = c_data->next;
 	redir->path = str;
 	l_redir = c_data->redir;
 	if (!l_redir)
 	{
 		c_data->redir = redir;
-		return;
+		return ;
 	}
 	while (l_redir->next)
 		l_redir = l_redir->next;
@@ -185,12 +188,7 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 // split the redirection and put in data
 void	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 {
-	t_data	*last_data;
-
-	last_data = (*data);
-	while (last_data->next)
-		last_data = last_data->next;
-	if(*token && *str)
+	if (*token /*&& *str*/)
 		*token = (*token)->next;
 	if ((*token)->value == '<')
 	{
@@ -203,19 +201,17 @@ void	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 		init_redir(token, data, env, SPACES);
 	}
 	else
+	{
 		init_redir(token, data, env, MINOR);
+	}
+	(void)str;
 }
 
 
 // split the redirection and put in data
 void	is_redir_output(t_token **token, t_data **data, char **str, char **env)
 {
-	t_data	*last_data;
-
-	last_data = (*data);
-	while (last_data->next)
-		last_data = last_data->next;
-	if(*token && *str)
+	if (*token /*&& *str*/)
 		*token = (*token)->next;
 	if ((*token)->value == '>')
 	{
@@ -229,6 +225,8 @@ void	is_redir_output(t_token **token, t_data **data, char **str, char **env)
 	}
 	else
 		init_redir(token, data, env, MAJOR);
+	printf("SALGO\n");
+	(void)str;
 }
 
 
@@ -238,14 +236,14 @@ int	is_pipe(t_token **token, t_data **data, char **str)
 	t_data	*n_data;
 	t_data	*last_data;
 
-	if (init_data(&n_data))
+	if (!init_data(&n_data))
 		return (free(*str), 0);
 	last_data = (*data);
 	while (last_data->next)
-		last_data = last_data->next;
-	if(*str)
+		last_data = last_data->next;	
+	if (*str)
 	{
-		if(!add_args(&(last_data)->args, str))
+		if (!add_args(&(last_data)->args, str))
 			return (0);
 	}
 	last_data->next = n_data;
@@ -298,12 +296,10 @@ void	is_expandsor(t_token **token, char **str, char **env)
 		*str = new_str(str, '$');
 	else if ((*token)->value == '"')
 	{
-		// *token = (*token)->next;
 		is_double_string(token, env, str);
 	}
 	else if ((*token)->value == '\'')
 	{
-		// *token = (*token)->next;
 		is_simple_string(token, env, str);
 	}
 	else
@@ -329,8 +325,8 @@ int	count_args(char **args)
 	int	i;
 
 	i = 0;
-	if(!args)
-	 return (0);
+	if (!args)
+		return (0);
 	while (args[i])
 		i++;
 	return (i);
@@ -343,7 +339,7 @@ void	free_args_triple(char ***arg)
 	i = -1;
 	if (!*arg)
 		return ;
-	while((*arg)[++i])
+	while ((*arg)[++i])
 	{
 		free((*arg)[i]);
 	}
@@ -357,24 +353,24 @@ int add_args(char ***arg, char **str)
 	int		i;
 
 	i = 0;
-	if(*arg)
+	if (*arg)
 		args = (char **)malloc(sizeof(char *) * (count_args(*arg) + 2));
 	else
 		args = (char **)malloc(sizeof(char *) * 2);
 	if (!args)
 		return (free_args_triple(arg), 0);
-	while((*arg) && (*arg)[i])
+	while ((*arg) && (*arg)[i])
 	{
 		args[i] = ft_strdup((*arg)[i]);
-		if(!args[i])
-			return(free_args_triple(&args), free_args_triple(arg), 0);
+		if (!args[i])
+			return (free_args_triple(&args), free_args_triple(arg), 0);
 		i++;
 	}
 	args[i] = ft_strdup(*str);
-	if(!args[i])
-		return(free_args_triple(&args), free_args_triple(arg), 0);
+	if (!args[i])
+		return (free_args_triple(&args), free_args_triple(arg), 0);
 	args[i + 1] = NULL;
-	free(*str), free_args_triple(arg);
+	(free(*str), free_args_triple(arg));
 	*str = NULL;
 	*arg = args;
 	return (1);
@@ -382,7 +378,7 @@ int add_args(char ***arg, char **str)
 
 void	is_space(t_token **token, t_data **data, char **str)
 {
-	if(*token)
+	if (*token)
 		*token = (*token)->next;
 	if (*str)
 		add_last_data(data, str);
@@ -410,7 +406,7 @@ int	switch_case(t_token **token, char **env, t_data **data, char **str)
 
 int	add_last_data(t_data **data, char **str)
 {
-	t_data *n_data;
+	t_data	*n_data;
 
 	n_data = *data;
 	while (n_data->next)
@@ -437,7 +433,7 @@ int	split_token(t_token *token, char **env, t_data **data)
 {
 	char	*str;
 
-	if(!init_data(data))
+	if (!init_data(data))
 		(void)data; //TODO falta gestionar errores
 	str = NULL;
 	while (token)
@@ -452,7 +448,7 @@ int	split_token(t_token *token, char **env, t_data **data)
 			token = token->next;
 		}
 	}
-	if(str)
+	if (str)
 	{
 		if (!add_last_data(data, &str))
 			return (0);
