@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/05/05 19:42:12 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/05 21:55:00 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,13 +143,14 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 	redir->next = NULL;
 	redir->type = type;
 	redir->path = NULL;
-	str = charstr((*token)->value);
-	*token = (*token)->next;
+	str = NULL;
+	// str = charstr((*token)->value);
+	// *token = (*token)->next;
 	while ((*token))
 	{
 		if (is_special((*token)->value, "'\"$"))
 			switch_case_redir(token, &str, env);
-		else if (is_special((*token)->value, "| <>"))
+		else if (is_special((*token)->value, "| <>") && str)
 		{
 			while (c_data->next)
 				c_data = c_data->next;
@@ -164,6 +165,10 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 				l_redir = l_redir->next;
 			l_redir->next = redir;
 			return ;
+		}
+		else if ((*token)->value == ' ')
+		{
+			*token = (*token)->next;
 		}
 		else
 		{
