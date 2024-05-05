@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/04/28 21:40:24 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/05/05 20:41:14 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,7 +234,7 @@ void execute_command(t_data *data, char *command_path)
         if (data->redir != NULL && data->redir->type == D_MINOR)
 			heredoc(data);
 	    if (data->redir != NULL)
-		handle_redir(data);
+		    handle_redir(data);
 		if (execve(command_path, data->args, NULL) == -1)
 		{
 			perror("execve");
