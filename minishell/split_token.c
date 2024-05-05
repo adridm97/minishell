@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   split_token.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/05/04 21:21:30 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/05/05 19:42:12 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,7 +304,7 @@ void	is_expandsor(t_token **token, char **str, char **env)
 	}
 	else
 	{
-		if (*token && take_key(token, &key, " <>|'\""))
+		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€"))
 		{
 			key = key_to_res(&key, env);
 			if (key)
@@ -453,5 +453,7 @@ int	split_token(t_token *token, char **env, t_data **data)
 		if (!add_last_data(data, &str))
 			return (0);
 	}
+	if ((*data)->args)
+		(*data)->comand = (*data)->args[0];
 	return (1);
 }

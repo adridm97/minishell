@@ -3,18 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/04 21:07:52 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/05/05 19:34:27 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#define _POSIX_SOURCE
-#define _XOPEN_SOURCE_EXTENDED 1
-#include <stdio.h>
-#include <signal.h>
 
 /*TODO por algun motivo al poner adios el history falla*/
 int	main(int argc, char *argv[], char *env[])
@@ -48,23 +44,6 @@ int	main(int argc, char *argv[], char *env[])
 	}
 	return (0);
 }
-
-// int main(void) 
-// {
-// struct sigaction info;
-
-// if (sigaction(SIGCHLD,NULL,&info) != -1)
-//     if (info.sa_handler == SIG_IGN)
-// 	{
-
-//         printf("SIGCHLD being ignored.\n");
-// 	}
-//     else if (info.sa_handler == SIG_DFL)
-// 	{
-
-//             printf("SIGCHLD being defaulted.\n");
-// 	}
-// }
 
 /*int es_comando_valido(char *comando) {
     // Aquí podrías implementar una lógica para verificar si el comando es válido
