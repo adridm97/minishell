@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/04 12:22:05 by kevin            ###   ########.fr       */
+/*   Updated: 2024/04/24 23:24:10 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,18 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft/libft.h"
+# include "libft/get_next_line.h"
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <fcntl.h>
+
+// Signals
+# define CTRL_C SIGINT
+# define CTRL_SLASH SIGQUIT
+
+// Mode
+# define DEFAULT 0
+# define CHILDS 1
 
 # define SPACES		0 // ' '
 # define PIPE		1 // |
@@ -63,6 +72,15 @@ typedef struct s_redir
 	char			*path;
 	struct s_redir	*next;
 }	t_redir;
+
+/*
+typedef struct s_heredoc
+{
+	int					type;
+	char				*file;
+	struct s_heredoc	*next;
+}	t_heredoc;
+*/
 
 /*
 Structure:
@@ -127,6 +145,9 @@ int		add_args(char ***arg, char **str);
 int		add_last_data(t_data **data, char **str);
 
 
+void	execute_command(t_data *data, char *command_path);
+void	handle_redir(t_data *data);
+void	heredoc(t_data *data);
 
 // Regular Colors
 # define BLACK "\x1b[0m"
@@ -138,8 +159,4 @@ int		add_last_data(t_data **data, char **str);
 # define CYAN "\x1b[36m"
 # define WHITE "\x1b[37m"
 
-//executor.c
-int		is_valid_command(t_data *data);
-void	execute_command(t_data *data, char *command_path);
-void	handle_redir(t_data *data);
 #endif

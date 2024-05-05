@@ -6,7 +6,7 @@ RM = rm -f
 AR = ar rcs
 RM = rm -f
 OBJS_PATH		= ./build
-HEADER			= libft.h
+HEADER			= libft.h get_next_line.h
 SOURCES = \
 	ft_atoi.c \
 	ft_bzero.c \
@@ -51,7 +51,8 @@ SOURCES = \
 	ft_lstmap_bonus.c \
 	ft_lstnew_bonus.c \
 	ft_lstsize_bonus.c
-
+	get_next_line.c \
+	get_next_line_utils.c
 
 
 all: $(NAME)
