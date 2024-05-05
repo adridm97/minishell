@@ -36,7 +36,7 @@ int	main(int argc, char *argv[], char *env[])
 			break ;
 		if (input && *input)
 			add_history (input);
-		data = lexer(input, data);
+		data = lexer(input, data, env);
 		//if (!data)
 		// 	exit(EXIT_FAILURE);	
 		is_valid_command(data);

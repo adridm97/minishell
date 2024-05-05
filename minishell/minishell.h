@@ -95,6 +95,7 @@ Structure:
 */
 typedef struct s_token
 {
+	int				index;
 	int				type;
 	char			value;
 	struct s_token	*next;
@@ -111,6 +112,7 @@ typedef struct s_token
 typedef struct s_data
 {
 	char			*comand;
+	char			*path;
 	char			**args;
 	struct s_data	*next;
 	struct s_redir	*redir;
@@ -118,16 +120,31 @@ typedef struct s_data
 }	t_data;
 
 // lexer.c
-int		new_token(char c, int type, t_token **token);
+int		new_token(char c, int type, t_token **token, int index);
 int		add_token(char c, int type, t_token **token);
-t_data	*lexer(char *input, t_data *data);
+t_data	*lexer(char *input, t_data *data, char **env);
 int		typeing(char c, char *base);
-void	lexer_error(t_error *error);
-char	**special_split(char const *s);
+void	is_error(t_error *error);
 void	free_data(t_data **data);
+int		init_data(t_data **data);
+void	free_redir(t_redir **redir);
+
+
+// split things
+char	**special_split(char const *s);
+int		split_token(t_token *token, char **env, t_data **data);
 
 //executor.c
 int		is_valid_command(t_data *data);
+
+//split_token
+void	is_expandsor(t_token **token, char **str, char **env);
+void	is_expandsor_str_simple(t_token **token, char **str, char **env);
+int		switch_case(t_token **token, char **env, t_data **data, char **str);
+int		add_args(char ***arg, char **str);
+int		add_last_data(t_data **data, char **str);
+
+
 void	execute_command(t_data *data, char *command_path);
 void	handle_redir(t_data *data);
 void	heredoc(t_data *data);
