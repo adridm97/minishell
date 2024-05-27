@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/04 16:58:01 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/05/26 17:18:24 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,7 +177,7 @@ static void	print_data(t_data *data)
 	{
 		printf("data %i\nComand: %s|\n", i, data->comand);
 		while (data->args && data->args[++j])
-			printf("arg[%i]: %s|\n", j, data->args[j]);
+			printf("arg[%i]: %s|\nnext = %p\n", j, data->args[j], data->next);
 		j = -1;
 		print_redir(data->redir);
 		data = data->next;

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/05/05 21:55:00 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/27 06:52:48 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -421,6 +421,18 @@ int	add_last_data(t_data **data, char **str)
 	return (1);
 }
 
+void	include_comand(t_data **data)
+{
+	t_data *ldata;
+
+	ldata = *data;
+	while(ldata)
+	{
+		if(ldata->args)
+			ldata->comand = ldata->args[0];
+		ldata = ldata->next;
+	}
+}
 /*TODO Poner en path el path || OJOOOO $PATH hola Pierde la h
 ¿El siguiente comando da este resultado. Es correcto?
 a>a a>a hola
@@ -458,7 +470,6 @@ int	split_token(t_token *token, char **env, t_data **data)
 		if (!add_last_data(data, &str))
 			return (0);
 	}
-	if ((*data)->args)
-		(*data)->comand = (*data)->args[0];
+	include_comand(data);
 	return (1);
 }
