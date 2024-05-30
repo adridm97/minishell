@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/26 17:18:24 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/30 21:42:58 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,7 +242,44 @@ void	free_data(t_data **data)
 	*data = NULL;
 }
 
-int	init_data(t_data **data)
+void	clean_env(char ***env, int i)
+{
+	while(i >=0)
+		free(env[0][i]);
+}
+
+int	create_env(t_data **data, char **env)
+{
+	int	i;
+
+	i = 0;
+	if (!env || !env[0])
+		return (0);
+	while (env[i])
+		i++;
+	(*data)->env = (char**)malloc(sizeof(char**) * ++i);
+	i = -1;
+	if (!(*data)->env)
+		return(0);	
+	while (env[++i])
+	{
+		(*data)->env[i] = ft_strdup(env[i]);
+		if (!(*data)->env[i])
+			return (clean_env(&(*data)->env, --i), 0);
+	}
+	return (1);
+}
+void	print_env(char **env)
+{
+	int	i;
+
+	i = -1;
+	printf("-----------------ENV--------------\n");
+	while(env[++i])
+		printf("%i=%s\n", i, env[i]);
+}
+
+int	init_data(t_data **data, char **env)
 {
 	*data = (t_data *)malloc(sizeof(t_data));
 	if (!*data)
@@ -252,6 +289,9 @@ int	init_data(t_data **data)
 	(*data)->next = NULL;
 	(*data)->path = NULL;
 	(*data)->redir = NULL;
+	(*data)->env = NULL;
+	if (!create_env(data, env))
+		return (0);
 	return (1);
 }
 

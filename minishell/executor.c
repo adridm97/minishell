@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/05/05 20:41:14 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/29 22:47:11 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -263,6 +263,7 @@ int is_valid_command(t_data *data)
 	i = 0;
 	if (path == NULL)
 	{
+
 		fprintf(stderr, "No se pudo obtener el valor de PATH\n");
 		exit(EXIT_FAILURE);
 	}

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/05/27 06:52:48 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/29 22:48:01 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,7 +241,7 @@ int	is_pipe(t_token **token, t_data **data, char **str)
 	t_data	*n_data;
 	t_data	*last_data;
 
-	if (!init_data(&n_data))
+	if (!init_data(&n_data, (*data)->env))
 		return (free(*str), 0);
 	last_data = (*data);
 	while (last_data->next)
@@ -450,14 +450,14 @@ int	split_token(t_token *token, char **env, t_data **data)
 {
 	char	*str;
 
-	if (!init_data(data))
+	if (!init_data(data, env))
 		(void)data; //TODO falta gestionar errores
 	str = NULL;
 	while (token)
 	{
 		if (is_special(token->value, " |\"'<>$"))
 		{
-			switch_case(&token, env, data, &str);
+			switch_case(&token, (*data)->env, data, &str);
 		}
 		else
 		{

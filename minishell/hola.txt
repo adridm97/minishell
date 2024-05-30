@@ -1,0 +1,11 @@
+Makefile
+build
+executor.c
+hola.txt
+lexer.c
+libft
+minishell
+minishell.c
+minishell.h
+special_split.c
+split_token.c

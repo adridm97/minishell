@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/27 06:53:46 by kevin            ###   ########.fr       */
+/*   Updated: 2024/05/29 22:28:11 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,7 @@ typedef struct s_data
 	struct s_data	*next;
 	struct s_redir	*redir;
 	struct s_error	error;
+	char			**env;
 }	t_data;
 
 // lexer.c
@@ -126,7 +127,7 @@ t_data	*lexer(char *input, t_data *data, char **env);
 int		typeing(char c, char *base);
 void	is_error(t_error *error);
 void	free_data(t_data **data);
-int		init_data(t_data **data);
+int	init_data(t_data **data, char **env);
 void	free_redir(t_redir **redir);
 
 
