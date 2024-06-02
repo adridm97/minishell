@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/06/02 12:06:06 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/02 18:30:48 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,8 +128,9 @@ t_data	*lexer(char *input, t_data *data, char **env);
 int		typeing(char c, char *base);
 void	is_error(t_error *error);
 void	free_data(t_data **data);
-int	init_data(t_data **data, char **env);
+int		init_data(t_data **data, char **env);
 void	free_redir(t_redir **redir);
+void	free_args(char **args);
 
 
 // split things

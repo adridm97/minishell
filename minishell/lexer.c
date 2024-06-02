@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/30 21:42:58 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/02 18:23:52 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,15 +268,6 @@ int	create_env(t_data **data, char **env)
 			return (clean_env(&(*data)->env, --i), 0);
 	}
 	return (1);
-}
-void	print_env(char **env)
-{
-	int	i;
-
-	i = -1;
-	printf("-----------------ENV--------------\n");
-	while(env[++i])
-		printf("%i=%s\n", i, env[i]);
 }
 
 int	init_data(t_data **data, char **env)

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/06/02 14:51:35 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/02 18:57:00 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,6 +253,78 @@ void    b_echo(t_data *data)
         }
     }
 }
+
+void    b_pwd()
+{
+    size_t  size;
+    char    *buff;
+
+    size = 1;
+    buff = NULL;
+    while(!buff)
+        buff = getcwd(buff, size++);
+    printf("%s\n", buff);
+    free(buff);
+}
+
+void    print_env(t_data *data)
+{
+    int i;
+
+    i = -1;
+    if (data->env)
+    {
+        while (data->env[++i])
+            printf("declare -x %s\n", data->env[i]);
+    }
+}
+
+int ft_matsize(char **mat)
+{
+    int size;
+
+    size = 0;
+    while (mat[size])
+        size++;
+    return (size);
+}
+
+char **ft_matadd(char ***mat, char *str)
+{
+    int size;
+    char **new_mat;
+    int i;
+    char **c_mat;
+
+    i = -1;
+    size = ft_matsize(*mat);
+    new_mat = (char**)malloc(sizeof(char**) * (size + 2));
+    if (!new_mat)
+        return (NULL);
+    c_mat = *mat;
+    while (c_mat[++i])
+    {
+        new_mat[i] = ft_strdup(c_mat[i]);
+        printf("ENTRO\n");
+    }
+    new_mat[i++] = ft_strdup(str);
+    new_mat[i] = NULL;
+    free_args(*mat);
+    return (new_mat);
+}
+
+// cada nuevo comando env se reinicializa
+void    b_export(t_data *data)
+{
+    if (!data->args[1])
+        print_env(data);
+    else
+    {
+        data->env = ft_matadd(&data->env, data->args[1]);
+        print_env(data);
+    }
+}
+
 void    switch_builtin(t_data *data)
 {
     if (!ft_strcmp(data->comand, "echo"))
@@ -260,9 +332,9 @@ void    switch_builtin(t_data *data)
     else if (!ft_strcmp(data->comand, "cd"))
         b_cd(data);
     else if (!ft_strcmp(data->comand, "pwd"))
-        b_cd(data);
+        b_pwd();
     else if (!ft_strcmp(data->comand, "export"))
-        b_cd(data);
+        b_export(data);
     else if (!ft_strcmp(data->comand, "unset"))
         b_cd(data);
     else if (!ft_strcmp(data->comand, "env"))
