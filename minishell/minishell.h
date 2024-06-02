@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/05/29 22:28:11 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/02 12:06:06 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <fcntl.h>
+#include <signal.h>
 
 // Signals
 # define CTRL_C SIGINT
@@ -146,7 +147,7 @@ int		add_args(char ***arg, char **str);
 int		add_last_data(t_data **data, char **str);
 
 
-void	execute_command(t_data *data, char *command_path);
+int	execute_command(t_data *data, char *command_path);
 void	handle_redir(t_data *data);
 void	heredoc(t_data *data);
 

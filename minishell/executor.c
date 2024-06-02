@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/05/29 22:47:11 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/02 14:51:35 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,15 +219,67 @@ void handle_redir(t_data *data)
     }
 }
 
-void execute_command(t_data *data, char *command_path)
+void    b_cd(t_data *data)
 {
-    
+    (void)data;
+    printf("hago cosas\n");
+}
+
+void    b_echo(t_data *data)
+{
+    int i;
+
+    i = 1;
+    if (ft_strcmp(data->args[1], "-n"))
+    {
+        while (data->args[i])
+        {
+
+            printf("%s", data->args[i]);
+            if (data->args[++i])
+                printf(" ");
+        }
+        printf("\n");
+    }
+    else
+    {
+        i++;
+        while (data->args[i])
+        {
+
+            printf("%s", data->args[i]);
+            if (data->args[++i])
+                printf(" ");
+        }
+    }
+}
+void    switch_builtin(t_data *data)
+{
+    if (!ft_strcmp(data->comand, "echo"))
+        b_echo(data);
+    else if (!ft_strcmp(data->comand, "cd"))
+        b_cd(data);
+    else if (!ft_strcmp(data->comand, "pwd"))
+        b_cd(data);
+    else if (!ft_strcmp(data->comand, "export"))
+        b_cd(data);
+    else if (!ft_strcmp(data->comand, "unset"))
+        b_cd(data);
+    else if (!ft_strcmp(data->comand, "env"))
+        b_cd(data);
+    else if (!ft_strcmp(data->comand, "exit"))
+        b_cd(data);
+    exit(EXIT_SUCCESS);
+}
+
+int execute_command(t_data *data, char *command_path)
+{
 	pid_t pid = fork();
 
 	if (pid == -1)
 	{
 		perror("fork");
-		exit(EXIT_FAILURE);
+        return(0);
 	}
 	else if (pid == 0)
 	{
@@ -235,10 +287,12 @@ void execute_command(t_data *data, char *command_path)
 			heredoc(data);
 	    if (data->redir != NULL)
 		    handle_redir(data);
-		if (execve(command_path, data->args, NULL) == -1)
+        if (!ft_strcmp(command_path,"is_builtinOMG"))
+            switch_builtin(data);
+		else if (execve(command_path, data->args, NULL) == -1)
 		{
 			perror("execve");
-			exit(EXIT_FAILURE);
+			return(0);
 		}
 	}
 	else
@@ -247,11 +301,21 @@ void execute_command(t_data *data, char *command_path)
 		if (waitpid(pid, &status, 0) == -1)
 		{
 			perror("waitpid");
-			exit(EXIT_FAILURE);
+			return(0);
 		}
 	}
+    return (1);
 }
-
+int is_builtin(char *comand)
+{
+    if(!comand)
+        return (0);
+    if (!ft_strcmp(comand, "echo") || !ft_strcmp(comand, "cd") || !ft_strcmp(comand, "pwd") \
+    || !ft_strcmp(comand, "export") || !ft_strcmp(comand, "unset") || !ft_strcmp(comand, "env") \
+    || !ft_strcmp(comand, "exit"))
+        return (1);
+    return (0);
+}
 int is_valid_command(t_data *data)
 {
 	int		i;
@@ -261,12 +325,14 @@ int is_valid_command(t_data *data)
 
 	path = getenv("PATH");
 	i = 0;
-	if (path == NULL)
+	if (path == NULL || !data->comand)
 	{
-
 		fprintf(stderr, "No se pudo obtener el valor de PATH\n");
-		exit(EXIT_FAILURE);
+        return (0);
+		//exit(EXIT_FAILURE);
 	}
+        if (is_builtin(data->comand))
+            return(execute_command(data, "is_builtinOMG"));
 	char **token = ft_split(path, ':');
 	while (token[i] != NULL)
 	{
