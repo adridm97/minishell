@@ -147,7 +147,7 @@ int		add_last_data(t_data **data, char **str);
 
 void	execute_command(t_data *data, char *command_path);
 void	handle_redir(t_data *data);
-void	heredoc(t_data *data);
+int	heredoc(t_data *data);
 
 // Regular Colors
 # define BLACK "\x1b[0m"

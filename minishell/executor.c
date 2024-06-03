@@ -32,7 +32,7 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (0);
 }
 
-void heredoc(t_data *data)
+int heredoc(t_data *data)
 {
     int     fd;
     int     i;
@@ -51,7 +51,7 @@ void heredoc(t_data *data)
             if (aux->type == D_MINOR)
             {
                 filename = "/tmp/heredoc";
-                fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+                fd = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
                 if (fd == -1)
                 {
                     perror("open");
@@ -117,48 +117,8 @@ void heredoc(t_data *data)
         if (line == NULL)
             break;
     }
+  return fd;
 }
-
-/*void	child_process(t_data *data, int *fd, char *comand_path)
-{
-	int	filein;
-    t_redir *aux;
-
-    aux = data->redir;
-	filein = open(aux->path, O_RDONLY, 0644);
-    if (filein == -1)
-    {
-        perror("open");
-        exit(EXIT_FAILURE);
-    }
-    dup2(fd[1], STDOUT_FILENO);
-    dup2(filein, STDIN_FILENO);
-    close(fd[0]);
-    execute_command(data,comand_path);
-}
-
-
-void	pipex(t_data *data, char *comand_path)
-{
-	pid_t	pid;
-	int		fd[2];
-
-	if (pipe(fd) == -1)
-	{
-		perror("pipe");
-		exit(EXIT_FAILURE);
-	}
-	pid = fork();
-	if (pid == -1)
-	{
-		perror("pid");
-		exit(EXIT_FAILURE);
-	}
-	if (pid == 0)
-		child_process(data, fd, comand_path);
-    waitpid(pid, NULL, 0);
-    parent_process(data, fd, comand_path);
-}*/
 
 void handle_redir(t_data *data)
 {
@@ -219,37 +179,128 @@ void handle_redir(t_data *data)
     }
 }
 
+void pipex(t_data *data, char *command_path)
+{
+  int fd[2];
+    pid_t pid;
+    int heredoc_fd = -1;
+
+    if (pipe(fd) == -1)
+    {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+
+    pid = fork();
+    if (pid == -1)
+    {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+    else if (pid == 0)
+    {
+        // Proceso hijo
+        close(fd[0]); // Cerrar el extremo de lectura de la tubería
+
+        // Si hay heredoc, redirigir la entrada estándar
+        if (data->redir != NULL && data->redir->type == D_MINOR)
+        {
+            heredoc_fd = heredoc(data);
+            if (dup2(heredoc_fd, STDIN_FILENO) == -1)
+            {
+                perror("dup2");
+                exit(EXIT_FAILURE);
+            }
+            close(heredoc_fd);
+        }
+
+        // Redirigir la salida estándar a la tubería
+        if (dup2(fd[1], STDOUT_FILENO) == -1)
+        {
+            perror("dup2");
+            exit(EXIT_FAILURE);
+        }
+        close(fd[1]);
+
+        // Ejecutar el comando
+        if (command_path == NULL || execve(command_path, data->args, NULL) == -1)
+        {
+            perror("execve");
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        // Proceso padre
+        close(fd[1]); // Cerrar el extremo de escritura de la tubería
+
+        // Configurar el siguiente comando
+        if (data->next != NULL)
+        {
+            t_data *next_data = data->next;
+            if (dup2(fd[0], STDIN_FILENO) == -1)
+            {
+                perror("dup2");
+                exit(EXIT_FAILURE);
+            }
+            close(fd[0]);
+
+            // Ejecutar el siguiente comando
+            pipex(next_data, command_path);
+        }
+
+        close(fd[0]);
+        waitpid(pid, NULL, 0);
+    }
+}
 void execute_command(t_data *data, char *command_path)
 {
-    
-	pid_t pid = fork();
+  if (data->next != NULL)
+    {
+        pipex(data, command_path);
+        return;
+    }
 
-	if (pid == -1)
-	{
-		perror("fork");
-		exit(EXIT_FAILURE);
-	}
-	else if (pid == 0)
-	{
+    pid_t pid = fork();
+
+    if (pid == -1)
+    {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+    else if (pid == 0)
+    {
         if (data->redir != NULL && data->redir->type == D_MINOR)
-			heredoc(data);
-	    if (data->redir != NULL)
-		    handle_redir(data);
-		if (execve(command_path, data->args, NULL) == -1)
-		{
-			perror("execve");
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		int	status;
-		if (waitpid(pid, &status, 0) == -1)
-		{
-			perror("waitpid");
-			exit(EXIT_FAILURE);
-		}
-	}
+        {
+            int heredoc_fd = heredoc(data);
+            if (dup2(heredoc_fd, STDIN_FILENO) == -1)
+            {
+                perror("dup2");
+                exit(EXIT_FAILURE);
+            }
+            close(heredoc_fd);
+        }
+
+        if (data->redir != NULL)
+        {
+            handle_redir(data);
+        }
+
+        if (execve(command_path, data->args, NULL) == -1)
+        {
+            perror("execve");
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        int status;
+        if (waitpid(pid, &status, 0) == -1)
+        {
+            perror("waitpid");
+            exit(EXIT_FAILURE);
+        }
+    }
 }
 
 int is_valid_command(t_data *data)
@@ -274,8 +325,6 @@ int is_valid_command(t_data *data)
 		printf("%s/%s\n", token[i], data->comand);
 		if (access(comand_path, X_OK) == 0)
 		{
-			/*if (data->redir != NULL && data->redir->type == PIPE)
-			    pipex(data, comand_path);*/
 			execute_command(data, comand_path);
 			printf("El comando \"%s\" es válido en la ruta: %s\n", data->comand, comand_path);
 			free(comand_path);
