@@ -139,6 +139,8 @@ int		split_token(t_token *token, char **env, t_data **data);
 
 //executor.c
 int		is_valid_command(t_data *data);
+char **ft_matadd(char ***mat, char *str);
+void pipex(t_data *data);
 
 //split_token
 void	is_expandsor(t_token **token, char **str, char **env);
