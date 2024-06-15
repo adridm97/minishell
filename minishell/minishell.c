@@ -39,7 +39,10 @@ int	main(int argc, char *argv[], char *env[])
 		data = lexer(input, data, env);
 		//if (!data)
 		// 	exit(EXIT_FAILURE);	
-		is_valid_command(data);
+		if(data->next)
+			execute_pipeline(data);
+		else
+			is_valid_command(data);
 		// printf("%s\n", data.token->value);
 		//free_data(&data);
 		data = NULL;
