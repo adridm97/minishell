@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/06/24 17:07:27 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/24 21:49:19 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,6 +225,7 @@ void    b_cd(t_data *data)
     printf("hago cosas\n");
 }
 
+//TODO falta que espanda
 void    b_echo(t_data *data)
 {
     int i;
@@ -345,13 +346,12 @@ char **ft_mat_rem_index(char ***mat, int index)
     {
         if (i == index)
         {
-            printf("ENCUENTRO EL MALO = %s\n", c_mat[i]);
-            i++;
+            // printf("ENCUENTRO EL MALO = %s\n", c_mat[i]);
         }
-        if (c_mat[i])
+        else if (c_mat[i])
         {
-            printf("PETO AQUI\n");
-            printf("He entrado aqui y es %s\n", c_mat[i]);
+            // printf("PETO AQUI\n");
+            // printf("He entrado aqui y es %s\n", c_mat[i]);
             new_mat[++j] = ft_strdup(c_mat[i]);
         }
     }
