@@ -3,16 +3,43 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42barcel>       +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/28 21:10:35 by aduenas-          #+#    #+#             */
-/*   Updated: 2023/09/03 21:36:08 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/06/22 18:34:25 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 //#include <fcntl.h>
 //#include <stdio.h>
+
+static char	*ft_strjoin(char const *str1, char const *str2)
+{
+	char		*buffer;
+	size_t		i;
+	size_t		j;
+
+	buffer = (char *)malloc(sizeof(*str1) \
+				* (gnl_ft_strlen(str1) + gnl_ft_strlen(str2) + 1));
+	if (!buffer)
+		return (NULL);
+	i = 0;
+	j = 0;
+	while (str1[i])
+	{
+		buffer[j++] = str1[i];
+		i++;
+	}
+	i = 0;
+	while (str2[i])
+	{
+		buffer[j++] = str2[i];
+		i++;
+	}
+	buffer[j] = 0;
+	return (buffer);
+}
 
 char	*ft_free(char *buf, char *buffer)
 {
@@ -25,40 +52,14 @@ char	*ft_free(char *buf, char *buffer)
 	return (temp);
 }
 
-char	*ft_next(char *buffer)
-{
-	int		i;
-	int		j;
-	char	*line;
 
-	i = 0;
-	while (buffer[i] && buffer[i] != '\n')
-		i++;
-	if (!buffer[i])
-	{
-		free(buffer);
-		return (NULL);
-	}
-	line = ft_calloc((ft_strlen(buffer) -i + 1), sizeof(char));
-	if (!line)
-	{
-		free(buffer);
-		return (NULL);
-	}
-	i++;
-	j = 0;
-	while (buffer[i])
-		line[j++] = buffer[i++];
-	free(buffer);
-	return (line);
-}
 
 char	*read_file(int fd, char *buff)
 {
 	char	*buffer;
 	int		bytes;
 
-	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	buffer = gnl_ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!buffer)
 		return (free(buff), NULL);
 	bytes = 1;
@@ -71,7 +72,7 @@ char	*read_file(int fd, char *buff)
 		buff = ft_free(buff, buffer);
 		if (!buff)
 			return (NULL);
-		if (ft_strchr(buffer, '\n'))
+		if (gnl_ft_strchr(buffer, '\n'))
 			break ;
 	}
 	free(buffer);
@@ -90,7 +91,7 @@ char	*ft_line(char *buffer)
 		i++;
 	if (buffer[i] == '\n')
 		i++;
-	line = ft_calloc((i + 1), sizeof(char));
+	line = gnl_ft_calloc((i + 1), sizeof(char));
 	i = 0;
 	if (!line)
 		return (free(buffer), NULL);
@@ -113,7 +114,7 @@ char	*get_next_line(int fd)
 		return (NULL);
 	if (!buff)
 	{
-		buff = ft_calloc(1, 1);
+		buff = gnl_ft_calloc(1, 1);
 		if (!buff)
 			return (NULL);
 	}
