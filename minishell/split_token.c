@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/06/03 08:46:50 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/25 20:44:38 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,11 +76,6 @@ void	is_simple_string(t_token **token, char **env, char **str)
 	while (*token && (*token)->value != '\'')
 	{
 		(void)env;
-		// if ((*token)->value == '$')
-		// {
-		// 	is_expandsor(token, &res, env);
-		// 	break;	
-		// }
 		res = new_str(&res, (*token)->value);
 		if (*token)
 			*token = (*token)->next;
@@ -90,7 +85,6 @@ void	is_simple_string(t_token **token, char **env, char **str)
 	free(*str);
 	*str = res;
 }
-
 
 // save in str the string
 void	is_double_string(t_token **token, char **env, char **str)
@@ -106,7 +100,7 @@ void	is_double_string(t_token **token, char **env, char **str)
 		if ((*token)->value == '$')
 		{
 			is_expandsor(token, &res, env);
-			break ;	
+			break ;
 		}
 		res = new_str(&res, (*token)->value);
 		if (*token)
@@ -126,8 +120,6 @@ void	switch_case_redir(t_token **token, char **str, char **env)
 		is_double_string(token, env, str);
 	else if ((*token)->value == '$')
 		is_expandsor(token, str, env);
-	// else if ((*token)->value == ' ')
-	// 	*token = (*token)->next;
 }
 
 /*TODO Hay que hacerla más corta*/
@@ -144,8 +136,6 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 	redir->type = type;
 	redir->path = NULL;
 	str = NULL;
-	// str = charstr((*token)->value);
-	// *token = (*token)->next;
 	while ((*token))
 	{
 		if (is_special((*token)->value, "'\"$"))
@@ -193,7 +183,7 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 // split the redirection and put in data
 void	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 {
-	if (*token /*&& *str*/)
+	if (*token)
 		*token = (*token)->next;
 	if ((*token)->value == '<')
 	{
@@ -212,11 +202,10 @@ void	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 	(void)str;
 }
 
-
 // split the redirection and put in data
 void	is_redir_output(t_token **token, t_data **data, char **str, char **env)
 {
-	if (*token /*&& *str*/)
+	if (*token)
 		*token = (*token)->next;
 	if ((*token)->value == '>')
 	{
@@ -234,7 +223,6 @@ void	is_redir_output(t_token **token, t_data **data, char **str, char **env)
 	(void)str;
 }
 
-
 // split the pipe and put in data
 int	is_pipe(t_token **token, t_data **data, char **str)
 {
@@ -245,7 +233,7 @@ int	is_pipe(t_token **token, t_data **data, char **str)
 		return (free(*str), 0);
 	last_data = (*data);
 	while (last_data->next)
-		last_data = last_data->next;	
+		last_data = last_data->next;
 	if (*str)
 	{
 		if (!add_args(&(last_data)->args, str))
@@ -278,7 +266,8 @@ char	*key_to_res(char **key, char **env)
 	res = NULL;
 	while (env[++i])
 	{
-		if (ft_strnstr(env[i], *key, ft_strlen(*key)) && env[i][ft_strlen(*key)] == '=')
+		if (ft_strnstr(env[i], *key, ft_strlen(*key)) \
+				&& env[i][ft_strlen(*key)] == '=')
 		{
 			res = ft_strdup(&env[i][ft_strlen(*key) + 1]);
 			free(*key);
@@ -318,7 +307,8 @@ void	is_expandsor(t_token **token, char **str, char **env)
 					res = ft_strjoin("", key);
 				else
 					res = ft_strjoin(*str, key);
-				free(*str), free(key);
+				free(*str);
+				free(key);
 				*str = res;
 			}
 		}
@@ -352,7 +342,7 @@ void	free_args_triple(char ***arg)
 	*arg = NULL;
 }
 
-int add_args(char ***arg, char **str)
+int	add_args(char ***arg, char **str)
 {
 	char	**args;
 	int		i;
@@ -423,12 +413,12 @@ int	add_last_data(t_data **data, char **str)
 
 void	include_comand(t_data **data)
 {
-	t_data *ldata;
+	t_data	*ldata;
 
 	ldata = *data;
-	while(ldata)
+	while (ldata)
 	{
-		if(ldata->args)
+		if (ldata->args)
 			ldata->comand = ldata->args[0];
 		ldata = ldata->next;
 	}
@@ -446,12 +436,13 @@ path: a, type: 2
 Redirs
 path: a, type: 2
 */
+
 int	split_token(t_token *token, char **env, t_data **data)
 {
 	char	*str;
 
 	if (!init_data(data, env))
-		(void)data; //TODO falta gestionar errores
+		(void)data;
 	str = NULL;
 	while (token)
 	{

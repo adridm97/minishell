@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 09:54:17 by kevin             #+#    #+#             */
-/*   Updated: 2024/04/09 09:54:19 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/25 23:14:36 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_list	*ft_lstlast(t_list *lst)
 {
-	t_list *p;
+	t_list	*p;
 
 	p = lst;
 	if (p == NULL || lst == NULL)

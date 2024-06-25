@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/28 21:10:35 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/06/22 18:34:25 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/25 23:26:48 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,6 @@ char	*ft_free(char *buf, char *buffer)
 	free(buf);
 	return (temp);
 }
-
-
 
 char	*read_file(int fd, char *buff)
 {

@@ -6,13 +6,13 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/06/24 21:49:19 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/25 23:28:35 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void handle_redir(t_data *data);
+void	handle_redir(t_data *data);
 
 int	ft_strcmp(const char *s1, const char *s2)
 {
@@ -32,91 +32,90 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (0);
 }
 
-int heredoc(t_data *data) {
-    int fd;
-    char *line;
-    char *filename = "/tmp/heredoc";
-    t_redir *aux = data->redir;
+int	heredoc(t_data *data) {
+	int		fd;
+	char	*line;
+	char	*filename;
+	t_redir	*aux;
 
-    fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-    if (fd == -1) {
-        perror("open");
-        exit(EXIT_FAILURE);
-    }
+	aux = data->redir;
+	filename = "/tmp/heredoc";
+	fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if (fd == -1)
+	{
+		perror("open");
+		exit(EXIT_FAILURE);
+	}
 
-    while (1) {
-        line = readline("> ");
-        if (line == NULL || ft_strcmp(line, aux->path) == 0) {
-            free(line);
-            break;
-        }
-        ft_putstr_fd(line, fd);
-        ft_putstr_fd("\n", fd);
-        free(line);
-    }
-    close(fd);
-    return open(filename, O_RDONLY);
+	while (1)
+	{
+		line = readline("> ");
+		if (line == NULL || ft_strcmp(line, aux->path) == 0)
+		{
+			free(line);
+			break;
+		}
+		ft_putstr_fd(line, fd);
+		ft_putstr_fd("\n", fd);
+		free(line);
+	}
+	close(fd);
+	return open(filename, O_RDONLY);
 }
 
 
-void handle_redir(t_data *data)
+void	handle_redir(t_data *data)
 {
-    int 	fd;
-    t_redir *redir = data->redir;
+	int 	fd;
+	t_redir *redir;
+	
+	redir = data->redir;
 
-    while (redir != NULL)
-    {
-        if (redir->type == MAJOR)
-        {
-            fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        }
-        else if (redir->type == D_MAJOR)
-        {
-            fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
-        }
-        else if (redir->type == MINOR)
-        {
-            fd = open(redir->path, O_RDONLY);
-        }
-        else
-        {
-            redir = redir->next;
-            continue;
-        }
-
-        if (fd == -1)
-        {
-            perror("open");
-            exit(EXIT_FAILURE);
-        }
-
-        if ((redir->type == MAJOR || redir->type == D_MAJOR) && dup2(fd, STDOUT_FILENO) == -1)
-        {
-            perror("dup2");
-            exit(EXIT_FAILURE);
-        }
-        else if (redir->type == MINOR && dup2(fd, STDIN_FILENO) == -1)
-        {
-            perror("dup2");
-            exit(EXIT_FAILURE);
-        }
-        close(fd);
-        redir = redir->next;
-    }
+	while (redir != NULL)
+	{
+		if (redir->type == MAJOR)
+			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		else if (redir->type == D_MAJOR)
+			fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		else if (redir->type == MINOR)
+			fd = open(redir->path, O_RDONLY);
+		else
+		{
+			redir = redir->next;
+			continue;
+		}
+		if (fd == -1)
+		{
+			perror("open");
+			exit(EXIT_FAILURE);
+		}
+		if ((redir->type == MAJOR || redir->type == D_MAJOR) && dup2(fd, STDOUT_FILENO) == -1)
+		{
+			perror("dup2");
+			exit(EXIT_FAILURE);
+		}
+		else if (redir->type == MINOR && dup2(fd, STDIN_FILENO) == -1)
+		{
+			perror("dup2");
+			exit(EXIT_FAILURE);
+		}
+		close(fd);
+		redir = redir->next;
+	}
 }
 
-void    b_cd(t_data *data)
+void	b_cd(t_data *data)
 {
-    (void)data;
-    printf("hago cosas\n");
+	(void)data;
+	printf("hago cosas\n");
 }
 
 //TODO falta que espanda
-void    b_echo(t_data *data)
+void	b_echo(t_data *data)
 {
-    int i;
+	int	i;
 
-    i = 1;
+	i = 1;
     if (ft_strcmp(data->args[1], "-n"))
     {
         while (data->args[i])
@@ -142,37 +141,31 @@ void    b_echo(t_data *data)
     exit(EXIT_SUCCESS);
 }
 
-void    b_pwd()
-{
-    size_t  size;
-    char    *buff;
 
-    size = 1;
-    buff = NULL;
-    while(!buff)
-        buff = getcwd(buff, size++);
-    printf("%s\n", buff);
-    free(buff);
-    exit(EXIT_SUCCESS);
+	size = 1;
+	buff = NULL;
+	while (!buff)
+		buff = getcwd(buff, size++);
+	printf("%s\n", buff);
+	free(buff);
+	exit(EXIT_SUCCESS);
 }
 
-void    print_env(t_data *data, char *str)
+void	print_env(t_data *data, char *str)
 {
-    int i;
+	int	i;
 
-    i = -1;
-    if (data->env)
-    {
-        while (data->env[++i])
-            printf("%s%s\n", str, data->env[i]);
-    }
+	i = -1;
+	if (data->env)
+	{
+		while (data->env[++i])
+			printf("%s%s\n", str, data->env[i]);
+	}
 }
 
-
-
-int ft_matsize(char **mat)
+int	ft_matsize(char **mat)
 {
-	int size;
+	int	size;
 
 	size = 0;
 	while (mat[size])
@@ -180,142 +173,132 @@ int ft_matsize(char **mat)
 	return (size);
 }
 
-char **ft_matadd(char ***mat, char *str)
+char	**ft_matadd(char ***mat, char *str)
 {
-    int size;
-    char **new_mat;
-    int i;
-    char **c_mat;
+	int		size;
+	char	**new_mat;
+	int		i;
+	char	**c_mat;
 
-    i = -1;
-    size = ft_matsize(*mat);
-    new_mat = (char**)malloc(sizeof(char**) * (size + 2));
-    if (!new_mat)
-        return (NULL);
-    c_mat = *mat;
-    while (c_mat[++i])
-    {
-        new_mat[i] = ft_strdup(c_mat[i]);
-    }
-    new_mat[i] = ft_strdup(str);
-    new_mat[++i] = NULL;
-    free_args(*mat);
-    return (new_mat);
+	i = -1;
+	size = ft_matsize(*mat);
+	new_mat = (char **)malloc(sizeof(char **) * (size + 2));
+	if (!new_mat)
+		return (NULL);
+	c_mat = *mat;
+	while (c_mat[++i])
+		new_mat[i] = ft_strdup(c_mat[i]);
+	new_mat[i] = ft_strdup(str);
+	new_mat[++i] = NULL;
+	free_args(*mat);
+	return (new_mat);
 }
-
 
 // cada nuevo comando env se reinicializa
-void    b_export(t_data **data)
+void	b_export(t_data **data)
 {
-    if (!(*data)->args[1])
-        print_env(*data, "declare -x ");
-    else
-        (*data)->env = ft_matadd(&(*data)->env, (*data)->args[1]);
-    unlink("/tmp/env.env");
-    if (!save_env(*data))
-        exit(EXIT_FAILURE);
-    exit(EXIT_SUCCESS);
+	if (!(*data)->args[1])
+		print_env(*data, "declare -x ");
+	else
+		(*data)->env = ft_matadd(&(*data)->env, (*data)->args[1]);
+	unlink("/tmp/env.env");
+	if (!save_env(*data))
+		exit(EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
 }
 
-char **ft_mat_rem_index(char ***mat, int index)
+char	**ft_mat_rem_index(char ***mat, int index)
 {
-    char **new_mat;
-    int i;
-    int j;
-    char **c_mat;
+	char	**new_mat;
+	int		i;
+	int		j;
+	char	**c_mat;
 
-    i = -1;
-    j = -1;
-    new_mat = (char**)malloc(sizeof(char**) * (ft_matsize(*mat)));
-    if (!new_mat)
-        return (NULL);
-    c_mat = *mat;
-    while (c_mat[++i])
-    {
-        if (i == index)
-        {
-            // printf("ENCUENTRO EL MALO = %s\n", c_mat[i]);
-        }
-        else if (c_mat[i])
-        {
-            // printf("PETO AQUI\n");
-            // printf("He entrado aqui y es %s\n", c_mat[i]);
-            new_mat[++j] = ft_strdup(c_mat[i]);
-        }
-    }
-    new_mat[++j] = NULL;
-    free_args(*mat);
-    return (new_mat);
+	i = -1;
+	j = -1;
+	new_mat = (char **)malloc(sizeof(char **) * (ft_matsize(*mat)));
+	if (!new_mat)
+		return (NULL);
+	c_mat = *mat;
+	while (c_mat[++i])
+	{
+		if (i == index)
+			// printf("ENCUENTRO EL MALO = %s\n", c_mat[i]);
+		else if (c_mat[i])
+			new_mat[++j] = ft_strdup(c_mat[i]);
+	}
+	new_mat[++j] = NULL;
+	free_args(*mat);
+	return (new_mat);
 }
 
-int    index_env(t_data *data, char *str)
+int	index_env(t_data *data, char *str)
 {
-    int     i;
-    char    **env;
+	int		i;
+	char	**env;
 
-    i = -1;
-    env = data->env;
-    while (env[++i])
-    {
-        if (ft_strnstr(env[i], str, ft_strlen(str)) && (env[i][ft_strlen(str)] == '=' || env[i][ft_strlen(str)] == '\0'))
-            return (i);
-    }
-    return (-1);
+	i = -1;
+	env = data->env;
+	while (env[++i])
+	{
+		if (ft_strnstr(env[i], str, ft_strlen(str)) && \
+				(env[i][ft_strlen(str)] \
+				== '=' || env[i][ft_strlen(str)] == '\0'))
+			return (i);
+	}
+	return (-1);
 }
 
-void    b_unset(t_data *data)
+void	b_unset(t_data *data)
 {
-    int i;
+	int	i;
 
-    i = index_env(data, data->args[1]);
-    printf("%i\n", i);
-    if (i != -1)
-        data->env = ft_mat_rem_index(&data->env, i);
-    unlink("/tmp/env.env");
-    if (!save_env(data))
-        exit(EXIT_FAILURE);
-    exit(EXIT_SUCCESS);
-    
+	i = index_env(data, data->args[1]);
+	printf("%i\n", i);
+	if (i != -1)
+		data->env = ft_mat_rem_index(&data->env, i);
+	unlink("/tmp/env.env");
+	if (!save_env(data))
+		exit(EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
 }
 
-void    b_env(t_data *data)
+void	b_env(t_data *data)
 {
-    int i;
+	int	i;
 
-    i = -1;
-    if (data->env)
-    {
-        while (data->env[++i])
-        {
-            if (ft_strrchr(data->env[i], '='))
-                printf("%s\n", data->env[i]);
-        }
-    }
-    exit(EXIT_SUCCESS);
+	i = -1;
+	if (data->env)
+	{
+		while (data->env[++i])
+		{
+			if (ft_strrchr(data->env[i], '='))
+				printf("%s\n", data->env[i]);
+		}
+	}
+	exit(EXIT_SUCCESS);
 }
 
-void    switch_builtin(t_data **ddata)
+void	switch_builtin(t_data **ddata)
 {
-    t_data *data;
+	t_data	*data;
 
-    data = *ddata;
-    if (!ft_strcmp(data->comand, "echo"))
-        b_echo(data);
-    else if (!ft_strcmp(data->comand, "cd"))
-        b_cd(data);
-    else if (!ft_strcmp(data->comand, "pwd"))
-        b_pwd();
-    else if (!ft_strcmp(data->comand, "export"))
-        b_export(ddata);
-    else if (!ft_strcmp(data->comand, "unset"))
-        b_unset(data);
-    else if (!ft_strcmp(data->comand, "env"))
-        b_env(data);
-    else if (!ft_strcmp(data->comand, "exit"))
-        b_cd(data);
-    printf("llego???\n");
-    // exit(EXIT_SUCCESS);
-    return ;
+	data = *ddata;
+	if (!ft_strcmp(data->comand, "echo"))
+		b_echo(data);
+	else if (!ft_strcmp(data->comand, "cd"))
+		b_cd(data);
+	else if (!ft_strcmp(data->comand, "pwd"))
+		b_pwd();
+	else if (!ft_strcmp(data->comand, "export"))
+		b_export(ddata);
+	else if (!ft_strcmp(data->comand, "unset"))
+		b_unset(data);
+	else if (!ft_strcmp(data->comand, "env"))
+		b_env(data);
+	else if (!ft_strcmp(data->comand, "exit"))
+		b_cd(data);
+	return ;
 }
 
 /*int execute_command(t_data **ddata, char *command_path)
@@ -354,182 +337,197 @@ void    switch_builtin(t_data **ddata)
 	}
     return (1);
 }*/
-int is_builtin(char *comand)
+int	is_builtin(char *comand)
 {
-    if(!comand)
-        return (0);
-    if (!ft_strcmp(comand, "echo") || !ft_strcmp(comand, "cd") || !ft_strcmp(comand, "pwd") \
-    || !ft_strcmp(comand, "export") || !ft_strcmp(comand, "unset") || !ft_strcmp(comand, "env") \
-    || !ft_strcmp(comand, "exit"))
-        return (1);
-    return (0);
+	if (!comand)
+		return (0);
+	if (!ft_strcmp(comand, "echo") || !ft_strcmp(comand, "cd") \
+			|| !ft_strcmp(comand, "pwd") \
+			|| !ft_strcmp(comand, "export") || !ft_strcmp(comand, "unset") \
+			|| !ft_strcmp(comand, "env") \
+			|| !ft_strcmp(comand, "exit"))
+		return (1);
+	return (0);
 }
 
-void execute_command(t_data **ddata, char *command_path) {
-    pid_t pid;
-
-    pid = fork();
-
-	t_data *data;
-    data = *ddata;
-    if (pid == -1) {
-        perror("fork");
-        return;
-    } else if (pid == 0) {
-        // Proceso hijo
-        if ((data->redir != NULL && data->redir->type == D_MINOR) && data->next == NULL) {
-            int heredoc_fd = heredoc(data);
-            if (dup2(heredoc_fd, STDIN_FILENO) == -1) {
-                perror("dup2");
-                exit(EXIT_FAILURE);
-            }
-            close(heredoc_fd);
-        }
-
-        if (data->redir != NULL) {
-            handle_redir(data);
-        }
-
-        if (ft_strcmp(command_path, "is_builtinOMG") == 0) {
-            switch_builtin(ddata);
-            exit(EXIT_SUCCESS);
-        } else {
-            if (execve(command_path, data->args, data->env) == -1) {
-                perror("execve");
-                exit(EXIT_FAILURE);
-            }
-        }
-    } else {
-        // Proceso padre
-        int exit_code;
-        if (waitpid(pid, &exit_code, 0) == -1) {
-            perror("waitpid");
-            return;
-        }
-
-        if (exit_code != 0) {
-            fprintf(stderr, "Proceso hijo terminó con error: %d\n", exit_code);
-        }
-    }
-}
-
-void execute_pipeline(t_data *data) {
-    t_data *current = data;
-    int input_fd = STDIN_FILENO;
-    int fd[2];
-    pid_t pid;
-    int heredoc_fd = -1;
-
-    while (current != NULL) {
-        // Manejo del heredoc antes del fork
-        if (current->redir != NULL && current->redir->type == D_MINOR) {
-            heredoc_fd = heredoc(current);
-        }
-        // Creación del pipe si no es el último comando
-        if (current->next != NULL) {
-            if (pipe(fd) == -1) {
-                perror("pipe");
-                exit(EXIT_FAILURE);
-            }
-        }
-        pid = fork();
-        //execve("/bin/cat", (char *[]){"cat", "/tmp/heredoc", NULL}, NULL);
-        if (pid == -1) {
-            perror("fork");
-            exit(EXIT_FAILURE);
-        } else if (pid == 0) {
-            // Proceso hijo
-            if (heredoc_fd != -1) {
-                if (dup2(heredoc_fd, STDIN_FILENO) == -1) {
-                    perror("dup2");
-                    exit(EXIT_FAILURE);
-                }
-                close(heredoc_fd);
-            } else if (input_fd != STDIN_FILENO) {
-                if (dup2(input_fd, STDIN_FILENO) == -1) {
-                    perror("dup2");
-                    exit(EXIT_FAILURE);
-                }
-                close(input_fd);
-            }
-            if (current->next != NULL) {
-                close(fd[0]);
-                if (dup2(fd[1], STDOUT_FILENO) == -1) {
-                    perror("dup2");
-                    exit(EXIT_FAILURE);
-                }
-                close(fd[1]);
-            }
-            if (current->redir != NULL) {
-                handle_redir(current);
-            }
-
-            if (!is_valid_command(current)) {
-                fprintf(stderr, "Comando no encontrado: %s\n", current->comand);
-                exit(EXIT_FAILURE);
-            }
-            exit(EXIT_SUCCESS);
-        } else {
-            // Proceso padre
-            if (input_fd != STDIN_FILENO) {
-                close(input_fd);
-            }
-            if (current->next != NULL) {
-                close(fd[1]);
-                input_fd = fd[0];
-            }
-            if (heredoc_fd != -1) {
-                close(heredoc_fd);
-                heredoc_fd = -1;
-            }
-            current = current->next;
-        }
-    }
-
-    // Esperar a que todos los procesos hijos terminen
-    while (wait(NULL) > 0);
-}
-
-int is_valid_command(t_data *data)
+void	execute_command(t_data **ddata, char *command_path)
 {
-    char *path;
-    int  i;
-    char *comand_path;
-    char **token;
+	pid_t	pid;
+	t_data	*data;
+	int		heredoc_fd;
+	int		exit_code;
 
-    i = 0;
-    path = getenv("PATH");
-    if (!path || !data->comand)
-    {
-        fprintf(stderr, "No se pudo obtener el valor de PATH\n");
-        return 0;
-    }
-
-    if (is_builtin(data->comand))
-    {
-        execute_command(&data, "is_builtinOMG");
-        return 1;
-    }
-    
-    token = ft_split(path, ':');
-    while(token[i] != NULL)
-    {
-        comand_path = ft_strjoin(token[i], "/");
-        comand_path = ft_strjoin(comand_path, data->comand);
-
-        if (access(comand_path, X_OK) == 0)
-        {
-            execute_command(&data, comand_path);
-            //printf("El comando \"%s\" es válido en la ruta: %s\n", data->comand, comand_path);
-            free(comand_path);
-            free_args(token);
-            return 1;
-        }
-        free(comand_path);
-        i++;
-    }
-    free_args(token);
-    return 0;
+	pid = fork();
+	data = *ddata;
+	if (pid == -1)
+	{
+		perror("fork");
+		return ;
+	}
+	else if (pid == 0)
+	{
+		if ((data->redir != NULL && data->redir->type == D_MINOR) \
+				&& data->next == NULL)
+		{
+			heredoc_fd = heredoc(data);
+			if (dup2(heredoc_fd, STDIN_FILENO) == -1)
+			{
+				perror("dup2");
+				exit(EXIT_FAILURE);
+			}
+			close(heredoc_fd);
+		}
+		if (data->redir != NULL)
+			handle_redir(data);
+		if (ft_strcmp(command_path, "is_builtinOMG") == 0)
+		{
+			switch_builtin(ddata);
+			exit(EXIT_SUCCESS);
+		}
+		else
+		{
+			if (execve(command_path, data->args, data->env) == -1)
+			{
+				perror("execve");
+				exit(EXIT_FAILURE);
+			}
+		}
+	}
+	else
+	{
+		if (waitpid(pid, &exit_code, 0) == -1)
+		{
+			perror("waitpid");
+			return ;
+		}
+		if (exit_code != 0)
+			fprintf(stderr, "Proceso hijo terminó con error: %d\n", exit_code);
+	}
 }
 
+void	execute_pipeline(t_data *data)
+{
+	t_data	*current;
+	int		input_fd;
+	int		fd[2];
+	pid_t	pid;
+	int		heredoc_fd;
 
+	heredoc_fd = -1;
+	input_fd = STDIN_FILENO;
+	current = data;
+	while (current != NULL)
+	{
+		if (current->redir != NULL && current->redir->type == D_MINOR)
+			heredoc_fd = heredoc(current);
+		if (current->next != NULL)
+		{
+			if (pipe(fd) == -1)
+			{
+				perror("pipe");
+				exit(EXIT_FAILURE);
+			}
+		}
+		pid = fork();
+		if (pid == -1)
+		{
+			perror("fork");
+			exit(EXIT_FAILURE);
+		}
+		else if (pid == 0)
+		{
+			if (heredoc_fd != -1)
+			{
+				if (dup2(heredoc_fd, STDIN_FILENO) == -1)
+				{
+					perror("dup2");
+					exit(EXIT_FAILURE);
+				}
+				close(heredoc_fd);
+			}
+			else if (input_fd != STDIN_FILENO)
+			{
+				if (dup2(input_fd, STDIN_FILENO) == -1)
+				{
+					perror("dup2");
+					exit(EXIT_FAILURE);
+				}
+				close(input_fd);
+			}
+			if (current->next != NULL)
+			{
+				close(fd[0]);
+				if (dup2(fd[1], STDOUT_FILENO) == -1)
+				{
+					perror("dup2");
+					exit(EXIT_FAILURE);
+				}
+				close(fd[1]);
+			}
+			if (current->redir != NULL)
+				handle_redir(current);
+			if (!is_valid_command(current))
+			{
+				fprintf(stderr, "Comando no encontrado: %s\n", current->comand);
+				exit(EXIT_FAILURE);
+			}
+			exit(EXIT_SUCCESS);
+		}
+		else
+		{
+			if (input_fd != STDIN_FILENO)
+				close(input_fd);
+			if (current->next != NULL)
+			{
+				close(fd[1]);
+				input_fd = fd[0];
+			}
+			if (heredoc_fd != -1)
+			{
+				close(heredoc_fd);
+				heredoc_fd = -1;
+			}
+			current = current->next;
+		}
+	}
+	while (wait(NULL) > 0)
+		;
+}
+
+int	is_valid_command(t_data *data)
+{
+	char	*path;
+	int		i;
+	char	*comand_path;
+	char	**token;
+
+	i = 0;
+	path = getenv("PATH");
+	if (!path || !data->comand)
+	{
+		fprintf(stderr, "No se pudo obtener el valor de PATH\n");
+		return (0);
+	}
+	if (is_builtin(data->comand))
+	{
+		execute_command(&data, "is_builtinOMG");
+		return (1);
+	}
+	token = ft_split(path, ':');
+	while (token[i] != NULL)
+	{
+		comand_path = ft_strjoin(token[i], "/");
+		comand_path = ft_strjoin(comand_path, data->comand);
+		if (access(comand_path, X_OK) == 0)
+		{
+			execute_command(&data, comand_path);
+			free(comand_path);
+			free_args(token);
+			return (1);
+		}
+		free(comand_path);
+		i++;
+	}
+	free_args(token);
+	return (0);
+}

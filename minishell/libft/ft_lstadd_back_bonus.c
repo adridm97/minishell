@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 09:50:57 by kevin             #+#    #+#             */
-/*   Updated: 2024/04/14 20:23:43 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/25 23:05:24 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 void	ft_lstadd_back(t_list **alst, t_list *new)
 {
-	t_list *temporal;
+	t_list	*temporal;
 
 	temporal = (*alst);
 	if ((*alst))
@@ -26,5 +26,4 @@ void	ft_lstadd_back(t_list **alst, t_list *new)
 	}
 	if (!(*alst))
 		((*alst) = new);
-
 }

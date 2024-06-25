@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/06/24 16:26:29 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/25 23:01:10 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,7 +244,7 @@ void	free_data(t_data **data)
 
 void	clean_env(char ***env, int i)
 {
-	while(i >=0)
+	while (i >= 0)
 		free(env[0][i]);
 }
 
@@ -259,17 +259,17 @@ int	create_env(t_data **data, char **env)
 		return (0);
 	while (env[i])
 		i++;
-	(*data)->env = (char**)malloc(sizeof(char**) * ++i);
+	(*data)->env = (char **)malloc(sizeof(char **) * ++i);
 	i = -1;
 	if (!(*data)->env)
-		return(0);	
+		return (0);
 	while (env[++i])
 	{
 		(*data)->env[i] = ft_strdup(env[i]);
 		if (!(*data)->env[i])
 			return (clean_env(&(*data)->env, --i), 0);
 	}
-		(*data)->env[i] = NULL;
+	(*data)->env[i] = NULL;
 	return (1);
 }
 
@@ -292,34 +292,28 @@ char	**get_env_file(int fd)
 	}
 	close(fd);
 	fd = open("/tmp/env.env", O_RDONLY, 777);
-	// printf("EL FD ES: %i\n", fd);
-	// printf("Cuenta %i lineas\n",i);
-	mat = (char**)malloc(sizeof(char**) * (i + 1));
+	mat = (char **)malloc(sizeof(char **) * (i + 1));
 	i = -1;
 	if (!mat)
-		return(0);	
+		return (0);
 	env = get_next_line(fd);
 	while (env)
 	{
-		clean = ft_strtrim(env,"\n");
+		clean = ft_strtrim(env, "\n");
 		mat[++i] = clean;
-		// printf("en get env[%i]: %s\n",i, mat[i]);
-		//printf("en get env[i]: %s\n", env);
 		free(env);
 		env = get_next_line(fd);
-		//if (!env)
-			//return (clean_env(&(*data)->env, --i), 0);
 	}
 	mat[++i] = NULL;
-	// printf("en get env[%i]: %s\n",i, mat[i]);
 	close(fd);
 	return (mat);
 }
 
 int	get_file_env(int fd, t_data **data)
 {
-	int	i;
-	char *env;
+	int		i;
+	char	*env;
+
 	env = get_next_line(fd);
 	i = 0;
 	if (!env || (*data)->env)
@@ -330,20 +324,17 @@ int	get_file_env(int fd, t_data **data)
 		env = get_next_line(fd);
 		i++;
 	}
-	close(fd);
+	close (fd);
 	fd = open("/tmp/env.env", O_RDONLY, 777);
-	(*data)->env = (char**)malloc(sizeof(char**) * ++i);
+	(*data)->env = (char **)malloc(sizeof(char **) * ++i);
 	i = -1;
 	if (!(*data)->env)
-		return(0);	
+		return (0);
 	env = get_next_line(fd);
 	while (env)
 	{
-		// printf("en get_file... env[%i]=%s\n",i, env);
 		(*data)->env[++i] = env;
 		env = get_next_line(fd);
-		//if (!env)
-			//return (clean_env(&(*data)->env, --i), 0);
 	}
 	return (1);
 }
@@ -359,18 +350,6 @@ int	init_data(t_data **data, char **env)
 	(*data)->path = NULL;
 	(*data)->redir = NULL;
 	(*data)->env = NULL;
-	// fd = open("/tmp/env.env",O_RDONLY);
-	// if (fd >= 0)
-	// {
-	// 	if(!get_file_env(fd, data))
-	// 	{
-	// 		if (!create_env(data, env))
-	// 			return (0);
-	// 	}
-	// 	close(fd);
-	// 	unlink("/tmp/env.env");
-	// }
-	// else 
 	if (!create_env(data, env))
 		return (0);
 	return (1);
@@ -390,21 +369,27 @@ t_data	*lexer(char *input, t_data *data, char **env)
 	{
 		if (!token)
 		{
-			if (!new_token(input[i], typeing(input[i], " |><\'\""), &token, 0))
-				return (is_error(&(t_error){"Memory error",1}), free_token(&token), NULL);
+			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
+						, &token, 0))
+				return (is_error(& (t_error){"Memory error",1}) \
+						, free_token(&token), NULL);
 		}
 		else
 		{
-			if (!add_token(input[i], typeing(input[i], " |><\'\""), &token))
-				return (is_error(&(t_error){"Memory error",1}), free_token(&token), NULL);
+			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
+						, &token))
+				return (is_error(& (t_error){"Memory error",1}) \
+						, free_token(&token), NULL);
 		}
 	}
 	check_closed(token, &error);
 	check_gramathic(token, &error);
 	if (error.is_error)
-		return(is_error(&(t_error){"Syntax error",1}), free(error.error), free_data(&data), free_token(&token), NULL);
+		return (is_error(& (t_error){"Syntax error",1}), \
+				free(error.error), free_data(&data), free_token(&token), NULL);
 	else if (!split_token(token, env, &data))
-		return (is_error(&(t_error){"Memory error",1}), free_data(&data), free_token(&token), NULL);
+		return (is_error(& (t_error){"Memory error",1}), \
+				free_data(&data), free_token(&token), NULL);
 	print_data(data);
 	free_token(&token);
 	return (data);

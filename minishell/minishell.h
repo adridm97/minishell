@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/06/24 13:49:01 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/25 19:58:42 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <fcntl.h>
-#include <signal.h>
+# include <signal.h>
 
 // Signals
 # define CTRL_C SIGINT
@@ -133,21 +133,20 @@ void	free_redir(t_redir **redir);
 void	free_args(char **args);
 char	**get_env_file(int fd);
 
-
 // minishell.c
-int save_env(t_data *data);
-int file_exist(char *file);
+int		save_env(t_data *data);
+int		file_exist(char *file);
 
 // split things
 char	**special_split(char const *s);
 int		split_token(t_token *token, char **env, t_data **data);
 
 //executor.c
-char **ft_matadd(char ***mat, char *str);
-void execute_pipeline(t_data *data);
-int is_valid_command(t_data *data);
-int ft_matsize(char **mat);
-void    print_env(t_data *data, char *str);
+char	**ft_matadd(char ***mat, char *str);
+void	execute_pipeline(t_data *data);
+int		is_valid_command(t_data *data);
+int		ft_matsize(char **mat);
+void	print_env(t_data *data, char *str);
 
 //split_token
 void	is_expandsor(t_token **token, char **str, char **env);
@@ -156,7 +155,6 @@ int		switch_case(t_token **token, char **env, t_data **data, char **str);
 int		add_args(char ***arg, char **str);
 int		add_last_data(t_data **data, char **str);
 char	*key_to_res(char **key, char **env);
-
 
 void	execute_command(t_data **ddata, char *command_path);
 void	handle_redir(t_data *data);
