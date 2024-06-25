@@ -32,7 +32,8 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (0);
 }
 
-int	heredoc(t_data *data) {
+int	heredoc(t_data *data) 
+{
 	int		fd;
 	char	*line;
 	char	*filename;
@@ -116,16 +117,15 @@ void	b_echo(t_data *data)
 	int	i;
 
 	i = 1;
-    if (ft_strcmp(data->args[1], "-n"))
-    {
-        while (data->args[i])
-        {
-
-            printf("%s", data->args[i]);
-            if (data->args[++i])
-                printf(" ");
-        }
-        printf("\n");
+	if (ft_strcmp(data->args[1], "-n"))
+	{
+		while (data->args[i])
+		{
+			printf("%s", data->args[i]);
+			if (data->args[++i])
+			printf(" ");
+			}
+			printf("\n");
     }
     else
     {
@@ -141,6 +141,10 @@ void	b_echo(t_data *data)
     exit(EXIT_SUCCESS);
 }
 
+void	b_pwd(void)
+{
+	size_t	size;
+	char	*buff;
 
 	size = 1;
 	buff = NULL;
@@ -223,7 +227,7 @@ char	**ft_mat_rem_index(char ***mat, int index)
 	while (c_mat[++i])
 	{
 		if (i == index)
-			// printf("ENCUENTRO EL MALO = %s\n", c_mat[i]);
+			 printf("ENCUENTRO EL MALO = %s\n", c_mat[i]);
 		else if (c_mat[i])
 			new_mat[++j] = ft_strdup(c_mat[i]);
 	}
