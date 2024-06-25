@@ -32,92 +32,32 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (0);
 }
 
-void heredoc(t_data *data)
-{
-    int     fd;
-    int     i;
-    char    *line;
-    char    *filename; 
-    t_redir *aux;
-    t_data  *iterator;
+int heredoc(t_data *data) {
+    int fd;
+    char *line;
+    char *filename = "/tmp/heredoc";
+    t_redir *aux = data->redir;
 
-    i = 0;
-    iterator = data;
-    while (iterator)
-    {
-        aux = iterator->redir;
-        if (aux && aux->path)
-        {
-            if (aux->type == D_MINOR)
-            {
-                filename = "/tmp/heredoc";
-                fd = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
-                if (fd == -1)
-                {
-                    perror("open");
-                    exit(EXIT_FAILURE);
-                }
-                line = readline("> ");
-                while (line)
-                {
-                    
-                    if (ft_strcmp(line, aux->path) == 0)
-                    {
-                        free(line);
-                        break;
-                    }
-                    ft_putstr_fd(line, fd);
-                    ft_putstr_fd("\n", fd);
-                    free(line);
-                    line = readline("> ");
-                }
-                close(fd);
-                int arg_count = 0;
-                while (data->args[arg_count] != NULL)
-                    arg_count++;
-                if(arg_count < 2)
-                {
-                    // Crear un nuevo arreglo de punteros con espacio adicional
-                    char **new_args = malloc((i + 2) * sizeof(char *));
-                    if (new_args == NULL)
-                    {
-                        perror("malloc");
-                        exit(EXIT_FAILURE);
-                    }
-                    // Copiar los elementos del arreglo original al nuevo arreglo
-                    i = 0;
-                    while (iterator->args[i] != NULL)
-                    {
-                        new_args[i] = iterator->args[i];
-                        i++;
-                    }
-                    // Agregar el nombre del archivo al final del nuevo arreglo
-                    new_args[i] = filename;
-                    new_args[i + 1] = NULL;  // Asegurarse de que el nuevo arreglo esté terminado con NULL
-                    // Liberar el arreglo original
-                    free(iterator->args);
-                    // Actualizar el puntero args para apuntar al nuevo arreglo
-                    iterator->args = new_args;
-                }
-                // Salir si no hay más delimitadores
-                if (aux->next == NULL)
-                {
-                    break;
-                }
-            }
-            if(aux->next != NULL)
-            {
-                iterator->redir = aux->next;
-            }
-        }
-        if(iterator->next != NULL)
-        {
-            iterator = iterator->next;
-        }
-        if (line == NULL)
-            break;
+    fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    if (fd == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
     }
+
+    while (1) {
+        line = readline("> ");
+        if (line == NULL || ft_strcmp(line, aux->path) == 0) {
+            free(line);
+            break;
+        }
+        ft_putstr_fd(line, fd);
+        ft_putstr_fd("\n", fd);
+        free(line);
+    }
+    close(fd);
+    return open(filename, O_RDONLY);
 }
+
 
 void handle_redir(t_data *data)
 {
@@ -283,149 +223,138 @@ int is_builtin(char *comand)
     return 0;
 }
 
-void execute_command(t_data *data, char *command_path)
-{
-    pid_t pid = fork();
+void execute_command(t_data *data, char *command_path) {
+    pid_t pid;
 
-    if (pid == -1)
-    {
+    pid = fork();
+
+    if (pid == -1) {
         perror("fork");
         return;
-    }
-    else if (pid == 0)
-    {
-        if (ft_strcmp(command_path, "is_builtinOMG") == 0)
-        {
+    } else if (pid == 0) {
+        // Proceso hijo
+        if ((data->redir != NULL && data->redir->type == D_MINOR) && data->next == NULL) {
+            int heredoc_fd = heredoc(data);
+            if (dup2(heredoc_fd, STDIN_FILENO) == -1) {
+                perror("dup2");
+                exit(EXIT_FAILURE);
+            }
+            close(heredoc_fd);
+        }
+
+        if (data->redir != NULL) {
+            handle_redir(data);
+        }
+
+        if (ft_strcmp(command_path, "is_builtinOMG") == 0) {
             switch_builtin(data);
             exit(EXIT_SUCCESS);
-        }
-        else
-        {
-            if (execve(command_path, data->args, data->env) == -1)
-            {
+        } else {
+            if (execve(command_path, data->args, data->env) == -1) {
                 perror("execve");
                 exit(EXIT_FAILURE);
             }
         }
-    }
-    else
-    {
-        int status;
-        if (waitpid(pid, &status, 0) == -1)
-        {
+    } else {
+        // Proceso padre
+        int exit_code;
+        if (waitpid(pid, &exit_code, 0) == -1) {
             perror("waitpid");
             return;
+        }
+
+        if (exit_code != 0) {
+            fprintf(stderr, "Proceso hijo terminó con error: %d\n", exit_code);
         }
     }
 }
 
-void execute_pipeline(t_data *data)
-{
+void execute_pipeline(t_data *data) {
     t_data *current = data;
     int input_fd = STDIN_FILENO;
     int fd[2];
     pid_t pid;
+    int heredoc_fd = -1;
 
-    while (current != NULL)
-    {
-        if (current->next != NULL)
-        {
-            if (pipe(fd) == -1)
-            {
+    while (current != NULL) {
+        // Manejo del heredoc antes del fork
+        if (current->redir != NULL && current->redir->type == D_MINOR) {
+            heredoc_fd = heredoc(current);
+        }
+        // Creación del pipe si no es el último comando
+        if (current->next != NULL) {
+            if (pipe(fd) == -1) {
                 perror("pipe");
                 exit(EXIT_FAILURE);
             }
         }
-
         pid = fork();
-        if (pid == -1)
-        {
+        //execve("/bin/cat", (char *[]){"cat", "/tmp/heredoc", NULL}, NULL);
+        if (pid == -1) {
             perror("fork");
             exit(EXIT_FAILURE);
-        }
-        else if (pid == 0)
-        {
-            // En el proceso hijo
-
-            // Redireccionar entrada
-            if (dup2(input_fd, STDIN_FILENO) == -1)
-            {
-                perror("dup2");
-                exit(EXIT_FAILURE);
-            }
-            if (input_fd != STDIN_FILENO)
-                close(input_fd);
-
-            // Redireccionar salida para comandos intermedios
-            if (current->next != NULL)
-            {
-                close(fd[0]); // Cerrar el extremo de lectura del pipe
-                if (dup2(fd[1], STDOUT_FILENO) == -1)
-                {
+        } else if (pid == 0) {
+            // Proceso hijo
+            if (heredoc_fd != -1) {
+                if (dup2(heredoc_fd, STDIN_FILENO) == -1) {
                     perror("dup2");
                     exit(EXIT_FAILURE);
                 }
-                close(fd[1]); // Cerrar el extremo de escritura del pipe
+                close(heredoc_fd);
+            } else if (input_fd != STDIN_FILENO) {
+                if (dup2(input_fd, STDIN_FILENO) == -1) {
+                    perror("dup2");
+                    exit(EXIT_FAILURE);
+                }
+                close(input_fd);
+            }
+            if (current->next != NULL) {
+                close(fd[0]);
+                if (dup2(fd[1], STDOUT_FILENO) == -1) {
+                    perror("dup2");
+                    exit(EXIT_FAILURE);
+                }
+                close(fd[1]);
+            }
+            if (current->redir != NULL) {
+                handle_redir(current);
             }
 
-            // Ejecutar comando
-            if (current->redir != NULL && current->redir->type == D_MINOR)
-                heredoc(current);
-            if (current->redir != NULL)
-                handle_redir(current);
-
-            if (!is_valid_command(current))
-            {
+            if (!is_valid_command(current)) {
                 fprintf(stderr, "Comando no encontrado: %s\n", current->comand);
                 exit(EXIT_FAILURE);
             }
             exit(EXIT_SUCCESS);
-        }
-        else
-        {
-            // En el proceso padre
-
-            // Redirigir la entrada del siguiente comando
-            if (current->next != NULL)
-            {
-                close(fd[1]); // Cerrar el extremo de escritura del pipe en el padre
-                if (input_fd != STDIN_FILENO)
-                    close(input_fd);
-                input_fd = fd[0]; // Actualizar input_fd para el siguiente comando
+        } else {
+            // Proceso padre
+            if (input_fd != STDIN_FILENO) {
+                close(input_fd);
             }
-            else
-            {
-                close(fd[0]);
+            if (current->next != NULL) {
                 close(fd[1]);
+                input_fd = fd[0];
+            }
+            if (heredoc_fd != -1) {
+                close(heredoc_fd);
+                heredoc_fd = -1;
             }
             current = current->next;
         }
     }
 
-    // Esperar a que terminen todos los procesos hijos
-    int status;
-    while (wait(&status) > 0)
-    {
-        if (WIFEXITED(status))
-        {
-            int exit_status = WEXITSTATUS(status);
-            if (exit_status != 0)
-            {
-                fprintf(stderr, "Un proceso hijo terminó con estado de salida %d\n", exit_status);
-            }
-        }
-        else if (WIFSIGNALED(status))
-        {
-            int term_signal = WTERMSIG(status);
-            fprintf(stderr, "Un proceso hijo fue terminado por la señal %d\n", term_signal);
-        }
-    }
+    // Esperar a que todos los procesos hijos terminen
+    while (wait(NULL) > 0);
 }
-
 
 int is_valid_command(t_data *data)
 {
-    char *path = getenv("PATH");
+    char *path;
+    int  i;
+    char *comand_path;
+    char **token;
+
+    i = 0;
+    path = getenv("PATH");
     if (!path || !data->comand)
     {
         fprintf(stderr, "No se pudo obtener el valor de PATH\n");
@@ -437,22 +366,23 @@ int is_valid_command(t_data *data)
         execute_command(data, "is_builtinOMG");
         return 1;
     }
-
-    char **token = ft_split(path, ':');
-    for (int i = 0; token[i] != NULL; i++)
+    
+    token = ft_split(path, ':');
+    while(token[i] != NULL)
     {
-        char *comand_path = ft_strjoin(token[i], "/");
+        comand_path = ft_strjoin(token[i], "/");
         comand_path = ft_strjoin(comand_path, data->comand);
 
         if (access(comand_path, X_OK) == 0)
         {
             execute_command(data, comand_path);
-            printf("El comando \"%s\" es válido en la ruta: %s\n", data->comand, comand_path);
+            //printf("El comando \"%s\" es válido en la ruta: %s\n", data->comand, comand_path);
             free(comand_path);
             free_args(token);
             return 1;
         }
         free(comand_path);
+        i++;
     }
     free_args(token);
     return 0;
