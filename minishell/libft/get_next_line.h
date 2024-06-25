@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42barcel>       +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 20:25:49 by aduenas-          #+#    #+#             */
-/*   Updated: 2023/09/03 19:00:09 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/06/22 18:32:54 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,10 @@
 
 char	*read_file(int fd, char *buff);
 char	*get_next_line(int fd);
-char	*ft_strchr(const char *string, int c);
+char	*gnl_ft_strchr(const char *string, int c);
 char	*ft_line(char *buff);
-char	*ft_strjoin(char const *str1, char const *str2);
-void	*ft_calloc(size_t count, size_t size);
-
-size_t	ft_strlen(const char *str);
+void	*gnl_ft_calloc(size_t count, size_t size);
+char	*ft_next(char *buffer);
+size_t	gnl_ft_strlen(const char *str);
 
 #endif

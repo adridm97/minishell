@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/06/02 18:57:00 by kevin            ###   ########.fr       */
+/*   Updated: 2024/06/24 21:49:19 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,129 +105,273 @@ void handle_redir(t_data *data)
     }
 }
 
-void b_cd(t_data *data)
+void    b_cd(t_data *data)
 {
-    if (data->args[1] == NULL || chdir(data->args[1]) != 0)
-    {
-        perror("cd");
-    }
+    (void)data;
+    printf("hago cosas\n");
 }
 
-void b_echo(t_data *data)
+//TODO falta que espanda
+void    b_echo(t_data *data)
 {
-    int i = 1;
-    int newline = 1;
+    int i;
 
-    if (data->args[1] && ft_strcmp(data->args[1], "-n") == 0)
+    i = 1;
+    if (ft_strcmp(data->args[1], "-n"))
     {
-        newline = 0;
-        i = 2;
-    }
-    while (data->args[i])
-    {
-        printf("%s", data->args[i]);
-        if (data->args[i + 1])
-            printf(" ");
-        i++;
-    }
-    if (newline)
+        while (data->args[i])
+        {
+
+            printf("%s", data->args[i]);
+            if (data->args[++i])
+                printf(" ");
+        }
         printf("\n");
-}
-
-void b_pwd()
-{
-    char *buff = getcwd(NULL, 0);
-    if (buff)
-    {
-        printf("%s\n", buff);
-        free(buff);
     }
     else
     {
-        perror("getcwd");
+        i++;
+        while (data->args[i])
+        {
+
+            printf("%s", data->args[i]);
+            if (data->args[++i])
+                printf(" ");
+        }
+    }
+    exit(EXIT_SUCCESS);
+}
+
+void    b_pwd()
+{
+    size_t  size;
+    char    *buff;
+
+    size = 1;
+    buff = NULL;
+    while(!buff)
+        buff = getcwd(buff, size++);
+    printf("%s\n", buff);
+    free(buff);
+    exit(EXIT_SUCCESS);
+}
+
+void    print_env(t_data *data, char *str)
+{
+    int i;
+
+    i = -1;
+    if (data->env)
+    {
+        while (data->env[++i])
+            printf("%s%s\n", str, data->env[i]);
     }
 }
 
-void print_env(t_data *data)
-{
-    for (int i = 0; data->env[i]; i++)
-    {
-        printf("declare -x %s\n", data->env[i]);
-    }
-}
+
 
 int ft_matsize(char **mat)
 {
-    int size = 0;
-    while (mat[size])
-        size++;
-    return size;
+	int size;
+
+	size = 0;
+	while (mat[size])
+		size++;
+	return (size);
 }
 
 char **ft_matadd(char ***mat, char *str)
 {
-    int size = ft_matsize(*mat);
-    char **new_mat = malloc(sizeof(char*) * (size + 2));
+    int size;
+    char **new_mat;
+    int i;
+    char **c_mat;
+
+    i = -1;
+    size = ft_matsize(*mat);
+    new_mat = (char**)malloc(sizeof(char**) * (size + 2));
     if (!new_mat)
-        return NULL;
-
-    for (int i = 0; i < size; i++)
+        return (NULL);
+    c_mat = *mat;
+    while (c_mat[++i])
     {
-        new_mat[i] = ft_strdup((*mat)[i]);
+        new_mat[i] = ft_strdup(c_mat[i]);
     }
-    new_mat[size] = ft_strdup(str);
-    new_mat[size + 1] = NULL;
+    new_mat[i] = ft_strdup(str);
+    new_mat[++i] = NULL;
     free_args(*mat);
-    return new_mat;
+    return (new_mat);
 }
 
-void b_export(t_data *data)
+
+// cada nuevo comando env se reinicializa
+void    b_export(t_data **data)
 {
-    if (!data->args[1])
-    {
-        print_env(data);
-    }
+    if (!(*data)->args[1])
+        print_env(*data, "declare -x ");
     else
-    {
-        data->env = ft_matadd(&data->env, data->args[1]);
-        print_env(data);
-    }
+        (*data)->env = ft_matadd(&(*data)->env, (*data)->args[1]);
+    unlink("/tmp/env.env");
+    if (!save_env(*data))
+        exit(EXIT_FAILURE);
+    exit(EXIT_SUCCESS);
 }
 
-void switch_builtin(t_data *data)
+char **ft_mat_rem_index(char ***mat, int index)
 {
-    if (ft_strcmp(data->comand, "echo") == 0)
-        b_echo(data);
-    else if (ft_strcmp(data->comand, "cd") == 0)
-        b_cd(data);
-    else if (ft_strcmp(data->comand, "pwd") == 0)
-        b_pwd();
-    else if (ft_strcmp(data->comand, "export") == 0)
-        b_export(data);
-    else if (ft_strcmp(data->comand, "unset") == 0)
-        b_cd(data); // cambiar a la implementación de unset
-    else if (ft_strcmp(data->comand, "env") == 0)
-        print_env(data);
-    else if (ft_strcmp(data->comand, "exit") == 0)
-        exit(EXIT_SUCCESS);
+    char **new_mat;
+    int i;
+    int j;
+    char **c_mat;
+
+    i = -1;
+    j = -1;
+    new_mat = (char**)malloc(sizeof(char**) * (ft_matsize(*mat)));
+    if (!new_mat)
+        return (NULL);
+    c_mat = *mat;
+    while (c_mat[++i])
+    {
+        if (i == index)
+        {
+            // printf("ENCUENTRO EL MALO = %s\n", c_mat[i]);
+        }
+        else if (c_mat[i])
+        {
+            // printf("PETO AQUI\n");
+            // printf("He entrado aqui y es %s\n", c_mat[i]);
+            new_mat[++j] = ft_strdup(c_mat[i]);
+        }
+    }
+    new_mat[++j] = NULL;
+    free_args(*mat);
+    return (new_mat);
 }
 
+int    index_env(t_data *data, char *str)
+{
+    int     i;
+    char    **env;
+
+    i = -1;
+    env = data->env;
+    while (env[++i])
+    {
+        if (ft_strnstr(env[i], str, ft_strlen(str)) && (env[i][ft_strlen(str)] == '=' || env[i][ft_strlen(str)] == '\0'))
+            return (i);
+    }
+    return (-1);
+}
+
+void    b_unset(t_data *data)
+{
+    int i;
+
+    i = index_env(data, data->args[1]);
+    printf("%i\n", i);
+    if (i != -1)
+        data->env = ft_mat_rem_index(&data->env, i);
+    unlink("/tmp/env.env");
+    if (!save_env(data))
+        exit(EXIT_FAILURE);
+    exit(EXIT_SUCCESS);
+    
+}
+
+void    b_env(t_data *data)
+{
+    int i;
+
+    i = -1;
+    if (data->env)
+    {
+        while (data->env[++i])
+        {
+            if (ft_strrchr(data->env[i], '='))
+                printf("%s\n", data->env[i]);
+        }
+    }
+    exit(EXIT_SUCCESS);
+}
+
+void    switch_builtin(t_data **ddata)
+{
+    t_data *data;
+
+    data = *ddata;
+    if (!ft_strcmp(data->comand, "echo"))
+        b_echo(data);
+    else if (!ft_strcmp(data->comand, "cd"))
+        b_cd(data);
+    else if (!ft_strcmp(data->comand, "pwd"))
+        b_pwd();
+    else if (!ft_strcmp(data->comand, "export"))
+        b_export(ddata);
+    else if (!ft_strcmp(data->comand, "unset"))
+        b_unset(data);
+    else if (!ft_strcmp(data->comand, "env"))
+        b_env(data);
+    else if (!ft_strcmp(data->comand, "exit"))
+        b_cd(data);
+    printf("llego???\n");
+    // exit(EXIT_SUCCESS);
+    return ;
+}
+
+/*int execute_command(t_data **ddata, char *command_path)
+{
+	pid_t pid = fork();
+    t_data *data;
+
+    data = *ddata;
+	if (pid == -1)
+	{
+		perror("fork");
+        return(0);
+	}
+	else if (pid == 0)
+	{
+        if (data->redir != NULL && data->redir->type == D_MINOR)
+			heredoc(data);
+	    if (data->redir != NULL)
+		    handle_redir(data);
+        if (!ft_strcmp(command_path,"is_builtinOMG"))
+            switch_builtin(ddata);
+		else if (execve(command_path, data->args, NULL) == -1)
+		{
+			perror("execve");
+			return(0);
+		}
+	}
+	else
+	{
+		int	status;
+		if (waitpid(pid, &status, 0) == -1)
+		{
+			perror("waitpid");
+			return(0);
+		}
+	}
+    return (1);
+}*/
 int is_builtin(char *comand)
 {
-    if (!comand)
-        return 0;
-    if (ft_strcmp(comand, "echo") == 0 || ft_strcmp(comand, "cd") == 0 || ft_strcmp(comand, "pwd") == 0 ||
-        ft_strcmp(comand, "export") == 0 || ft_strcmp(comand, "unset") == 0 || ft_strcmp(comand, "env") == 0 ||
-        ft_strcmp(comand, "exit") == 0)
-        return 1;
-    return 0;
+    if(!comand)
+        return (0);
+    if (!ft_strcmp(comand, "echo") || !ft_strcmp(comand, "cd") || !ft_strcmp(comand, "pwd") \
+    || !ft_strcmp(comand, "export") || !ft_strcmp(comand, "unset") || !ft_strcmp(comand, "env") \
+    || !ft_strcmp(comand, "exit"))
+        return (1);
+    return (0);
 }
 
-void execute_command(t_data *data, char *command_path) {
+void execute_command(t_data **ddata, char *command_path) {
     pid_t pid;
 
     pid = fork();
 
+	t_data *data;
+    data = *ddata;
     if (pid == -1) {
         perror("fork");
         return;
@@ -247,7 +391,7 @@ void execute_command(t_data *data, char *command_path) {
         }
 
         if (ft_strcmp(command_path, "is_builtinOMG") == 0) {
-            switch_builtin(data);
+            switch_builtin(ddata);
             exit(EXIT_SUCCESS);
         } else {
             if (execve(command_path, data->args, data->env) == -1) {
@@ -363,7 +507,7 @@ int is_valid_command(t_data *data)
 
     if (is_builtin(data->comand))
     {
-        execute_command(data, "is_builtinOMG");
+        execute_command(&data, "is_builtinOMG");
         return 1;
     }
     
@@ -375,7 +519,7 @@ int is_valid_command(t_data *data)
 
         if (access(comand_path, X_OK) == 0)
         {
-            execute_command(data, comand_path);
+            execute_command(&data, comand_path);
             //printf("El comando \"%s\" es válido en la ruta: %s\n", data->comand, comand_path);
             free(comand_path);
             free_args(token);
