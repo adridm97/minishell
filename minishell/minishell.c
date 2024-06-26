@@ -96,6 +96,10 @@ int	main(int argc, char *argv[], char *env[])
 			unlink("/tmp/env.env");
 		}
 		input = readline(BLUE"Minishell: "BLACK);
+		if (input == NULL) {
+            printf("\n");
+            break; // Salir del bucle si se presionó Ctrl + D (EOF)
+        }
 		if (!strcmp(input, "exit"))
 			break ;
 		if (input && *input)
