@@ -78,6 +78,7 @@ int	main(int argc, char *argv[], char *env[])
 	(void)argc;
 	(void)argv;
 	data = NULL;
+	setup_signal_handlers();
 	while (1)
 	{
 		if (data)

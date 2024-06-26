@@ -160,6 +160,9 @@ void	execute_command(t_data **ddata, char *command_path);
 void	handle_redir(t_data *data);
 int		heredoc(t_data *data);
 
+//handlers.c
+void	setup_signal_handlers();
+
 // Regular Colors
 # define BLACK "\x1b[0m"
 # define RED "\x1b[31m"
