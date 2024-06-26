@@ -3,43 +3,44 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42barcel>       +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 20:36:45 by aduenas-          #+#    #+#             */
-/*   Updated: 2023/09/03 21:27:09 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/06/22 18:34:26 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_strjoin(char const *str1, char const *str2)
+char	*ft_next(char *buffer)
 {
-	char		*buffer;
-	size_t		i;
-	size_t		j;
+	int		i;
+	int		j;
+	char	*line;
 
-	buffer = (char *)malloc(sizeof(*str1) \
-				* (ft_strlen(str1) + ft_strlen(str2) + 1));
-	if (!buffer)
+	i = 0;
+	while (buffer[i] && buffer[i] != '\n')
+		i++;
+	if (!buffer[i])
+	{
+		free(buffer);
 		return (NULL);
-	i = 0;
+	}
+	line = gnl_ft_calloc((gnl_ft_strlen(buffer) -i + 1), sizeof(char));
+	if (!line)
+	{
+		free(buffer);
+		return (NULL);
+	}
+	i++;
 	j = 0;
-	while (str1[i])
-	{
-		buffer[j++] = str1[i];
-		i++;
-	}
-	i = 0;
-	while (str2[i])
-	{
-		buffer[j++] = str2[i];
-		i++;
-	}
-	buffer[j] = 0;
-	return (buffer);
+	while (buffer[i])
+		line[j++] = buffer[i++];
+	free(buffer);
+	return (line);
 }
 
-char	*ft_strchr(const char *string, int c)
+char	*gnl_ft_strchr(const char *string, int c)
 {
 	char	*str;
 
@@ -52,7 +53,7 @@ char	*ft_strchr(const char *string, int c)
 		return (NULL);
 }
 
-size_t	ft_strlen(const char *str)
+size_t	gnl_ft_strlen(const char *str)
 {
 	int	i;
 
@@ -78,7 +79,7 @@ void	ft_bzero(void *s, size_t n)
 	}
 }
 
-void	*ft_calloc(size_t count, size_t size)
+void	*gnl_ft_calloc(size_t count, size_t size)
 {
 	char	*res;
 
