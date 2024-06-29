@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/06/25 19:58:42 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/06/27 08:03:46 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,7 @@ void	execute_pipeline(t_data *data);
 int		is_valid_command(t_data *data);
 int		ft_matsize(char **mat);
 void	print_env(t_data *data, char *str);
+int	index_env(t_data *data, char *str);
 
 //split_token
 void	is_expandsor(t_token **token, char **str, char **env);

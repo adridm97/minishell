@@ -107,8 +107,70 @@ void	handle_redir(t_data *data)
 
 void	b_cd(t_data *data)
 {
-	(void)data;
-	printf("hago cosas\n");
+	int	i;
+	char	last_pwd[1024];
+	char	*res;
+
+	if (getcwd(last_pwd,sizeof(last_pwd)))
+	{
+		i = index_env(data, "OLDPWD");
+		// Se debe guardar al confirmar el cd
+		if(i >= 0)
+			data->env[i] = ft_strjoin("OLDPWD=",last_pwd);
+		else
+		{
+			res = ft_strjoin("OLDPWD=", last_pwd);
+			(data)->env = ft_matadd(&(data)->env, res);
+			// creo que no he de liberarlo
+			// free(last_pwd);
+			free(res);
+		}
+	}
+	else
+		exit(EXIT_FAILURE);
+	if (data->args[1] && !chdir(data->args[1]))
+	{
+		// printf("PETO, 1\n");	
+		i = index_env(data, "PWD");
+		if(i >= 0)
+			data->env[i] = ft_strjoin("PWD=",last_pwd);
+		else
+		{
+			res = ft_strjoin("PWD=", "PWD");
+			(data)->env = ft_matadd(&(data)->env, res);
+			// creo que no he de liberarlo
+			// free(last_pwd);
+			free(res);
+			i = index_env(data, "PWD");
+		}
+		// printf("PETO, 2\n");	
+		// printf("PETO, 3\n");
+		//es posible que aquí pierda memoria memory leak
+		if (getcwd(last_pwd,sizeof(last_pwd)))
+		{
+		data->env[i] = ft_strjoin("PWD=",last_pwd);
+		}
+		else
+			exit(EXIT_FAILURE);
+		if(!data->env[i])
+		{
+			// printf("PETO, no guardo en data env\n");	
+			exit(EXIT_FAILURE);
+		}
+		if (!save_env(data))
+		{
+			// printf("PETO, no guardo archivo en save env\n");	
+			exit(EXIT_FAILURE);
+		}
+		// printf("data env: %s\n", data->env[i]);
+	}
+	else
+	{
+		// printf("PETO Y NO CAMBIO\n");	
+    	exit(EXIT_FAILURE);
+	}
+		free(data->env[i]);
+    exit(EXIT_SUCCESS);
 }
 
 //TODO falta que espanda
@@ -117,7 +179,7 @@ void	b_echo(t_data *data)
 	int	i;
 
 	i = 1;
-	if (ft_strcmp(data->args[1], "-n"))
+	if (data->args[1] && ft_strcmp(data->args[1], "-n"))
 	{
 		while (data->args[i])
 		{
@@ -227,7 +289,7 @@ char	**ft_mat_rem_index(char ***mat, int index)
 	while (c_mat[++i])
 	{
 		if (i == index)
-			 printf("ENCUENTRO EL MALO = %s\n", c_mat[i]);
+			i = i;
 		else if (c_mat[i])
 			new_mat[++j] = ft_strdup(c_mat[i]);
 	}
