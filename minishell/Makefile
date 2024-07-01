@@ -1,6 +1,6 @@
 NAME            = minishell
 CC              = gcc
-CFLAGS          = -Wall -Wextra -Werror -g
+CFLAGS          = -Wall -Wextra -Werror -fPIE
 SOURCES         = minishell.c lexer.c executor.c special_split.c split_token.c signals.c
 OBJS_PATH       = ./build
 HEADER          = minishell.h
@@ -44,6 +44,12 @@ clean:
 	rm -rf $(OBJS_PATH)
 	make clean -C $(LIBFT_PATH)
 	$(MAKE) -C $(READLINEDIR) clean
+	rm -f $(READLINEDIR)/lib/libhistory.a
+	rm -f $(READLINEDIR)/lib/libhistory.old
+	rm -f $(READLINEDIR)/lib/libreadline.a
+	rm -f $(READLINEDIR)/lib/libreadline.old
+	rm -f $(READLINEDIR)/lib/libhistory.so*
+	rm -f $(READLINEDIR)/lib/libreadline.so*
 
 fclean: clean
 	rm -rf $(NAME)
