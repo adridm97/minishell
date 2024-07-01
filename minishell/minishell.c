@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/06/25 23:03:30 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/06/29 13:42:16 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ int	main(int argc, char *argv[], char *env[])
 	t_data		*data;
 	int			fd;
 	char		**mat;
+	char		*key;
 
 	(void)argc;
 	(void)argv;
@@ -108,6 +109,10 @@ int	main(int argc, char *argv[], char *env[])
 			data = lexer(input, data, mat);
 		else
 			data = lexer(input, data, env);
+		key = ft_strdup("PWD");
+		key = key_to_res(&key, data->env);
+		chdir(key);
+		free(key);
 		if (data->next)
 			execute_pipeline(data);
 		else
