@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/06/25 23:01:10 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/07/01 08:39:34 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,7 @@ void	print_redir(t_redir *redir)
 	}
 }
 
-static void	print_data(t_data *data)
+void	print_data(t_data *data)
 {
 	int	i;
 	int	j;
@@ -231,9 +231,11 @@ void	free_data(t_data **data)
 		del = (*data)->next;
 		free_args((*data)->args);
 		free_redir(&(*data)->redir);
+		clean_env(&(*data)->env, -1);
 		free(*data);
 		*data = del;
 	}
+	clean_env(&(*data)->env, -1);
 	if ((*data)->args)
 		free_args((*data)->args);
 	if ((*data)->redir)
@@ -244,8 +246,20 @@ void	free_data(t_data **data)
 
 void	clean_env(char ***env, int i)
 {
-	while (i >= 0)
-		free(env[0][i]);
+	if(i == -1)
+	{
+		while (env[0][++i])
+		{
+			free(env[0][i]);
+		}
+		free(*env);
+	}
+	else 
+	{
+		while (--i >= 0)
+			free(env[0][i]);
+		free(*env);
+	}
 }
 
 int	create_env(t_data **data, char **env)
@@ -259,7 +273,7 @@ int	create_env(t_data **data, char **env)
 		return (0);
 	while (env[i])
 		i++;
-	(*data)->env = (char **)malloc(sizeof(char **) * ++i);
+	(*data)->env = (char **)malloc(sizeof(char *) * (i + 1));
 	i = -1;
 	if (!(*data)->env)
 		return (0);
@@ -273,6 +287,7 @@ int	create_env(t_data **data, char **env)
 	return (1);
 }
 
+// TODO leaks
 char	**get_env_file(int fd)
 {
 	int		i;
@@ -355,7 +370,7 @@ int	init_data(t_data **data, char **env)
 	return (1);
 }
 
-t_data	*lexer(char *input, t_data *data, char **env)
+t_data	*lexer(char *input, t_data **data, char **env)
 {
 	t_token	*token;
 	t_error	error;
@@ -386,11 +401,11 @@ t_data	*lexer(char *input, t_data *data, char **env)
 	check_gramathic(token, &error);
 	if (error.is_error)
 		return (is_error(& (t_error){"Syntax error",1}), \
-				free(error.error), free_data(&data), free_token(&token), NULL);
-	else if (!split_token(token, env, &data))
+				free(error.error), free_data(data), free_token(&token), NULL);
+	else if (!split_token(token, env, data))
 		return (is_error(& (t_error){"Memory error",1}), \
-				free_data(&data), free_token(&token), NULL);
-	print_data(data);
+				free_data(data), free_token(&token), NULL);
+	// print_data(data);
 	free_token(&token);
-	return (data);
+	return (*data);
 }

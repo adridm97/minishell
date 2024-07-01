@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/06/25 20:44:38 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/07/01 08:19:35 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -442,7 +442,7 @@ int	split_token(t_token *token, char **env, t_data **data)
 	char	*str;
 
 	if (!init_data(data, env))
-		(void)data;
+		return (free_data(data), 0);
 	str = NULL;
 	while (token)
 	{
