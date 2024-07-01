@@ -120,6 +120,8 @@ int	main(int argc, char *argv[], char *env[])
 		free_data(&data);
 		data = NULL;
 	}
+	free_data(&data);
+	free(input);
 	return (0);
 }
 

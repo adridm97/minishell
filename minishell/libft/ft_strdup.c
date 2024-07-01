@@ -28,6 +28,23 @@ char	*ft_strdup(const char *s1)
 		res[c] = s1[c];
 	return (res);
 }
+
+char	*ft_strndup(const char *s1, size_t n)
+{
+	size_t	c;
+	char	*res;
+
+	c = 0;
+	while (s1[c] && c < n)
+		c++;
+	res = (char *)malloc((c + 1) * sizeof(char));
+	if (!res)
+		return (NULL);
+	for (size_t i = 0; i < c; i++)
+		res[i] = s1[i];
+	res[c] = '\0';
+	return (res);
+}
 /*
 int	main(void)
 {
