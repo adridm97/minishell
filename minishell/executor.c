@@ -380,7 +380,7 @@ char	**ft_mat_rem_index(char ***mat, int index)
 	while (c_mat[++i])
 	{
 		if (i == index)
-			i = i;
+			i = index;
 		else if (c_mat[i])
 			new_mat[++j] = ft_strdup(c_mat[i]);
 	}
