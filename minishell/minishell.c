@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/06/25 23:03:30 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/07/01 08:35:25 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ int	save_env(t_data *data)
 	{
 		ft_putstr_fd(env[i], fd);
 		ft_putstr_fd("\n", fd);
+		// printf("entorno: %s\n", env[i]);
 		i++;
 	}
 	close(fd);
@@ -74,6 +75,7 @@ int	main(int argc, char *argv[], char *env[])
 	t_data		*data;
 	int			fd;
 	char		**mat;
+	char		*key;
 
 	(void)argc;
 	(void)argv;
@@ -105,9 +107,13 @@ int	main(int argc, char *argv[], char *env[])
 		if (input && *input)
 			add_history (input);
 		if (mat)
-			data = lexer(input, data, mat);
+			data = lexer(input, &data, mat);
 		else
-			data = lexer(input, data, env);
+			data = lexer(input, &data, env);
+		key = ft_strdup("PWD");
+		key = key_to_res(&key, data->env);
+		chdir(key);
+		free(key);
 		if (data->next)
 			execute_pipeline(data);
 		else
@@ -116,6 +122,8 @@ int	main(int argc, char *argv[], char *env[])
 		{
 			if (!save_env(data))
 				return (1);
+			if (mat)
+				clean_env(&mat, -1);
 		}
 		free_data(&data);
 		data = NULL;

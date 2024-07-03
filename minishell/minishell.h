@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/06/25 19:58:42 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/07/01 08:21:02 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ typedef struct s_data
 // lexer.c
 int		new_token(char c, int type, t_token **token, int index);
 int		add_token(char c, int type, t_token **token);
-t_data	*lexer(char *input, t_data *data, char **env);
+t_data	*lexer(char *input, t_data **data, char **env);
 int		typeing(char c, char *base);
 void	is_error(t_error *error);
 void	free_data(t_data **data);
@@ -133,6 +133,8 @@ int		init_data(t_data **data, char **env);
 void	free_redir(t_redir **redir);
 void	free_args(char **args);
 char	**get_env_file(int fd);
+void	print_data(t_data *data);
+void	clean_env(char ***env, int i);
 
 // minishell.c
 int		save_env(t_data *data);
@@ -148,6 +150,7 @@ void	execute_pipeline(t_data *data);
 int		is_valid_command(t_data *data);
 int		ft_matsize(char **mat);
 void	print_env(t_data *data, char *str);
+int	index_env(t_data *data, char *str);
 
 //split_token
 void	is_expandsor(t_token **token, char **str, char **env);
