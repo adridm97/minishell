@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/03 20:20:05 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/03 20:23:10 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,6 @@ int	main(int argc, char *argv[], char *env[])
 			execute_pipeline(data);
 		else if (data)
 			is_valid_command(data);
-		printf("ESTO entra\n");
 		if (data && !file_exist("/tmp/env.env"))
 		{
 			if (!save_env(data))
