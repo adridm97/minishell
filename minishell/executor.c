@@ -313,9 +313,7 @@ char	**ft_mat_rem_index(char ***mat, int index)
 	c_mat = *mat;
 	while (c_mat[++i])
 	{
-		if (i == index)
-			i = i;
-		else if (c_mat[i])
+		if (c_mat[i] && i != index)
 			new_mat[++j] = ft_strdup(c_mat[i]);
 	}
 	new_mat[++j] = NULL;
