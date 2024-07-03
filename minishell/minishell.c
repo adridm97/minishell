@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/01 08:35:25 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/03 20:20:05 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,15 +110,19 @@ int	main(int argc, char *argv[], char *env[])
 			data = lexer(input, &data, mat);
 		else
 			data = lexer(input, &data, env);
-		key = ft_strdup("PWD");
-		key = key_to_res(&key, data->env);
-		chdir(key);
-		free(key);
-		if (data->next)
+		if (data)
+		{
+			key = ft_strdup("PWD");
+			key = key_to_res(&key, data->env);
+			chdir(key);
+			free(key);
+		}
+		if (data && data->next)
 			execute_pipeline(data);
-		else
+		else if (data)
 			is_valid_command(data);
-		if (!file_exist("/tmp/env.env"))
+		printf("ESTO entra\n");
+		if (data && !file_exist("/tmp/env.env"))
 		{
 			if (!save_env(data))
 				return (1);
