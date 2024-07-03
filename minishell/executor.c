@@ -193,7 +193,6 @@ void	b_echo(t_data *data)
         i++;
         while (data->args[i])
         {
-
             printf("%s", data->args[i]);
             if (data->args[++i])
                 printf(" ");
@@ -592,6 +591,7 @@ int	is_valid_command(t_data *data)
 
 	i = 0;
 	path = getenv("PATH");
+	printf("el path: %s\n", path);
 	if (!path || !data->comand)
 	{
 		fprintf(stderr, "No se pudo obtener el valor de PATH\n");
