@@ -214,13 +214,8 @@ int	heredoc(t_data *data)
 		{
 			key_val = key_to_res(&key, data->env);
 			expanded_line = ft_expand_line(line, '$', key_val);
-			//free(key);
 			if (expanded_line != NULL)
-			{
 				ft_putstr_fd(expanded_line, fd);
-				if (expanded_line && expanded_line != line)
-					//free(expanded_line);
-			}
 		}
 		else
 			ft_putstr_fd(line, fd);
