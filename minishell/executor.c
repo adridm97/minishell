@@ -32,11 +32,163 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (0);
 }
 
+// size_t	calculate_expanded_length(const char *line, char **env)
+// {
+// 	size_t	i;
+// 	size_t	len;
+// 	size_t	j;
+// 	size_t	var_len;
+// 	char	*var_name;
+// 	char	*var_value;
+
+// 	i = 0;
+// 	len = 0;
+// 	while (line[i] != '\0')
+// 	{
+// 		if (line[i] == '$')
+// 		{
+// 			j = i + 1;
+// 			while (line[j] != '\0' && (ft_isalnum(line[j]) || line[j] == '_'))
+// 			j++;
+// 			var_len = j - (i + 1);
+// 			var_name = ft_strndup(line + i + 1, var_len);
+// 			var_value = key_to_res(&var_name, env);
+// 			if (var_value)
+// 			{
+// 				len += ft_strlen(var_value);
+// 				free(var_value);
+// 			}
+// 			else
+// 				len += j - i;
+// 			i = j;
+// 		}
+// 		else
+// 		{
+// 			len++;
+// 			i++;
+// 		}
+// 	}
+// 	return (len);
+// }
+
+// char	*expand_variables(const char *line, char **env)
+// {
+// 	size_t	result_len;
+// 	char	*result;
+// 	size_t	i;
+// 	size_t	k;
+// 	size_t	j;
+// 	size_t	var_len;
+// 	char	*var_name;
+// 	char	*var_value;
+
+// 	i = 0;
+// 	j = 0;
+// 	k = 0;
+//  	result_len = calculate_expanded_length(line, env);
+// 	result = malloc(result_len + 1);
+// 	while (line[i] != '\0')
+// 	{
+// 		if (line[i] == '$')
+// 		{
+// 			j = i + 1;
+// 			while (line[j] != '\0' && (ft_isalnum(line[j]) || line[j] == '_'))
+// 				j++;
+// 			var_len = j - (i + 1);
+// 			var_name = ft_strndup(line + i + 1, var_len);
+// 			var_value = key_to_res(&var_name, env);
+// 			if (var_value)
+// 			{
+// 				ft_strcpy(result + k, var_value);
+// 				k += ft_strlen(var_value);
+// 				free(var_value);
+// 			}
+// 			else
+// 			{
+// 				result[k++] = '$';
+// 				ft_strncpy(result + k, line + i + 1, var_len);
+// 				k += var_len;
+// 			}
+// 			i = j;
+// 		}
+// 		else
+// 		{
+// 			result[k++] = line[i++];
+// 		}
+// 	}
+// 	result[k] = '\0';
+// 	return result;
+// }
+
+char	*ft_get_key(char *line)
+{
+	int		i;
+	int		start;
+	char	*res;
+	char	*delimiter;
+
+	delimiter = " <>|'\".,-+*!¡?¿%%=·@#ªº¬€";
+	i = 0;
+	while (line[i] && line[i] != '$')
+		i++;
+	if (!line[i] || line[i] != '$')
+		return (NULL);
+	i++;
+	start = i;
+	while (line[i] && ft_strchr(delimiter, line[i]) == NULL)
+		i++;
+	res = malloc((i - start + 1) * sizeof(char));
+	if (!res)
+		return (NULL);
+	ft_strncpy(res, line + start, i - start);
+	res[i - start] = '\0';
+	return (res);
+}
+
+char	*ft_expand_line(char *str, char start, char *value)
+{
+	int		i;
+	int		j;
+	int		k;
+	int		val_len;
+	int		str_len;
+	char	*delimiter;
+	char	*res;
+
+	i = 0;
+	j = 0;
+	k = 0;
+	delimiter = " <>|'\".,-+*!¡?¿%%=·@#ªº¬€";
+	val_len = ft_strlen(value);
+	str_len = ft_strlen(str);
+	res = malloc(str_len + val_len + 1);
+	if (!res)
+		return (NULL);
+	while (str[i])
+	{
+		if (str[i] == start)
+		{
+			i++;
+			while (str[i] && ft_strchr(delimiter, str[i]) == NULL)
+				i++;
+			while (value[k])
+				res[j++] = value[k++];
+		}
+		else
+			res[j++] = str[i++];
+	}
+	res[j] = '\0';
+	return (res);
+}
+
 int	heredoc(t_data *data) 
 {
 	int		fd;
 	char	*line;
 	char	*filename;
+	char	*key;
+	char	*expanded_line;
+	char	*key_val;
 	t_redir	*aux;
 
 	aux = data->redir;
@@ -56,7 +208,22 @@ int	heredoc(t_data *data)
 			free(line);
 			break;
 		}
-		ft_putstr_fd(line, fd);
+		key = ft_get_key(line);
+		expanded_line = line;
+		if (key && key != NULL)
+		{
+			key_val = key_to_res(&key, data->env);
+			expanded_line = ft_expand_line(line, '$', key_val);
+			//free(key);
+			if (expanded_line != NULL)
+			{
+				ft_putstr_fd(expanded_line, fd);
+				if (expanded_line && expanded_line != line)
+					//free(expanded_line);
+			}
+		}
+		else
+			ft_putstr_fd(line, fd);
 		ft_putstr_fd("\n", fd);
 		free(line);
 	}
@@ -588,25 +755,30 @@ int	is_valid_command(t_data *data)
 	int		i;
 	char	*comand_path;
 	char	**token;
+	char	*tmp;
 
 	i = 0;
-	path = getenv("PATH");
-	printf("el path: %s\n", path);
+	path = ft_strdup("PATH");
+	path = key_to_res(&path, data->env);
 	if (!path || !data->comand)
 	{
 		fprintf(stderr, "No se pudo obtener el valor de PATH\n");
+		free(path);
 		return (0);
 	}
 	if (is_builtin(data->comand))
 	{
 		execute_command(&data, "is_builtinOMG");
+		free(path);
 		return (1);
 	}
 	token = ft_split(path, ':');
+	free(path);
 	while (token[i] != NULL)
 	{
-		comand_path = ft_strjoin(token[i], "/");
-		comand_path = ft_strjoin(comand_path, data->comand);
+		tmp = ft_strjoin(token[i], "/");
+		comand_path = ft_strjoin(tmp, data->comand);
+		free(tmp);
 		if (access(comand_path, X_OK) == 0)
 		{
 			execute_command(&data, comand_path);

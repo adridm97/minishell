@@ -8,9 +8,9 @@ LIBFT_PATH      = ./libft
 LIBFT           = $(LIBFT_PATH)/libft.a
 LIBDIR          = libs
 READLINEDIR     = $(LIBDIR)/readline-4.3
-INCLUDEDIR      = $(READLINEDIR)/include
 LIBREADLINE     = $(READLINEDIR)/lib/libreadline.a
-
+LIBHISTORY      = $(READLINEDIR)/lib/libhistory.a
+INCLUDEDIR      = $(READLINEDIR)/include
 # Ruta absoluta del directorio de Readline
 ABS_READLINEDIR := $(shell pwd)/$(READLINEDIR)
 
@@ -53,6 +53,7 @@ clean:
 
 fclean: clean
 	rm -rf $(NAME)
+	rm -rf $(LIBREADLINE) $(LIBHISTORY)
 	make fclean -C $(LIBFT_PATH)
 	$(MAKE) -C $(READLINEDIR) distclean
 
