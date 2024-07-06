@@ -32,6 +32,8 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (0);
 }
 
+
+
 int	heredoc(t_data *data) 
 {
 	int		fd;
@@ -259,6 +261,13 @@ char	**ft_matadd(char ***mat, char *str)
 	return (new_mat);
 }
 
+//la key no puede contener algunos simbolos.
+int	key_is_valid(char *key)
+{
+	(void)key;
+	return (1);
+}
+
 // hay que ponerle, no cambia las variables, no llega al data.env correctamente tras pasarlo a una funcion.
 void	b_export(t_data **data)
 {
@@ -278,6 +287,9 @@ void	b_export(t_data **data)
 	}
 	else
 		key = ft_strdup((cdata)->args[1]);
+		//TODO Falta implementar
+	if(!key_is_valid(key))
+		return ;
 	// printf("la i es %s\n", key);
 	if (index_env(cdata, key) >= 0)
 	{
@@ -389,6 +401,8 @@ void	switch_builtin(t_data **ddata)
 		b_env(data);
 	else if (!ft_strcmp(data->comand, "exit"))
 		b_cd(data);
+	else if (!ft_strcmp(data->comand, "$?"))
+		printf("%i\n", g_stat_code);
 	return ;
 }
 

@@ -6,13 +6,13 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/01 08:21:02 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/03 21:31:55 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
-
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -46,6 +46,7 @@
 # define D_MINOR	8 // <<
 
 # define ERROR		0
+
 
 /*	char			*path;
 	struct s_error	*errors;
@@ -176,5 +177,7 @@ void	setup_signal_handlers();
 # define MAGENTA "\x1b[35m"
 # define CYAN "\x1b[36m"
 # define WHITE "\x1b[37m"
+
+extern int g_stat_code;
 
 #endif
