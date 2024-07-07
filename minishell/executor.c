@@ -386,6 +386,7 @@ void	b_echo(t_data *data)
 	{
 		while (data->args[i])
 		{
+			data->args[i] = heredoc_tokenizer(data->args[i],data);
 			printf("%s", data->args[i]);
 			if (data->args[++i])
 			printf(" ");
@@ -397,6 +398,7 @@ void	b_echo(t_data *data)
         i++;
         while (data->args[i])
         {
+			data->args[i] = heredoc_tokenizer(data->args[i],data);
             printf("%s", data->args[i]);
             if (data->args[++i])
                 printf(" ");
