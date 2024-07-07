@@ -76,7 +76,9 @@ int	main(int argc, char *argv[], char *env[])
 	int			fd;
 	char		**mat;
 	char		*key;
+	int			g_stat_code;
 
+	g_stat_code = 0;
 	(void)argc;
 	(void)argv;
 	data = NULL;
@@ -102,7 +104,10 @@ int	main(int argc, char *argv[], char *env[])
             printf("\n");
             break; // Salir del bucle si se presionó Ctrl + D (EOF)
         }
-		if (!strcmp(input, "exit"))
+		if (!strcmp(input, "exit")) //TODO Exit ha de permitir 1 arg y solo 1 ademas solo permite 
+									//numeros y hay que hacer modulo de 256 para que no se exceda.
+									//si el 1º argumento es erróneo "ejemplo letras", ha de salir y 
+									//obviar el resto de args, no ocurre igual si solo pasas 2 parametros validos
 			break ;
 		if (input && *input)
 			add_history (input);

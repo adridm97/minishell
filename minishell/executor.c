@@ -120,64 +120,117 @@ int	ft_strcmp(const char *s1, const char *s2)
 // 	return result;
 // }
 
-char	*ft_get_key(char *line)
+// char	*ft_get_key(char *line)
+// {
+// 	int		i;
+// 	int		start;
+// 	char	*res;
+
+// 	i = 0;
+// 	while (line[i] && line[i] != '$')
+// 		i++;
+// 	if (!line[i] || line[i] != '$')
+// 		return (NULL);
+// 	i++;
+// 	start = i;
+// 	while (line[i] && ft_strchr(" <>|'\".,-+*!¡?¿%%=·@#ªº¬€$", line[i]) == NULL)
+// 		i++;
+// 	res = malloc((i - start + 1) * sizeof(char));
+// 	if (!res)
+// 		return (NULL);
+// 	ft_strncpy(res, line + start, i - start);
+// 	res[i - start] = '\0';
+// 	return (res);
+// }
+
+// char	*ft_expand_line(char *str, char start, char *value)
+// {
+// 	int		i;
+// 	int		j;
+// 	int		k;
+// 	int		val_len;
+// 	int		str_len;
+// 	char	*res;
+
+// 	i = 0;
+// 	j = 0;
+// 	k = 0;
+// 	val_len = ft_strlen(value);
+// 	str_len = ft_strlen(str);
+// 	res = malloc(str_len + val_len + 1);
+// 	if (!res)
+// 		return (NULL);
+// 	while (str[i])
+// 	{
+// 		if (str[i] == start)
+// 		{
+// 			i++;
+// 			while (str[i] && ft_strchr(" <>|'\".,-+*!¡?¿%%=·@#ªº¬€", str[i]) == NULL)
+// 				i++;
+// 			while (value[k])
+// 				res[j++] = value[k++];
+// 		}
+// 		else
+// 			res[j++] = str[i++];
+// 	}
+// 	res[j] = '\0';
+// 	return (res);
+// }
+
+/*int	switch_case_heredoc(t_token **token, char **env, t_data **data, char **str)
 {
-	int		i;
-	int		start;
-	char	*res;
-	char	*delimiter;
+	if ((*token)->value == '\'')
+		is_simple_string(token, env, str);
+	else if ((*token)->value == '"')
+		is_double_string(token, env, str);
+	else if ((*token)->value == '$')
+		is_expandsor(token, str, env);
+	return (1);
+}*/
 
-	delimiter = " <>|'\".,-+*!¡?¿%%=·@#ªº¬€";
-	i = 0;
-	while (line[i] && line[i] != '$')
-		i++;
-	if (!line[i] || line[i] != '$')
-		return (NULL);
-	i++;
-	start = i;
-	while (line[i] && ft_strchr(delimiter, line[i]) == NULL)
-		i++;
-	res = malloc((i - start + 1) * sizeof(char));
-	if (!res)
-		return (NULL);
-	ft_strncpy(res, line + start, i - start);
-	res[i - start] = '\0';
-	return (res);
-}
-
-char	*ft_expand_line(char *str, char start, char *value)
+char	*heredoc_tokenizer(char *str, t_data *data)
 {
+	t_token	*token;
+	//t_token	*c_token;
 	int		i;
-	int		j;
-	int		k;
-	int		val_len;
-	int		str_len;
-	char	*delimiter;
+	char	*input;
 	char	*res;
 
-	i = 0;
-	j = 0;
-	k = 0;
-	delimiter = " <>|'\".,-+*!¡?¿%%=·@#ªº¬€";
-	val_len = ft_strlen(value);
-	str_len = ft_strlen(str);
-	res = malloc(str_len + val_len + 1);
-	if (!res)
-		return (NULL);
-	while (str[i])
+	//c_token = token;
+	res = NULL;
+	input = ft_strdup(str);
+	i = -1;
+	token = NULL;
+	while (input[++i])
 	{
-		if (str[i] == start)
+		if (!token)
 		{
-			i++;
-			while (str[i] && ft_strchr(delimiter, str[i]) == NULL)
-				i++;
-			while (value[k])
-				res[j++] = value[k++];
+			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
+						, &token, 0))
+				return (is_error(& (t_error){"Memory error",1}) \
+						, free_token(&token), NULL);
 		}
 		else
-			res[j++] = str[i++];
+		{
+			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
+						, &token))
+				return (is_error(& (t_error){"Memory error",1}) \
+						, free_token(&token), NULL);
+		}
 	}
-	res[j] = '\0';
+	while (token)
+	{
+		if (is_special(token->value, "$") && (!is_special(token->next->value, "\"'")))
+			is_expandsor(&token, &res, data->env);
+		else
+		{
+			if (token)
+			{
+				res = new_str(&res, token->value);
+				token = token->next;
+			}
+		}	
+	}
 	return (res);
 }
 
@@ -186,9 +239,7 @@ int	heredoc(t_data *data)
 	int		fd;
 	char	*line;
 	char	*filename;
-	char	*key;
 	char	*expanded_line;
-	char	*key_val;
 	t_redir	*aux;
 
 	aux = data->redir;
@@ -208,17 +259,8 @@ int	heredoc(t_data *data)
 			free(line);
 			break;
 		}
-		key = ft_get_key(line);
-		expanded_line = line;
-		if (key && key != NULL)
-		{
-			key_val = key_to_res(&key, data->env);
-			expanded_line = ft_expand_line(line, '$', key_val);
-			if (expanded_line != NULL)
-				ft_putstr_fd(expanded_line, fd);
-		}
-		else
-			ft_putstr_fd(line, fd);
+		expanded_line = heredoc_tokenizer(line, data);
+		ft_putstr_fd(expanded_line, fd);
 		ft_putstr_fd("\n", fd);
 		free(line);
 	}
@@ -374,6 +416,12 @@ void	b_pwd(void)
 		buff = getcwd(buff, size++);
 	printf("%s\n", buff);
 	free(buff);
+	exit(EXIT_SUCCESS);
+}
+
+void	b_stat_code(void)
+{
+	printf("%i\n", g_stat_code);
 	exit(EXIT_SUCCESS);
 }
 
@@ -548,6 +596,8 @@ void	switch_builtin(t_data **ddata)
 		b_env(data);
 	else if (!ft_strcmp(data->comand, "exit"))
 		b_cd(data);
+	else if (!ft_strcmp(data->comand, "$?"))
+		b_stat_code();
 	return ;
 }
 
@@ -757,6 +807,11 @@ int	is_valid_command(t_data *data)
 	path = key_to_res(&path, data->env);
 	if (!path || !data->comand)
 	{
+		if (data->redir != NULL && data->redir->type == D_MINOR)
+		{
+			heredoc(data);
+			return (0);
+		}
 		fprintf(stderr, "No se pudo obtener el valor de PATH\n");
 		free(path);
 		return (0);

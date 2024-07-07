@@ -298,7 +298,7 @@ void	is_expandsor(t_token **token, char **str, char **env)
 	}
 	else
 	{
-		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€"))
+		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€$"))
 		{
 			key = key_to_res(&key, env);
 			if (key)

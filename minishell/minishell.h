@@ -132,6 +132,7 @@ void	free_data(t_data **data);
 int		init_data(t_data **data, char **env);
 void	free_redir(t_redir **redir);
 void	free_args(char **args);
+void	free_token(t_token **token);
 char	**get_env_file(int fd);
 void	print_data(t_data *data);
 void	clean_env(char ***env, int i);
@@ -159,10 +160,12 @@ int		switch_case(t_token **token, char **env, t_data **data, char **str);
 int		add_args(char ***arg, char **str);
 int		add_last_data(t_data **data, char **str);
 char	*key_to_res(char **key, char **env);
-
+int		is_special(char c, char *comp);
 void	execute_command(t_data **ddata, char *command_path);
 void	handle_redir(t_data *data);
 int		heredoc(t_data *data);
+char	*charstr(char c);
+char	*new_str(char **str, char c);
 
 //handlers.c
 void	setup_signal_handlers();
@@ -176,5 +179,7 @@ void	setup_signal_handlers();
 # define MAGENTA "\x1b[35m"
 # define CYAN "\x1b[36m"
 # define WHITE "\x1b[37m"
+
+extern int	g_stat_code;
 
 #endif
