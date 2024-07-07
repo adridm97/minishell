@@ -264,11 +264,18 @@ char	**ft_matadd(char ***mat, char *str)
 //la key no puede contener algunos simbolos.
 int	key_is_valid(char *key)
 {
+	int	i;
+
+	i = -1;
 	(void)key;
+	while(key[++i])
+	{
+		if (is_special(key[i], " <>|'\".,-+*!¡?¿%%=·@#ªº¬€"))
+			return (0);
+	}
 	return (1);
 }
 
-// hay que ponerle, no cambia las variables, no llega al data.env correctamente tras pasarlo a una funcion.
 void	b_export(t_data **data)
 {
 	int		i;
@@ -289,7 +296,7 @@ void	b_export(t_data **data)
 		key = ft_strdup((cdata)->args[1]);
 		//TODO Falta implementar
 	if(!key_is_valid(key))
-		return ;
+			free(key), exit(EXIT_SUCCESS);
 	// printf("la i es %s\n", key);
 	if (index_env(cdata, key) >= 0)
 	{
