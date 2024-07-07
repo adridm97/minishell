@@ -1,6 +1,6 @@
 NAME            = minishell
 CC              = gcc
-CFLAGS          = -Wall -Wextra -Werror -g
+CFLAGS          = -Wall -Wextra -Werror -fPIE -g
 SOURCES         = minishell.c lexer.c executor.c special_split.c split_token.c signals.c
 OBJS_PATH       = ./build
 HEADER          = minishell.h
@@ -8,9 +8,9 @@ LIBFT_PATH      = ./libft
 LIBFT           = $(LIBFT_PATH)/libft.a
 LIBDIR          = libs
 READLINEDIR     = $(LIBDIR)/readline-4.3
-INCLUDEDIR      = $(READLINEDIR)/include
 LIBREADLINE     = $(READLINEDIR)/lib/libreadline.a
-
+LIBHISTORY      = $(READLINEDIR)/lib/libhistory.a
+INCLUDEDIR      = $(READLINEDIR)/include
 # Ruta absoluta del directorio de Readline
 ABS_READLINEDIR := $(shell pwd)/$(READLINEDIR)
 
@@ -44,9 +44,16 @@ clean:
 	rm -rf $(OBJS_PATH)
 	make clean -C $(LIBFT_PATH)
 	$(MAKE) -C $(READLINEDIR) clean
+	rm -f $(READLINEDIR)/lib/libhistory.a
+	rm -f $(READLINEDIR)/lib/libhistory.old
+	rm -f $(READLINEDIR)/lib/libreadline.a
+	rm -f $(READLINEDIR)/lib/libreadline.old
+	rm -f $(READLINEDIR)/lib/libhistory.so*
+	rm -f $(READLINEDIR)/lib/libreadline.so*
 
 fclean: clean
 	rm -rf $(NAME)
+	rm -rf $(LIBREADLINE) $(LIBHISTORY)
 	make fclean -C $(LIBFT_PATH)
 	$(MAKE) -C $(READLINEDIR) distclean
 

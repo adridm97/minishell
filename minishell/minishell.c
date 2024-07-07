@@ -6,14 +6,11 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/06 08:53:58 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/03 20:23:10 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int g_stat_code = 0;
-
 
 char	**ft_matcpy(char **mat)
 {
@@ -71,8 +68,7 @@ int	file_exist(char *file)
 	return (1);
 }
 
-/*TODO Exit ha de permitir 1 arg y solo 1 ademas solo permite numeros y hay que hacer modulo de 256 para que no se exceda.
-si el 1º argumento es erróneo "ejemplo letras", ha de salir y obviar el resto de args, no ocurre igual si solo pasas 2 parametros validos  */
+/*TODO por algun motivo al poner adios el history falla*/
 int	main(int argc, char *argv[], char *env[])
 {
 	static char	*input;
@@ -80,7 +76,9 @@ int	main(int argc, char *argv[], char *env[])
 	int			fd;
 	char		**mat;
 	char		*key;
+	int			g_stat_code;
 
+	g_stat_code = 0;
 	(void)argc;
 	(void)argv;
 	data = NULL;
@@ -106,18 +104,17 @@ int	main(int argc, char *argv[], char *env[])
             printf("\n");
             break; // Salir del bucle si se presionó Ctrl + D (EOF)
         }
-		printf("1\n");
-		if (!strcmp(input, "exit"))
+		if (!strcmp(input, "exit")) //TODO Exit ha de permitir 1 arg y solo 1 ademas solo permite 
+									//numeros y hay que hacer modulo de 256 para que no se exceda.
+									//si el 1º argumento es erróneo "ejemplo letras", ha de salir y 
+									//obviar el resto de args, no ocurre igual si solo pasas 2 parametros validos
 			break ;
-		printf("2\n");
 		if (input && *input)
 			add_history (input);
 		if (mat)
 			data = lexer(input, &data, mat);
 		else
 			data = lexer(input, &data, env);
-		printf("3\n");
-
 		if (data)
 		{
 			key = ft_strdup("PWD");
@@ -125,14 +122,10 @@ int	main(int argc, char *argv[], char *env[])
 			chdir(key);
 			free(key);
 		}
-		printf("4\n");
-
 		if (data && data->next)
 			execute_pipeline(data);
 		else if (data)
 			is_valid_command(data);
-		printf("5\n");
-
 		if (data && !file_exist("/tmp/env.env"))
 		{
 			if (!save_env(data))
@@ -140,10 +133,11 @@ int	main(int argc, char *argv[], char *env[])
 			if (mat)
 				clean_env(&mat, -1);
 		}
-		printf("6\n");
 		free_data(&data);
 		data = NULL;
 	}
+	free_data(&data);
+	free(input);
 	return (0);
 }
 

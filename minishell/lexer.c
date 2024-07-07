@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/03 22:06:13 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/01 08:39:34 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ int	check_error(t_token *token, char type)
 				return (0);
 		}
 	}
-	// error_statuss = 2;
 	return (1);
 }
 
@@ -288,6 +287,7 @@ int	create_env(t_data **data, char **env)
 	return (1);
 }
 
+// TODO leaks
 char	**get_env_file(int fd)
 {
 	int		i;

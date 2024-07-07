@@ -32,13 +32,214 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (0);
 }
 
+// size_t	calculate_expanded_length(const char *line, char **env)
+// {
+// 	size_t	i;
+// 	size_t	len;
+// 	size_t	j;
+// 	size_t	var_len;
+// 	char	*var_name;
+// 	char	*var_value;
 
+// 	i = 0;
+// 	len = 0;
+// 	while (line[i] != '\0')
+// 	{
+// 		if (line[i] == '$')
+// 		{
+// 			j = i + 1;
+// 			while (line[j] != '\0' && (ft_isalnum(line[j]) || line[j] == '_'))
+// 			j++;
+// 			var_len = j - (i + 1);
+// 			var_name = ft_strndup(line + i + 1, var_len);
+// 			var_value = key_to_res(&var_name, env);
+// 			if (var_value)
+// 			{
+// 				len += ft_strlen(var_value);
+// 				free(var_value);
+// 			}
+// 			else
+// 				len += j - i;
+// 			i = j;
+// 		}
+// 		else
+// 		{
+// 			len++;
+// 			i++;
+// 		}
+// 	}
+// 	return (len);
+// }
+
+// char	*expand_variables(const char *line, char **env)
+// {
+// 	size_t	result_len;
+// 	char	*result;
+// 	size_t	i;
+// 	size_t	k;
+// 	size_t	j;
+// 	size_t	var_len;
+// 	char	*var_name;
+// 	char	*var_value;
+
+// 	i = 0;
+// 	j = 0;
+// 	k = 0;
+//  	result_len = calculate_expanded_length(line, env);
+// 	result = malloc(result_len + 1);
+// 	while (line[i] != '\0')
+// 	{
+// 		if (line[i] == '$')
+// 		{
+// 			j = i + 1;
+// 			while (line[j] != '\0' && (ft_isalnum(line[j]) || line[j] == '_'))
+// 				j++;
+// 			var_len = j - (i + 1);
+// 			var_name = ft_strndup(line + i + 1, var_len);
+// 			var_value = key_to_res(&var_name, env);
+// 			if (var_value)
+// 			{
+// 				ft_strcpy(result + k, var_value);
+// 				k += ft_strlen(var_value);
+// 				free(var_value);
+// 			}
+// 			else
+// 			{
+// 				result[k++] = '$';
+// 				ft_strncpy(result + k, line + i + 1, var_len);
+// 				k += var_len;
+// 			}
+// 			i = j;
+// 		}
+// 		else
+// 		{
+// 			result[k++] = line[i++];
+// 		}
+// 	}
+// 	result[k] = '\0';
+// 	return result;
+// }
+
+// char	*ft_get_key(char *line)
+// {
+// 	int		i;
+// 	int		start;
+// 	char	*res;
+
+// 	i = 0;
+// 	while (line[i] && line[i] != '$')
+// 		i++;
+// 	if (!line[i] || line[i] != '$')
+// 		return (NULL);
+// 	i++;
+// 	start = i;
+// 	while (line[i] && ft_strchr(" <>|'\".,-+*!¡?¿%%=·@#ªº¬€$", line[i]) == NULL)
+// 		i++;
+// 	res = malloc((i - start + 1) * sizeof(char));
+// 	if (!res)
+// 		return (NULL);
+// 	ft_strncpy(res, line + start, i - start);
+// 	res[i - start] = '\0';
+// 	return (res);
+// }
+
+// char	*ft_expand_line(char *str, char start, char *value)
+// {
+// 	int		i;
+// 	int		j;
+// 	int		k;
+// 	int		val_len;
+// 	int		str_len;
+// 	char	*res;
+
+// 	i = 0;
+// 	j = 0;
+// 	k = 0;
+// 	val_len = ft_strlen(value);
+// 	str_len = ft_strlen(str);
+// 	res = malloc(str_len + val_len + 1);
+// 	if (!res)
+// 		return (NULL);
+// 	while (str[i])
+// 	{
+// 		if (str[i] == start)
+// 		{
+// 			i++;
+// 			while (str[i] && ft_strchr(" <>|'\".,-+*!¡?¿%%=·@#ªº¬€", str[i]) == NULL)
+// 				i++;
+// 			while (value[k])
+// 				res[j++] = value[k++];
+// 		}
+// 		else
+// 			res[j++] = str[i++];
+// 	}
+// 	res[j] = '\0';
+// 	return (res);
+// }
+
+/*int	switch_case_heredoc(t_token **token, char **env, t_data **data, char **str)
+{
+	if ((*token)->value == '\'')
+		is_simple_string(token, env, str);
+	else if ((*token)->value == '"')
+		is_double_string(token, env, str);
+	else if ((*token)->value == '$')
+		is_expandsor(token, str, env);
+	return (1);
+}*/
+
+char	*heredoc_tokenizer(char *str, t_data *data)
+{
+	t_token	*token;
+	//t_token	*c_token;
+	int		i;
+	char	*input;
+	char	*res;
+
+	//c_token = token;
+	res = NULL;
+	input = ft_strdup(str);
+	i = -1;
+	token = NULL;
+	while (input[++i])
+	{
+		if (!token)
+		{
+			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
+						, &token, 0))
+				return (is_error(& (t_error){"Memory error",1}) \
+						, free_token(&token), NULL);
+		}
+		else
+		{
+			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
+						, &token))
+				return (is_error(& (t_error){"Memory error",1}) \
+						, free_token(&token), NULL);
+		}
+	}
+	while (token)
+	{
+		if (is_special(token->value, "$") && (!is_special(token->next->value, "\"'")))
+			is_expandsor(&token, &res, data->env);
+		else
+		{
+			if (token)
+			{
+				res = new_str(&res, token->value);
+				token = token->next;
+			}
+		}	
+	}
+	return (res);
+}
 
 int	heredoc(t_data *data) 
 {
 	int		fd;
 	char	*line;
 	char	*filename;
+	char	*expanded_line;
 	t_redir	*aux;
 
 	aux = data->redir;
@@ -58,7 +259,8 @@ int	heredoc(t_data *data)
 			free(line);
 			break;
 		}
-		ft_putstr_fd(line, fd);
+		expanded_line = heredoc_tokenizer(line, data);
+		ft_putstr_fd(expanded_line, fd);
 		ft_putstr_fd("\n", fd);
 		free(line);
 	}
@@ -195,7 +397,6 @@ void	b_echo(t_data *data)
         i++;
         while (data->args[i])
         {
-
             printf("%s", data->args[i]);
             if (data->args[++i])
                 printf(" ");
@@ -215,6 +416,12 @@ void	b_pwd(void)
 		buff = getcwd(buff, size++);
 	printf("%s\n", buff);
 	free(buff);
+	exit(EXIT_SUCCESS);
+}
+
+void	b_stat_code(void)
+{
+	printf("%i\n", g_stat_code);
 	exit(EXIT_SUCCESS);
 }
 
@@ -261,21 +468,7 @@ char	**ft_matadd(char ***mat, char *str)
 	return (new_mat);
 }
 
-//la key no puede contener algunos simbolos.
-int	key_is_valid(char *key)
-{
-	int	i;
-
-	i = -1;
-	(void)key;
-	while(key[++i])
-	{
-		if (is_special(key[i], " <>|'\".,-+*!¡?¿%%=·@#ªº¬€"))
-			return (0);
-	}
-	return (1);
-}
-
+// hay que ponerle, no cambia las variables, no llega al data.env correctamente tras pasarlo a una funcion.
 void	b_export(t_data **data)
 {
 	int		i;
@@ -294,9 +487,6 @@ void	b_export(t_data **data)
 	}
 	else
 		key = ft_strdup((cdata)->args[1]);
-		//TODO Falta implementar
-	if(!key_is_valid(key))
-			free(key), exit(EXIT_SUCCESS);
 	// printf("la i es %s\n", key);
 	if (index_env(cdata, key) >= 0)
 	{
@@ -332,9 +522,7 @@ char	**ft_mat_rem_index(char ***mat, int index)
 	c_mat = *mat;
 	while (c_mat[++i])
 	{
-		if (i == index)
-			i = i;
-		else if (c_mat[i])
+		if (c_mat[i] && i != index)
 			new_mat[++j] = ft_strdup(c_mat[i]);
 	}
 	new_mat[++j] = NULL;
@@ -409,7 +597,7 @@ void	switch_builtin(t_data **ddata)
 	else if (!ft_strcmp(data->comand, "exit"))
 		b_cd(data);
 	else if (!ft_strcmp(data->comand, "$?"))
-		printf("%i\n", g_stat_code);
+		b_stat_code();
 	return ;
 }
 
@@ -612,24 +800,35 @@ int	is_valid_command(t_data *data)
 	int		i;
 	char	*comand_path;
 	char	**token;
+	char	*tmp;
 
 	i = 0;
-	path = getenv("PATH");
+	path = ft_strdup("PATH");
+	path = key_to_res(&path, data->env);
 	if (!path || !data->comand)
 	{
+		if (data->redir != NULL && data->redir->type == D_MINOR)
+		{
+			heredoc(data);
+			return (0);
+		}
 		fprintf(stderr, "No se pudo obtener el valor de PATH\n");
+		free(path);
 		return (0);
 	}
 	if (is_builtin(data->comand))
 	{
 		execute_command(&data, "is_builtinOMG");
+		free(path);
 		return (1);
 	}
 	token = ft_split(path, ':');
+	free(path);
 	while (token[i] != NULL)
 	{
-		comand_path = ft_strjoin(token[i], "/");
-		comand_path = ft_strjoin(comand_path, data->comand);
+		tmp = ft_strjoin(token[i], "/");
+		comand_path = ft_strjoin(tmp, data->comand);
+		free(tmp);
 		if (access(comand_path, X_OK) == 0)
 		{
 			execute_command(&data, comand_path);

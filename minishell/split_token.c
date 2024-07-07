@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/07/03 21:40:59 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/01 08:19:35 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -278,7 +278,7 @@ char	*key_to_res(char **key, char **env)
 	return (NULL);
 }
 
-// TODO al pasar $+ char prohibido peta con seg fault
+// Expand the $ with env
 void	is_expandsor(t_token **token, char **str, char **env)
 {
 	char	*key;
@@ -298,7 +298,7 @@ void	is_expandsor(t_token **token, char **str, char **env)
 	}
 	else
 	{
-		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€"))
+		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€$"))
 		{
 			key = key_to_res(&key, env);
 			if (key)

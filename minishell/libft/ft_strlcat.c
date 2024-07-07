@@ -37,6 +37,25 @@ size_t	ft_strlcat(char *dst, const char *src, size_t dstsize)
 		c_dst++;
 	return (c_dst);
 }
+
+char	*ft_strcat(char *dst, const char *src)
+{
+	size_t	c_dst;
+	size_t	c_src;
+
+	c_dst = 0;
+	c_src = 0;
+	while (dst[c_dst])
+		c_dst++;
+	while (src[c_src])
+	{
+		dst[c_dst] = src[c_src];
+		c_dst++;
+		c_src++;
+	}
+	dst[c_dst] = '\0';
+	return (dst);
+}
 /*
 int	main(void)
 {
