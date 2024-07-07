@@ -393,7 +393,7 @@ void	b_echo(t_data *data)
 			}
 			printf("\n");
     }
-    else
+    else if (data->args[1])
     {
         i++;
         while (data->args[i])
@@ -403,7 +403,10 @@ void	b_echo(t_data *data)
             if (data->args[++i])
                 printf(" ");
         }
+		printf("\n");
     }
+	else
+		printf("\n");
     exit(EXIT_SUCCESS);
 }
 
