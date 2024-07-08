@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/01 08:21:02 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/08 08:02:16 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,9 +152,10 @@ int		is_valid_command(t_data *data);
 int		ft_matsize(char **mat);
 void	print_env(t_data *data, char *str);
 int	index_env(t_data *data, char *str);
+void sc_error(int sce);
 
 //split_token
-void	is_expandsor(t_token **token, char **str, char **env);
+int	is_expandsor(t_token **token, char **str, char **env);
 void	is_expandsor_str_simple(t_token **token, char **str, char **env);
 int		switch_case(t_token **token, char **env, t_data **data, char **str);
 int		add_args(char ***arg, char **str);
@@ -182,4 +183,136 @@ void	setup_signal_handlers();
 
 extern int	g_stat_code;
 
-#endif
+# define SC_SUCCESS												0
+# define SC_OPERATION_NOT_PERMITTED								1
+# define SC_NO_SUCH_FILE_OR_DIRECTORY							2
+# define SC_NO_SUCH_PROCESS										3
+# define SC_INTERRUPTED_SYSTEM_CALL								4
+# define SC_INPUTOUTPUT_ERROR									5
+# define SC_NO_SUCH_DEVICE_OR_ADDRESS							6
+# define SC_ARGUMENT_LIST_TOO_LONG								7
+# define SC_EXEC_FORMAT_ERROR									8
+# define SC_BAD_FILE_DESCRIPTOR									9
+# define SC_NO_CHILD_PROCESSES									10
+# define SC_RESOURCE_TEMPORARILY_UNAVAILABLE					11
+# define SC_CANNOT_ALLOCATE_MEMORY								12
+# define SC_PERMISSION_DENIED									13
+# define SC_BAD_ADDRESS											14
+# define SC_BLOCK_DEVICE_REQUIRED								15
+# define SC_DEVICE_OR_RESOURCE_BUSY								16
+# define SC_FILE_EXISTS											17
+# define SC_INVALID_CROSSDEVICE_LINK 							18
+# define SC_NO_SUCH_DEVICE										19
+# define SC_NOT_A_DIRECTORY										20
+# define SC_IS_A_DIRECTORY										21
+# define SC_INVALID_ARGUMENT									22
+# define SC_TOO_MANY_OPEN_FILES_IN_SYSTEM						23
+# define SC_TOO_MANY_OPEN_FILES									24
+# define SC_INAPPROPRIATE_IOCTL_FOR_DEVICE						25
+# define SC_TEXT_FILE_BUSY										26
+# define SC_FILE_TOO_LARGE										27
+# define SC_NO_SPACE_LEFT_ON_DEVICE								28
+# define SC_ILLEGAL_SEEK										29
+# define SC_READONLY_FILE_SYSTEM 								30
+# define SC_TOO_MANY_LINKS										31
+# define SC_BROKEN_PIPE											32
+# define SC_NUMERICAL_ARGUMENT_OUT_OF_DOMAIN					33
+# define SC_NUMERICAL_RESULT_OUT_OF_RANGE						34
+# define SC_RESOURCE_DEADLOCK_AVOIDED							35
+# define SC_FILE_NAME_TOO_LONG									36
+# define SC_NO_LOCKS_AVAILABLE									37
+# define SC_FUNCTION_NOT_IMPLEMENTED							38
+# define SC_DIRECTORY_NOT_EMPTY									39
+# define SC_TOO_MANY_LEVELS_OF_SYMBOLIC_LINKS					40
+# define SC_NO_MESSAGE_OF_DESIRED_TYPE							42
+# define SC_IDENTIFIER_REMOVED									43
+# define SC_CHANNEL_NUMBER_OUT_OF_RANGE							44
+# define SC_LEVEL_2_NOT_SYNCHRONIZED							45
+# define SC_LEVEL_3_HALTED										46
+# define SC_LEVEL_3_RESET										47
+# define SC_LINK_NUMBER_OUT_OF_RANGE							48
+# define SC_PROTOCOL_DRIVER_NOT_ATTACHED						49
+# define SC_NO_CSI_STRUCTURE_AVAILABLE							50
+# define SC_LEVEL_2_HALTED										51
+# define SC_INVALID_EXCHANGE									52
+# define SC_INVALID_REQUEST_DESCRIPTOR							53
+# define SC_EXCHANGE_FULL										54
+# define SC_NO_ANODE											55
+# define SC_INVALID_REQUEST_CODE								56
+# define SC_INVALID_SLOT										57
+# define SC_BAD_FONT_FILE_FORMAT								59
+# define SC_DEVICE_NOT_A_STREAM									60
+# define SC_NO_DATA_AVAILABLE									61
+# define SC_TIMER_EXPIRED										62
+# define SC_OUT_OF_STREAMS_RESOURCES							63
+# define SC_MACHINE_IS_NOT_ON_THE_NETWORK						64
+# define SC_PACKAGE_NOT_INSTALLED								65
+# define SC_OBJECT_IS_REMOTE									66
+# define SC_LINK_HAS_BEEN_SEVERED								67
+# define SC_ADVERTISE_ERROR										68
+# define SC_SRMOUNT_ERROR										69
+# define SC_COMMUNICATION_ERROR_ON_SEND							70
+# define SC_PROTOCOL_ERROR										71
+# define SC_MULTIHOP_ATTEMPTED									72
+# define SC_RFS_SPECIFIC_ERROR									73
+# define SC_BAD_MESSAGE											74
+# define SC_VALUE_TOO_LARGE_FOR_DEFINED_DATA_TYPE				75
+# define SC_NAME_NOT_UNIQUE_ON_NETWORK							76
+# define SC_FILE_DESCRIPTOR_IN_BAD_STATE						77
+# define SC_REMOTE_ADDRESS_CHANGED								78
+# define SC_CAN_NOT_ACCESS_A_NEEDED_SHARED_LIBRARY				79
+# define SC_ACCESSING_A_CORRUPTED_SHARED_LIBRARY				80
+# define SC_LIB_SECTION_IN_AOUT_CORRUPTED 						81
+# define SC_ATTEMPTING_TO_LINK_IN_TOO_MANY_SHARED_LIBRARIES		82
+# define SC_CANNOT_EXEC_A_SHARED_LIBRARY_DIRECTLY				83
+# define SC_INVALID_OR_INCOMPLETE_MULTIBYTE_OR_WIDE_CHARACTER	84
+# define SC_INTERRUPTED_SYSTEM_CALL_SHOULD_BE_RESTARTED			85
+# define SC_STREAMS_PIPE_ERROR									86
+# define SC_TOO_MANY_USERS										87
+# define SC_SOCKET_OPERATION_ON_NONSOCKET						88
+# define SC_DESTINATION_ADDRESS_REQUIRED						89
+# define SC_MESSAGE_TOO_LONG									90
+# define SC_PROTOCOL_WRONG_TYPE_FOR_SOCKET						91
+# define SC_PROTOCOL_NOT_AVAILABLE								92
+# define SC_PROTOCOL_NOT_SUPPORTED								93
+# define SC_SOCKET_TYPE_NOT_SUPPORTED							94
+# define SC_OPERATION_NOT_SUPPORTED								95
+# define SC_PROTOCOL_FAMILY_NOT_SUPPORTED						96
+# define SC_ADDRESS_FAMILY_NOT_SUPPORTED_BY_PROTOCOL			97
+# define SC_ADDRESS_ALREADY_IN_USE								98
+# define SC_CANNOT_ASSIGN_REQUESTED_ADDRESS						99
+# define SC_NETWORK_IS_DOWN										100
+# define SC_NETWORK_IS_UNREACHABLE								101
+# define SC_NETWORK_DROPPED_CONNECTION_ON_RESET					102
+# define SC_SOFTWARE_CAUSED_CONNECTION_ABORT					103
+# define SC_CONNECTION_RESET_BY_PEER							104
+# define SC_NO_BUFFER_SPACE_AVAILABLE							105
+# define SC_TRANSPORT_ENDPOINT_IS_ALREADY_CONNECTED				106
+# define SC_TRANSPORT_ENDPOINT_IS_NOT_CONNECTED					107
+# define SC_CANNOT_SEND_AFTER_TRANSPORT_ENDPOINT_SHUTDOWN		108
+# define SC_TOO_MANY_REFERENCES									109
+# define SC_CONNECTION_TIMED_OUT								110
+# define SC_CONNECTION_REFUSED									111
+# define SC_HOST_IS_DOWN										112
+# define SC_NO_ROUTE_TO_HOST									113
+# define SC_OPERATION_ALREADY_IN_PROGRESS						114
+# define SC_OPERATION_NOW_IN_PROGRESS							115
+# define SC_STALE_FILE_HANDLE									116
+# define SC_STRUCTURE_NEEDS_CLEANING							117
+# define SC_NOT_A_XENIX_NAMED_TYPE_FILE							118
+# define SC_NO_XENIX_SEMAPHORES_AVAILABLE						119
+# define SC_IS_A_NAMED_TYPE_FILE								120
+# define SC_REMOTE_IO_ERROR										121
+# define SC_DISK_QUOTA_EXCEEDED									122
+# define SC_NO_MEDIUM_FOUND										123
+# define SC_OPERATION_CANCELED									125
+# define SC_REQUIRED_KEY_NOT_AVAILABLE							126
+# define SC_KEY_HAS_EXPIRED										127
+# define SC_KEY_HAS_BEEN_REVOKED								128
+# define SC_KEY_WAS_REJECTED_BY_SERVICE							129
+# define SC_OWNER_DIED											130
+# define SC_STATE_NOT_RECOVERABLE								131
+# define SC_OPERATION_NOT_POSSIBLE_DUE_TO_RFKILL				132
+# define SC_MEMORY_PAGE_HAS_HARDWARE_ERROR						133
+
+#endif					

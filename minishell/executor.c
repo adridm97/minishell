@@ -188,6 +188,11 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (1);
 }*/
 
+void sc_error(int sce)
+{
+	g_stat_code = sce;
+}
+
 char	*heredoc_tokenizer(char *str, t_data *data)
 {
 	t_token	*token;
@@ -199,6 +204,8 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 	//c_token = token;
 	res = NULL;
 	input = ft_strdup(str);
+	if (!input)
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	i = -1;
 	token = NULL;
 	while (input[++i])
@@ -208,20 +215,23 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token, 0))
 				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), NULL);
+						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 		else
 		{
 			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token))
 				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), NULL);
+						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 	}
 	while (token)
 	{
 		if (is_special(token->value, "$") && (!is_special(token->next->value, "\"'")))
-			is_expandsor(&token, &res, data->env);
+		{
+			if (!is_expandsor(&token, &res, data->env))
+				return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		}
 		else
 		{
 			if (token)
@@ -387,6 +397,8 @@ void	b_echo(t_data *data)
 		while (data->args[i])
 		{
 			data->args[i] = heredoc_tokenizer(data->args[i],data);
+			if (!data->args[i])
+				exit(g_stat_code);
 			printf("%s", data->args[i]);
 			if (data->args[++i])
 			printf(" ");
@@ -399,6 +411,8 @@ void	b_echo(t_data *data)
         while (data->args[i])
         {
 			data->args[i] = heredoc_tokenizer(data->args[i],data);
+			if (!data->args[i])
+				exit(g_stat_code);
             printf("%s", data->args[i]);
             if (data->args[++i])
                 printf(" ");
@@ -407,7 +421,8 @@ void	b_echo(t_data *data)
     }
 	else
 		printf("\n");
-    exit(EXIT_SUCCESS);
+	g_stat_code = SC_SUCCESS;
+    exit(g_stat_code);
 }
 
 void	b_pwd(void)
