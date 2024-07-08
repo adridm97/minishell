@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/08 07:28:01 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/08 09:00:39 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ char	**ft_matcpy(char **mat)
 	return (new_mat);
 }
 
+// TODO gestionar g_status
 int	save_env(t_data *data)
 {
 	int		fd;

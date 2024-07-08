@@ -336,6 +336,8 @@ void	b_cd(t_data *data)
 		{
 			res = ft_strjoin("OLDPWD=", last_pwd);
 			(data)->env = ft_matadd(&(data)->env, res);
+			if (!(data)->env)
+				exit (g_stat_code);
 			// creo que no he de liberarlo
 			// free(last_pwd);
 			free(res);
@@ -351,6 +353,8 @@ void	b_cd(t_data *data)
 		{
 			res = ft_strjoin("PWD=", "PWD");
 			(data)->env = ft_matadd(&(data)->env, res);
+			if (!(data)->env)
+				exit (g_stat_code);
 			// creo que no he de liberarlo
 			// free(last_pwd);
 			free(res);
@@ -386,7 +390,6 @@ void	b_cd(t_data *data)
     exit(EXIT_SUCCESS);
 }
 
-//TODO falta que espanda
 void	b_echo(t_data *data)
 {
 	int	i;
@@ -442,7 +445,7 @@ void	b_pwd(void)
 void	b_stat_code(void)
 {
 	printf("%i\n", g_stat_code);
-	exit(EXIT_SUCCESS);
+	exit(SC_SUCCESS);
 }
 
 void	print_env(t_data *data, char *str)
@@ -478,11 +481,23 @@ char	**ft_matadd(char ***mat, char *str)
 	size = ft_matsize(*mat);
 	new_mat = (char **)malloc(sizeof(char **) * (size + 2));
 	if (!new_mat)
-		return (NULL);
+		return (free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	c_mat = *mat;
 	while (c_mat[++i])
+	{
 		new_mat[i] = ft_strdup(c_mat[i]);
+		if (!new_mat[i])
+		{
+			new_mat[i] = NULL;
+			return (free_args(new_mat), free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		}
+	}
 	new_mat[i] = ft_strdup(str);
+	if (!new_mat[i])
+		{
+			new_mat[i] = NULL;
+			return (free_args(new_mat), free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		}
 	new_mat[++i] = NULL;
 	free_args(*mat);
 	return (new_mat);
@@ -518,12 +533,13 @@ void	b_export(t_data **data)
 	{
 		// printf("NO TENGO QUE ENTRAR AQUI\n");
 		(cdata)->env = ft_matadd(&(cdata)->env, (cdata)->args[1]);
+		if (!(cdata)->env)
+			exit (g_stat_code);
 	}
 	// printf("ENTRO AQUI y es: %s\n", (*data)->env[i]);
 	unlink("/tmp/env.env");
-	// print_env(cdata,"mierda: ");
 	if (!save_env(cdata))
-		exit(EXIT_FAILURE);
+		exit(g_stat_code);
 	exit(EXIT_SUCCESS);
 }
 
