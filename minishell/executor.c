@@ -335,6 +335,8 @@ void	b_cd(t_data *data)
 		else
 		{
 			res = ft_strjoin("OLDPWD=", last_pwd);
+			if (!res)
+				sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
 			(data)->env = ft_matadd(&(data)->env, res);
 			if (!(data)->env)
 				exit (g_stat_code);
@@ -352,9 +354,11 @@ void	b_cd(t_data *data)
 		if(i < 0)
 		{
 			res = ft_strjoin("PWD=", "PWD");
+			if (!res)
+				sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
 			(data)->env = ft_matadd(&(data)->env, res);
 			if (!(data)->env)
-				exit (g_stat_code);
+				free(res), exit(g_stat_code);
 			// creo que no he de liberarlo
 			// free(last_pwd);
 			free(res);
@@ -440,12 +444,6 @@ void	b_pwd(void)
 	printf("%s\n", buff);
 	free(buff);
 	exit(EXIT_SUCCESS);
-}
-
-void	b_stat_code(void)
-{
-	printf("%i\n", g_stat_code);
-	exit(SC_SUCCESS);
 }
 
 void	print_env(t_data *data, char *str)
@@ -632,8 +630,6 @@ void	switch_builtin(t_data **ddata)
 		b_env(data);
 	else if (!ft_strcmp(data->comand, "exit"))
 		b_cd(data);
-	else if (!ft_strcmp(data->comand, "$?"))
-		b_stat_code();
 	return ;
 }
 
@@ -737,7 +733,7 @@ void	execute_command(t_data **ddata, char *command_path)
 			return ;
 		}
 		if (exit_code != 0)
-			fprintf(stderr, "Proceso hijo terminó con error: %d\n", exit_code);
+			printf("Proceso hijo terminó con error: %d\n", exit_code);
 	}
 }
 
@@ -804,7 +800,7 @@ void	execute_pipeline(t_data *data)
 				handle_redir(current);
 			if (!is_valid_command(current))
 			{
-				fprintf(stderr, "Comando no encontrado: %s\n", current->comand);
+				printf("Comando no encontrado: %s\n", current->comand);
 				exit(EXIT_FAILURE);
 			}
 			exit(EXIT_SUCCESS);
@@ -848,7 +844,7 @@ int	is_valid_command(t_data *data)
 			heredoc(data);
 			return (0);
 		}
-		fprintf(stderr, "No se pudo obtener el valor de PATH\n");
+		printf("No se pudo obtener el valor de PATH\n");
 		free(path);
 		return (0);
 	}
@@ -860,6 +856,12 @@ int	is_valid_command(t_data *data)
 	}
 	token = ft_split(path, ':');
 	free(path);
+	if (access(data->comand, X_OK) == 0)
+	{
+		execute_command(&data, data->comand);
+		free_args(token);
+		return (1);
+	}
 	while (token[i] != NULL)
 	{
 		tmp = ft_strjoin(token[i], "/");
