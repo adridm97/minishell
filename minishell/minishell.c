@@ -6,11 +6,13 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/01 08:35:25 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/08 09:00:39 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int			g_stat_code;
 
 char	**ft_matcpy(char **mat)
 {
@@ -33,6 +35,7 @@ char	**ft_matcpy(char **mat)
 	return (new_mat);
 }
 
+// TODO gestionar g_status
 int	save_env(t_data *data)
 {
 	int		fd;
@@ -102,7 +105,10 @@ int	main(int argc, char *argv[], char *env[])
             printf("\n");
             break; // Salir del bucle si se presionó Ctrl + D (EOF)
         }
-		if (!strcmp(input, "exit"))
+		if (!strcmp(input, "exit")) //TODO Exit ha de permitir 1 arg y solo 1 ademas solo permite 
+									//numeros y hay que hacer modulo de 256 para que no se exceda.
+									//si el 1º argumento es erróneo "ejemplo letras", ha de salir y 
+									//obviar el resto de args, no ocurre igual si solo pasas 2 parametros validos
 			break ;
 		if (input && *input)
 			add_history (input);
@@ -110,15 +116,18 @@ int	main(int argc, char *argv[], char *env[])
 			data = lexer(input, &data, mat);
 		else
 			data = lexer(input, &data, env);
-		key = ft_strdup("PWD");
-		key = key_to_res(&key, data->env);
-		chdir(key);
-		free(key);
-		if (data->next)
+		if (data)
+		{
+			key = ft_strdup("PWD");
+			key = key_to_res(&key, data->env);
+			chdir(key);
+			free(key);
+		}
+		if (data && data->next)
 			execute_pipeline(data);
-		else
+		else if (data)
 			is_valid_command(data);
-		if (!file_exist("/tmp/env.env"))
+		if (data && !file_exist("/tmp/env.env"))
 		{
 			if (!save_env(data))
 				return (1);
@@ -128,6 +137,8 @@ int	main(int argc, char *argv[], char *env[])
 		free_data(&data);
 		data = NULL;
 	}
+	free_data(&data);
+	free(input);
 	return (0);
 }
 

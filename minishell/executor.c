@@ -32,11 +32,224 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (0);
 }
 
+// size_t	calculate_expanded_length(const char *line, char **env)
+// {
+// 	size_t	i;
+// 	size_t	len;
+// 	size_t	j;
+// 	size_t	var_len;
+// 	char	*var_name;
+// 	char	*var_value;
+
+// 	i = 0;
+// 	len = 0;
+// 	while (line[i] != '\0')
+// 	{
+// 		if (line[i] == '$')
+// 		{
+// 			j = i + 1;
+// 			while (line[j] != '\0' && (ft_isalnum(line[j]) || line[j] == '_'))
+// 			j++;
+// 			var_len = j - (i + 1);
+// 			var_name = ft_strndup(line + i + 1, var_len);
+// 			var_value = key_to_res(&var_name, env);
+// 			if (var_value)
+// 			{
+// 				len += ft_strlen(var_value);
+// 				free(var_value);
+// 			}
+// 			else
+// 				len += j - i;
+// 			i = j;
+// 		}
+// 		else
+// 		{
+// 			len++;
+// 			i++;
+// 		}
+// 	}
+// 	return (len);
+// }
+
+// char	*expand_variables(const char *line, char **env)
+// {
+// 	size_t	result_len;
+// 	char	*result;
+// 	size_t	i;
+// 	size_t	k;
+// 	size_t	j;
+// 	size_t	var_len;
+// 	char	*var_name;
+// 	char	*var_value;
+
+// 	i = 0;
+// 	j = 0;
+// 	k = 0;
+//  	result_len = calculate_expanded_length(line, env);
+// 	result = malloc(result_len + 1);
+// 	while (line[i] != '\0')
+// 	{
+// 		if (line[i] == '$')
+// 		{
+// 			j = i + 1;
+// 			while (line[j] != '\0' && (ft_isalnum(line[j]) || line[j] == '_'))
+// 				j++;
+// 			var_len = j - (i + 1);
+// 			var_name = ft_strndup(line + i + 1, var_len);
+// 			var_value = key_to_res(&var_name, env);
+// 			if (var_value)
+// 			{
+// 				ft_strcpy(result + k, var_value);
+// 				k += ft_strlen(var_value);
+// 				free(var_value);
+// 			}
+// 			else
+// 			{
+// 				result[k++] = '$';
+// 				ft_strncpy(result + k, line + i + 1, var_len);
+// 				k += var_len;
+// 			}
+// 			i = j;
+// 		}
+// 		else
+// 		{
+// 			result[k++] = line[i++];
+// 		}
+// 	}
+// 	result[k] = '\0';
+// 	return result;
+// }
+
+// char	*ft_get_key(char *line)
+// {
+// 	int		i;
+// 	int		start;
+// 	char	*res;
+
+// 	i = 0;
+// 	while (line[i] && line[i] != '$')
+// 		i++;
+// 	if (!line[i] || line[i] != '$')
+// 		return (NULL);
+// 	i++;
+// 	start = i;
+// 	while (line[i] && ft_strchr(" <>|'\".,-+*!¡?¿%%=·@#ªº¬€$", line[i]) == NULL)
+// 		i++;
+// 	res = malloc((i - start + 1) * sizeof(char));
+// 	if (!res)
+// 		return (NULL);
+// 	ft_strncpy(res, line + start, i - start);
+// 	res[i - start] = '\0';
+// 	return (res);
+// }
+
+// char	*ft_expand_line(char *str, char start, char *value)
+// {
+// 	int		i;
+// 	int		j;
+// 	int		k;
+// 	int		val_len;
+// 	int		str_len;
+// 	char	*res;
+
+// 	i = 0;
+// 	j = 0;
+// 	k = 0;
+// 	val_len = ft_strlen(value);
+// 	str_len = ft_strlen(str);
+// 	res = malloc(str_len + val_len + 1);
+// 	if (!res)
+// 		return (NULL);
+// 	while (str[i])
+// 	{
+// 		if (str[i] == start)
+// 		{
+// 			i++;
+// 			while (str[i] && ft_strchr(" <>|'\".,-+*!¡?¿%%=·@#ªº¬€", str[i]) == NULL)
+// 				i++;
+// 			while (value[k])
+// 				res[j++] = value[k++];
+// 		}
+// 		else
+// 			res[j++] = str[i++];
+// 	}
+// 	res[j] = '\0';
+// 	return (res);
+// }
+
+/*int	switch_case_heredoc(t_token **token, char **env, t_data **data, char **str)
+{
+	if ((*token)->value == '\'')
+		is_simple_string(token, env, str);
+	else if ((*token)->value == '"')
+		is_double_string(token, env, str);
+	else if ((*token)->value == '$')
+		is_expandsor(token, str, env);
+	return (1);
+}*/
+
+void sc_error(int sce)
+{
+	g_stat_code = sce;
+}
+
+char	*heredoc_tokenizer(char *str, t_data *data)
+{
+	t_token	*token;
+	//t_token	*c_token;
+	int		i;
+	char	*input;
+	char	*res;
+
+	//c_token = token;
+	res = NULL;
+	input = ft_strdup(str);
+	if (!input)
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+	i = -1;
+	token = NULL;
+	while (input[++i])
+	{
+		if (!token)
+		{
+			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
+						, &token, 0))
+				return (is_error(& (t_error){"Memory error",1}) \
+						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		}
+		else
+		{
+			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
+						, &token))
+				return (is_error(& (t_error){"Memory error",1}) \
+						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		}
+	}
+	while (token)
+	{
+		if (is_special(token->value, "$") && (!is_special(token->next->value, "\"'")))
+		{
+			if (!is_expandsor(&token, &res, data->env))
+				return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		}
+		else
+		{
+			if (token)
+			{
+				res = new_str(&res, token->value);
+				token = token->next;
+			}
+		}	
+	}
+	return (res);
+}
+
 int	heredoc(t_data *data) 
 {
 	int		fd;
 	char	*line;
 	char	*filename;
+	char	*expanded_line;
 	t_redir	*aux;
 
 	aux = data->redir;
@@ -56,7 +269,8 @@ int	heredoc(t_data *data)
 			free(line);
 			break;
 		}
-		ft_putstr_fd(line, fd);
+		expanded_line = heredoc_tokenizer(line, data);
+		ft_putstr_fd(expanded_line, fd);
 		ft_putstr_fd("\n", fd);
 		free(line);
 	}
@@ -121,7 +335,11 @@ void	b_cd(t_data *data)
 		else
 		{
 			res = ft_strjoin("OLDPWD=", last_pwd);
+			if (!res)
+				sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
 			(data)->env = ft_matadd(&(data)->env, res);
+			if (!(data)->env)
+				exit (g_stat_code);
 			// creo que no he de liberarlo
 			// free(last_pwd);
 			free(res);
@@ -136,7 +354,11 @@ void	b_cd(t_data *data)
 		if(i < 0)
 		{
 			res = ft_strjoin("PWD=", "PWD");
+			if (!res)
+				sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
 			(data)->env = ft_matadd(&(data)->env, res);
+			if (!(data)->env)
+				free(res), exit(g_stat_code);
 			// creo que no he de liberarlo
 			// free(last_pwd);
 			free(res);
@@ -172,7 +394,6 @@ void	b_cd(t_data *data)
     exit(EXIT_SUCCESS);
 }
 
-//TODO falta que espanda
 void	b_echo(t_data *data)
 {
 	int	i;
@@ -182,24 +403,33 @@ void	b_echo(t_data *data)
 	{
 		while (data->args[i])
 		{
+			data->args[i] = heredoc_tokenizer(data->args[i],data);
+			if (!data->args[i])
+				exit(g_stat_code);
 			printf("%s", data->args[i]);
 			if (data->args[++i])
 			printf(" ");
 			}
 			printf("\n");
     }
-    else
+    else if (data->args[1])
     {
         i++;
         while (data->args[i])
         {
-
+			data->args[i] = heredoc_tokenizer(data->args[i],data);
+			if (!data->args[i])
+				exit(g_stat_code);
             printf("%s", data->args[i]);
             if (data->args[++i])
                 printf(" ");
         }
+		printf("\n");
     }
-    exit(EXIT_SUCCESS);
+	else
+		printf("\n");
+	g_stat_code = SC_SUCCESS;
+    exit(g_stat_code);
 }
 
 void	b_pwd(void)
@@ -249,11 +479,23 @@ char	**ft_matadd(char ***mat, char *str)
 	size = ft_matsize(*mat);
 	new_mat = (char **)malloc(sizeof(char **) * (size + 2));
 	if (!new_mat)
-		return (NULL);
+		return (free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	c_mat = *mat;
 	while (c_mat[++i])
+	{
 		new_mat[i] = ft_strdup(c_mat[i]);
+		if (!new_mat[i])
+		{
+			new_mat[i] = NULL;
+			return (free_args(new_mat), free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		}
+	}
 	new_mat[i] = ft_strdup(str);
+	if (!new_mat[i])
+		{
+			new_mat[i] = NULL;
+			return (free_args(new_mat), free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		}
 	new_mat[++i] = NULL;
 	free_args(*mat);
 	return (new_mat);
@@ -289,12 +531,13 @@ void	b_export(t_data **data)
 	{
 		// printf("NO TENGO QUE ENTRAR AQUI\n");
 		(cdata)->env = ft_matadd(&(cdata)->env, (cdata)->args[1]);
+		if (!(cdata)->env)
+			exit (g_stat_code);
 	}
 	// printf("ENTRO AQUI y es: %s\n", (*data)->env[i]);
 	unlink("/tmp/env.env");
-	// print_env(cdata,"mierda: ");
 	if (!save_env(cdata))
-		exit(EXIT_FAILURE);
+		exit(g_stat_code);
 	exit(EXIT_SUCCESS);
 }
 
@@ -313,9 +556,7 @@ char	**ft_mat_rem_index(char ***mat, int index)
 	c_mat = *mat;
 	while (c_mat[++i])
 	{
-		if (i == index)
-			i = i;
-		else if (c_mat[i])
+		if (c_mat[i] && i != index)
 			new_mat[++j] = ft_strdup(c_mat[i]);
 	}
 	new_mat[++j] = NULL;
@@ -492,7 +733,7 @@ void	execute_command(t_data **ddata, char *command_path)
 			return ;
 		}
 		if (exit_code != 0)
-			fprintf(stderr, "Proceso hijo terminó con error: %d\n", exit_code);
+			printf("Proceso hijo terminó con error: %d\n", exit_code);
 	}
 }
 
@@ -559,7 +800,7 @@ void	execute_pipeline(t_data *data)
 				handle_redir(current);
 			if (!is_valid_command(current))
 			{
-				fprintf(stderr, "Comando no encontrado: %s\n", current->comand);
+				printf("Comando no encontrado: %s\n", current->comand);
 				exit(EXIT_FAILURE);
 			}
 			exit(EXIT_SUCCESS);
@@ -591,24 +832,41 @@ int	is_valid_command(t_data *data)
 	int		i;
 	char	*comand_path;
 	char	**token;
+	char	*tmp;
 
 	i = 0;
-	path = getenv("PATH");
+	path = ft_strdup("PATH");
+	path = key_to_res(&path, data->env);
 	if (!path || !data->comand)
 	{
-		fprintf(stderr, "No se pudo obtener el valor de PATH\n");
+		if (data->redir != NULL && data->redir->type == D_MINOR)
+		{
+			heredoc(data);
+			return (0);
+		}
+		printf("No se pudo obtener el valor de PATH\n");
+		free(path);
 		return (0);
 	}
 	if (is_builtin(data->comand))
 	{
 		execute_command(&data, "is_builtinOMG");
+		free(path);
 		return (1);
 	}
 	token = ft_split(path, ':');
+	free(path);
+	if (access(data->comand, X_OK) == 0)
+	{
+		execute_command(&data, data->comand);
+		free_args(token);
+		return (1);
+	}
 	while (token[i] != NULL)
 	{
-		comand_path = ft_strjoin(token[i], "/");
-		comand_path = ft_strjoin(comand_path, data->comand);
+		tmp = ft_strjoin(token[i], "/");
+		comand_path = ft_strjoin(tmp, data->comand);
+		free(tmp);
 		if (access(comand_path, X_OK) == 0)
 		{
 			execute_command(&data, comand_path);
