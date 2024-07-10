@@ -188,6 +188,11 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (1);
 }*/
 
+void sc_error(int sce)
+{
+	g_stat_code = sce;
+}
+
 char	*heredoc_tokenizer(char *str, t_data *data)
 {
 	t_token	*token;
@@ -199,6 +204,8 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 	//c_token = token;
 	res = NULL;
 	input = ft_strdup(str);
+	if (!input)
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	i = -1;
 	token = NULL;
 	while (input[++i])
@@ -208,20 +215,23 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token, 0))
 				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), NULL);
+						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 		else
 		{
 			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token))
 				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), NULL);
+						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 	}
 	while (token)
 	{
 		if (is_special(token->value, "$") && (!is_special(token->next->value, "\"'")))
-			is_expandsor(&token, &res, data->env);
+		{
+			if (!is_expandsor(&token, &res, data->env))
+				return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		}
 		else
 		{
 			if (token)
@@ -326,6 +336,8 @@ void	b_cd(t_data *data)
 		{
 			res = ft_strjoin("OLDPWD=", last_pwd);
 			(data)->env = ft_matadd(&(data)->env, res);
+			if (!(data)->env)
+				exit (g_stat_code);
 			// creo que no he de liberarlo
 			// free(last_pwd);
 			free(res);
@@ -341,6 +353,8 @@ void	b_cd(t_data *data)
 		{
 			res = ft_strjoin("PWD=", "PWD");
 			(data)->env = ft_matadd(&(data)->env, res);
+			if (!(data)->env)
+				exit (g_stat_code);
 			// creo que no he de liberarlo
 			// free(last_pwd);
 			free(res);
@@ -376,7 +390,6 @@ void	b_cd(t_data *data)
     exit(EXIT_SUCCESS);
 }
 
-//TODO falta que espanda
 void	b_echo(t_data *data)
 {
 	int	i;
@@ -386,23 +399,33 @@ void	b_echo(t_data *data)
 	{
 		while (data->args[i])
 		{
+			data->args[i] = heredoc_tokenizer(data->args[i],data);
+			if (!data->args[i])
+				exit(g_stat_code);
 			printf("%s", data->args[i]);
 			if (data->args[++i])
 			printf(" ");
 			}
 			printf("\n");
     }
-    else
+    else if (data->args[1])
     {
         i++;
         while (data->args[i])
         {
+			data->args[i] = heredoc_tokenizer(data->args[i],data);
+			if (!data->args[i])
+				exit(g_stat_code);
             printf("%s", data->args[i]);
             if (data->args[++i])
                 printf(" ");
         }
+		printf("\n");
     }
-    exit(EXIT_SUCCESS);
+	else
+		printf("\n");
+	g_stat_code = SC_SUCCESS;
+    exit(g_stat_code);
 }
 
 void	b_pwd(void)
@@ -422,7 +445,7 @@ void	b_pwd(void)
 void	b_stat_code(void)
 {
 	printf("%i\n", g_stat_code);
-	exit(EXIT_SUCCESS);
+	exit(SC_SUCCESS);
 }
 
 void	print_env(t_data *data, char *str)
@@ -458,11 +481,23 @@ char	**ft_matadd(char ***mat, char *str)
 	size = ft_matsize(*mat);
 	new_mat = (char **)malloc(sizeof(char **) * (size + 2));
 	if (!new_mat)
-		return (NULL);
+		return (free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	c_mat = *mat;
 	while (c_mat[++i])
+	{
 		new_mat[i] = ft_strdup(c_mat[i]);
+		if (!new_mat[i])
+		{
+			new_mat[i] = NULL;
+			return (free_args(new_mat), free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		}
+	}
 	new_mat[i] = ft_strdup(str);
+	if (!new_mat[i])
+		{
+			new_mat[i] = NULL;
+			return (free_args(new_mat), free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		}
 	new_mat[++i] = NULL;
 	free_args(*mat);
 	return (new_mat);
@@ -498,12 +533,13 @@ void	b_export(t_data **data)
 	{
 		// printf("NO TENGO QUE ENTRAR AQUI\n");
 		(cdata)->env = ft_matadd(&(cdata)->env, (cdata)->args[1]);
+		if (!(cdata)->env)
+			exit (g_stat_code);
 	}
 	// printf("ENTRO AQUI y es: %s\n", (*data)->env[i]);
 	unlink("/tmp/env.env");
-	// print_env(cdata,"mierda: ");
 	if (!save_env(cdata))
-		exit(EXIT_FAILURE);
+		exit(g_stat_code);
 	exit(EXIT_SUCCESS);
 }
 

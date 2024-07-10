@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/07/01 08:19:35 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/08 08:03:13 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,7 +279,7 @@ char	*key_to_res(char **key, char **env)
 }
 
 // Expand the $ with env
-void	is_expandsor(t_token **token, char **str, char **env)
+int	is_expandsor(t_token **token, char **str, char **env)
 {
 	char	*key;
 	char	*res;
@@ -311,8 +311,13 @@ void	is_expandsor(t_token **token, char **str, char **env)
 				free(key);
 				*str = res;
 			}
+			else
+				return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 		}
+		else
+				return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 	}
+	return (1);
 }
 
 int	count_args(char **args)
