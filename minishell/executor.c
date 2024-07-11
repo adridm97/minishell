@@ -321,32 +321,31 @@ void	handle_redir(t_data *data)
 
 void	b_cd(t_data *data)
 {
-	int	i;
-	char	last_pwd[1024];
-	char	pwd[1024];
+	int		i;
+	char	*last_pwd;
+	char	*pwd;
 	char	*res;
 
-	if (getcwd(last_pwd,sizeof(last_pwd)))
-	{
-		i = index_env(data, "OLDPWD");
-		// Se debe guardar al confirmar el cd
-		if(i >= 0)
-			data->env[i] = ft_strjoin("OLDPWD=",last_pwd);
-		else
-		{
-			res = ft_strjoin("OLDPWD=", last_pwd);
-			if (!res)
-				sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
-			(data)->env = ft_matadd(&(data)->env, res);
-			if (!(data)->env)
-				exit (g_stat_code);
-			// creo que no he de liberarlo
-			// free(last_pwd);
-			free(res);
-		}
-	}
+	while (!last_pwd)
+		last_pwd = getcwd(last_pwd, i++);
+	i = index_env(data, "OLDPWD");
+	// Se debe guardar al confirmar el cd
+	if(i >= 0)
+		data->env[i] = ft_strjoin("OLDPWD=",last_pwd);
 	else
-		exit(EXIT_FAILURE);
+	{
+		if(i == -2)
+			sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE), exit(g_stat_code);
+		res = ft_strjoin("OLDPWD=", last_pwd);
+		if (!res)
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
+		(data)->env = ft_matadd(&(data)->env, res);
+		if (!(data)->env)
+			exit (g_stat_code);
+		// creo que no he de liberarlo
+		// free(last_pwd);
+		free(res);
+	}
 	if (data->args[1] && !chdir(data->args[1]))
 	{
 		// printf("PETO, 1\n");	
@@ -367,31 +366,28 @@ void	b_cd(t_data *data)
 		// printf("PETO, 2\n");	
 		// printf("PETO, 3\n");
 		//es posible que aquí pierda memoria memory leak
-		if (getcwd(pwd,sizeof(pwd)))
-		{
+		while (!pwd)
+			pwd = getcwd(pwd, i++);
 		data->env[i] = ft_strjoin("PWD=",pwd);
-		}
-		else
-			exit(EXIT_FAILURE);
 		if(!data->env[i])
 		{
 			// printf("PETO, no guardo en data env\n");	
-			exit(EXIT_FAILURE);
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
 		}
 		if (!save_env(data))
 		{
 			// printf("PETO, no guardo archivo en save env\n");	
-			exit(EXIT_FAILURE);
+			exit(g_stat_code);
 		}
 		// printf("data env: %s\n", data->env[i]);
 	}
 	else
 	{
 		// printf("PETO Y NO CAMBIO\n");	
-    	exit(EXIT_SUCCESS);
+    	sc_error(SC_SUCCESS), exit(g_stat_code);
 	}
 		free(data->env[i]);
-    exit(EXIT_SUCCESS);
+    sc_error(SC_SUCCESS), exit(g_stat_code);
 }
 
 void	b_echo(t_data *data)
@@ -468,6 +464,7 @@ int	ft_matsize(char **mat)
 	return (size);
 }
 
+//manage g_status_code
 char	**ft_matadd(char ***mat, char *str)
 {
 	int		size;
@@ -571,6 +568,8 @@ int	index_env(t_data *data, char *str)
 
 	i = -1;
 	env = data->env;
+	if (!env)
+		return (-2);
 	while (env[++i])
 	{
 		if (ft_strnstr(env[i], str, ft_strlen(str)) && \
