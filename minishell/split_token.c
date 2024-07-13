@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/07/11 20:51:30 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/12 09:27:24 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,7 +251,7 @@ int	take_key(t_token **token, char **key, char *str)
 		*key = new_str(key, (*token)->value);
 		*token = (*token)->next;
 	}
-	if (key)
+	if (*key)
 		return (1);
 	else
 		return (0);
@@ -283,8 +283,11 @@ int	is_expandsor(t_token **token, char **str, char **env)
 {
 	char	*key;
 	char	*res;
+	char	*status_code;
 
+	status_code = NULL;
 	key = NULL;
+	printf("inicio de is_expand\n");
 	*token = (*token)->next;
 	if (!*token || is_special((*token)->value, "<> |"))
 		*str = new_str(str, '$');
@@ -314,8 +317,20 @@ int	is_expandsor(t_token **token, char **str, char **env)
 			else
 				return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 		}
+		else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€$"))
+		{
+			printf("LLEGO AQUI\n");
+			status_code = ft_itoa(g_stat_code);
+			if (!*str)
+					res = ft_strjoin("", status_code);
+			else
+				res = ft_strjoin(*str, status_code);
+			free(*str);
+			free(key);
+			*str = res;
+		}
 		else
-				return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+			return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 	}
 	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/08 09:00:39 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/13 14:31:27 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,52 @@ int	file_exist(char *file)
 	return (1);
 }
 
+int	index_env_env(char **env, char *str)
+{
+	int		i;
+
+	i = -1;
+	if (!env)
+		return (-2);
+	while (env[++i])
+	{
+		if (ft_strnstr(env[i], str, ft_strlen(str)) && \
+				(env[i][ft_strlen(str)] \
+				== '=' || env[i][ft_strlen(str)] == '\0'))
+			return (i);
+	}
+	return (-1);
+}
+
+void	set_env(char *key, char *val, char ***env)
+{
+	int		i;
+	char	*res;
+	char	*str;
+	str = ft_strjoin(key, "=");
+	if (!str)
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+	res = ft_strjoin(str, val);
+	if (!res)
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+	i = index_env_env(*env, key);
+	if (i >= 0)
+	{
+		i = index_env_env(*env, key);
+		*env[i] = res;
+	}
+	else if (i == -1)
+	{
+		*env = ft_matadd(env, res);
+		if (*env)
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+	}
+	else
+			sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE);
+	printf("QUE HAY EN RES: %s\n", res);
+	free(res), free(str);
+}
+
 /*TODO por algun motivo al poner adios el history falla*/
 int	main(int argc, char *argv[], char *env[])
 {
@@ -80,11 +126,19 @@ int	main(int argc, char *argv[], char *env[])
 	char		**mat;
 	char		*key;
 
-	g_stat_code = 0;
+	g_stat_code = 1;
 	(void)argc;
 	(void)argv;
 	data = NULL;
 	setup_signal_handlers();
+	// TODO Falta proteger las cosas del SHLVL
+	key = ft_strdup("SHLVL");
+	key = key_to_res(&key, env);
+	fd = ft_atoi(key) + 1;
+	free(key);
+	ft_itoa(fd);
+	set_env("SHLVL", key, &env);
+	free (key);
 	while (1)
 	{
 		if (data)
@@ -124,10 +178,12 @@ int	main(int argc, char *argv[], char *env[])
 			chdir(key);
 			free(key);
 		}
+		// print_data(data);
 		if (data && data->next)
 			execute_pipeline(data);
 		else if (data)
 			is_valid_command(data);
+		// printf("el status despues es: %i\n", g_stat_code);
 		if (data && !file_exist("/tmp/env.env"))
 		{
 			if (!save_env(data))
