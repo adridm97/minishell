@@ -1,0 +1,29 @@
+	// fd = open("/tmp/env.env", O_RDONLY, 777);
+	// mat = NULL;
+	// if (fd >= 0)
+	// {
+	// 	mat = get_env_file(fd);
+	// 	unlink("/tmp/env.env");
+	// 	close(fd);
+	// }
+	// // TODO Falta proteger las cosas del SHLVL
+	// key = ft_strdup("SHLVL");
+	// if (mat)
+	// {
+	// 	key = key_to_res(&key, mat);
+	// 	// printf("key = %s", key);
+	// }
+	// else
+	// 	key = key_to_res(&key, env);
+	// printf("key = %s\n", key);
+	// fd = ft_atoi(key) + 1;
+	// free(key);
+	// key = ft_itoa(fd);
+	// if (mat)
+	// {
+	// 	set_env("SHLVL", key, &mat);
+	// 	save_env_env(mat);
+	// }
+	// else
+	// 	set_env("SHLVL", key, &env);
+	// free (key);

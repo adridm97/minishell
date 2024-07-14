@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/07/12 09:27:24 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/13 22:02:56 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -287,7 +287,7 @@ int	is_expandsor(t_token **token, char **str, char **env)
 
 	status_code = NULL;
 	key = NULL;
-	printf("inicio de is_expand\n");
+	// printf("inicio de is_expand\n");
 	*token = (*token)->next;
 	if (!*token || is_special((*token)->value, "<> |"))
 		*str = new_str(str, '$');

@@ -558,6 +558,18 @@ void	print_env(t_data *data, char *str)
 	}
 }
 
+void	print_env_env(char **env, char *str)
+{
+	int	i;
+
+	i = -1;
+	if (env)
+	{
+		while (env[++i])
+			printf("%s%s\n", str, env[i]);
+	}
+}
+
 int	ft_matsize(char **mat)
 {
 	int	size;

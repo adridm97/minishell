@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/12 09:27:12 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/13 16:49:26 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,6 +151,7 @@ void	execute_pipeline(t_data *data);
 int		is_valid_command(t_data *data);
 int		ft_matsize(char **mat);
 void	print_env(t_data *data, char *str);
+void	print_env_env(char **env, char *str);
 int	index_env(t_data *data, char *str);
 void sc_error(int sce);
 
