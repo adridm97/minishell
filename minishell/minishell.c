@@ -124,9 +124,16 @@ int	main(int argc, char *argv[], char *env[])
 			free(key);
 		}
 		if (data && data->next)
-			execute_pipeline(data);
+		{
+			execute_pipeline(&data);
+			printf("el codigo es: %d\n", g_stat_code);
+		}
 		else if (data)
-			is_valid_command(data);
+		{
+			printf("llamada\n");
+			is_valid_command(data, 0);
+			printf("el codigo es: %d\n", g_stat_code);
+		}
 		if (data && !file_exist("/tmp/env.env"))
 		{
 			if (!save_env(data))
@@ -136,6 +143,7 @@ int	main(int argc, char *argv[], char *env[])
 		}
 		free_data(&data);
 		data = NULL;
+		g_stat_code = 0;
 	}
 	free_data(&data);
 	free(input);

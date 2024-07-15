@@ -219,7 +219,6 @@ void	is_redir_output(t_token **token, t_data **data, char **str, char **env)
 	}
 	else
 		init_redir(token, data, env, MAJOR);
-	printf("SALGO\n");
 	(void)str;
 }
 

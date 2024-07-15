@@ -260,7 +260,6 @@ int	heredoc(t_data *data)
 		perror("open");
 		exit(EXIT_FAILURE);
 	}
-
 	while (1)
 	{
 		line = readline("> ");
@@ -269,10 +268,13 @@ int	heredoc(t_data *data)
 			free(line);
 			break;
 		}
+		printf("llega\n");
 		expanded_line = heredoc_tokenizer(line, data);
 		ft_putstr_fd(expanded_line, fd);
 		ft_putstr_fd("\n", fd);
 		free(line);
+		free(expanded_line);
+		printf("aqui\n");
 	}
 	close(fd);
 	return open(filename, O_RDONLY);
@@ -304,15 +306,21 @@ void	handle_redir(t_data *data)
 			perror("open");
 			exit(EXIT_FAILURE);
 		}
-		if ((redir->type == MAJOR || redir->type == D_MAJOR) && dup2(fd, STDOUT_FILENO) == -1)
+		if ((redir->type == MAJOR || redir->type == D_MAJOR) && data->comand != NULL)
 		{
-			perror("dup2");
-			exit(EXIT_FAILURE);
+			if (dup2(fd, STDOUT_FILENO) == -1)
+			{
+				perror("dup2");
+				exit(EXIT_FAILURE);
+			}
 		}
-		else if (redir->type == MINOR && dup2(fd, STDIN_FILENO) == -1)
+		else if (redir->type == MINOR && data->comand != NULL)
 		{
-			perror("dup2");
-			exit(EXIT_FAILURE);
+			if (dup2(fd, STDIN_FILENO) == -1)
+			{
+				perror("dup2");
+				exit(EXIT_FAILURE);
+			}
 		}
 		close(fd);
 		redir = redir->next;
@@ -682,12 +690,12 @@ int	is_builtin(char *comand)
 	return (0);
 }
 
-void	execute_command(t_data **ddata, char *command_path)
+void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 {
 	pid_t	pid;
 	t_data	*data;
 	int		heredoc_fd;
-	int		exit_code;
+	int		status;
 
 	pid = fork();
 	data = *ddata;
@@ -698,8 +706,8 @@ void	execute_command(t_data **ddata, char *command_path)
 	}
 	else if (pid == 0)
 	{
-		if ((data->redir != NULL && data->redir->type == D_MINOR) \
-				&& data->next == NULL)
+		if (data && (data->redir != NULL && data->redir->type == D_MINOR) \
+				&& heredoc_processed == 0)
 		{
 			heredoc_fd = heredoc(data);
 			if (dup2(heredoc_fd, STDIN_FILENO) == -1)
@@ -727,31 +735,48 @@ void	execute_command(t_data **ddata, char *command_path)
 	}
 	else
 	{
-		if (waitpid(pid, &exit_code, 0) == -1)
+		while ((pid = wait(&status)) > 0)
 		{
-			perror("waitpid");
-			return ;
+			if (WIFEXITED(status))
+			{
+				g_stat_code = WEXITSTATUS(status);
+				printf("Proceso padre: El proceso hijo con PID %d terminó con código de salida %d\n", pid, g_stat_code);
+			}	
+			else if (WIFSIGNALED(status))
+			{
+				g_stat_code = WTERMSIG(status);
+				printf("Proceso padre: El proceso hijo con PID %d fue terminado por la señal %d\n", pid, g_stat_code);
+			}
 		}
-		if (exit_code != 0)
-			printf("Proceso hijo terminó con error: %d\n", exit_code);
 	}
 }
 
-void	execute_pipeline(t_data *data)
+void	execute_pipeline(t_data **data)
 {
 	t_data	*current;
 	int		input_fd;
 	int		fd[2];
 	pid_t	pid;
 	int		heredoc_fd;
+	int		heredoc_processed;
+	int		status;
+	int		last_pid;
 
+	heredoc_processed = 0;
 	heredoc_fd = -1;
 	input_fd = STDIN_FILENO;
-	current = data;
+	current = *data;
 	while (current != NULL)
 	{
 		if (current->redir != NULL && current->redir->type == D_MINOR)
-			heredoc_fd = heredoc(current);
+		{
+			if (heredoc_fd == -1)
+			{
+				heredoc_fd = heredoc(current);
+				heredoc_processed = 1;
+			}
+		}
+			//heredoc_fd = heredoc(current);
 		if (current->next != NULL)
 		{
 			if (pipe(fd) == -1)
@@ -798,10 +823,10 @@ void	execute_pipeline(t_data *data)
 			}
 			if (current->redir != NULL)
 				handle_redir(current);
-			if (!is_valid_command(current))
+			if (!is_valid_command(current, heredoc_processed))
 			{
 				printf("Comando no encontrado: %s\n", current->comand);
-				exit(EXIT_FAILURE);
+				exit(SC_KEY_HAS_EXPIRED);
 			}
 			exit(EXIT_SUCCESS);
 		}
@@ -822,11 +847,25 @@ void	execute_pipeline(t_data *data)
 			current = current->next;
 		}
 	}
-	while (wait(NULL) > 0)
-		;
+	last_pid = 0;
+	while ((pid = wait(&status)) > 0)
+    {
+        if (pid > last_pid && WIFEXITED(status))
+		{
+            g_stat_code = WEXITSTATUS(status);
+            printf("Proceso padre: El proceso hijo con PID %d terminó con código de salida %d\n", pid, g_stat_code);
+		}
+			
+        else if (pid > last_pid && WIFSIGNALED(status))
+        {
+            g_stat_code = WTERMSIG(status);
+            printf("Proceso padre: El proceso hijo con PID %d fue terminado por la señal %d\n", pid, g_stat_code);
+        }
+		last_pid = pid;
+    }
 }
 
-int	is_valid_command(t_data *data)
+int	is_valid_command(t_data *data, int heredoc_processed)
 {
 	char	*path;
 	int		i;
@@ -844,13 +883,17 @@ int	is_valid_command(t_data *data)
 			heredoc(data);
 			return (0);
 		}
-		printf("No se pudo obtener el valor de PATH\n");
+		if (data->redir != NULL)
+		{
+			handle_redir(data);
+		}
+		//printf("No se pudo obtener el valor de PATH\n");
 		free(path);
 		return (0);
 	}
 	if (is_builtin(data->comand))
 	{
-		execute_command(&data, "is_builtinOMG");
+		execute_command(&data, "is_builtinOMG", heredoc_processed);
 		free(path);
 		return (1);
 	}
@@ -858,7 +901,7 @@ int	is_valid_command(t_data *data)
 	free(path);
 	if (access(data->comand, X_OK) == 0)
 	{
-		execute_command(&data, data->comand);
+		execute_command(&data, data->comand, heredoc_processed);
 		free_args(token);
 		return (1);
 	}
@@ -869,7 +912,7 @@ int	is_valid_command(t_data *data)
 		free(tmp);
 		if (access(comand_path, X_OK) == 0)
 		{
-			execute_command(&data, comand_path);
+			execute_command(&data, comand_path, heredoc_processed);
 			free(comand_path);
 			free_args(token);
 			return (1);

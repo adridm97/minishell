@@ -147,8 +147,8 @@ int		split_token(t_token *token, char **env, t_data **data);
 
 //executor.c
 char	**ft_matadd(char ***mat, char *str);
-void	execute_pipeline(t_data *data);
-int		is_valid_command(t_data *data);
+void	execute_pipeline(t_data **data);
+int		is_valid_command(t_data *data, int heredoc_processed);
 int		ft_matsize(char **mat);
 void	print_env(t_data *data, char *str);
 int	index_env(t_data *data, char *str);
@@ -162,7 +162,7 @@ int		add_args(char ***arg, char **str);
 int		add_last_data(t_data **data, char **str);
 char	*key_to_res(char **key, char **env);
 int		is_special(char c, char *comp);
-void	execute_command(t_data **ddata, char *command_path);
+void	execute_command(t_data **ddata, char *command_path, int heredoc_processed);
 void	handle_redir(t_data *data);
 int		heredoc(t_data *data);
 char	*charstr(char c);
