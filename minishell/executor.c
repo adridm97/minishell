@@ -801,7 +801,7 @@ void	execute_command(t_data **ddata, char *command_path)
 	t_data	*data;
 	int		heredoc_fd;
 	int		exit_code;
-
+	
 	pid = fork();
 	data = *ddata;
 	if (pid == -1)

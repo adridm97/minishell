@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/14 08:10:01 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/15 08:18:38 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,9 +155,9 @@ int	main(int argc, char *argv[], char *env[])
 	mat = NULL;
 	setup_signal_handlers();
 	mat = create_env_first(env);
+	// TODO si da error que hay que hacer desde aqui?
 	if (!mat)
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	// TODO si da error que hay que hacer desde aqui?
 	key = ft_strdup("SHLVL");
 	if (!key)
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
@@ -171,7 +171,6 @@ int	main(int argc, char *argv[], char *env[])
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
 	if (!set_env("SHLVL", key, &mat))
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	// print_env_env(env, "Antes");
 	free (key);
 	while (1)
 	{
