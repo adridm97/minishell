@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/08 09:00:39 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/15 08:18:38 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,74 @@ int	file_exist(char *file)
 	return (1);
 }
 
+int	index_env_env(char **env, char *str)
+{
+	int		i;
+
+	i = -1;
+	if (!env)
+		return (-2);
+	while (env[++i])
+	{
+		if (ft_strnstr(env[i], str, ft_strlen(str)) && \
+				(env[i][ft_strlen(str)] \
+				== '=' || env[i][ft_strlen(str)] == '\0'))
+			return (i);
+	}
+	return (-1);
+}
+
+int	set_env(char *key, char *val, char ***env)
+{
+	int		i;
+	char	*res;
+	char	*str;
+
+	str = ft_strjoin(key, "=");
+	if (!str)
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+	res = ft_strjoin(str, val);
+	if (!res)
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+	i = index_env_env(*env, key);
+	if (i >= 0)
+	{
+		free((*env)[i]);
+		(*env)[i] = res;
+	}
+	else if (i == -1)
+	{
+		*env = ft_matadd(env, res);
+		if (*env)
+			return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+	}
+	else
+		return (sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE), 0);
+	return (free(str), 1);
+}
+
+char	**create_env_first(char **cenv)
+{
+	int		i;
+	char	**env;
+
+	i = 0;
+	if (!cenv || !cenv[0])
+		return (NULL);
+	while (cenv[i])
+		i++;
+	env = (char **)malloc(sizeof(char *) * (i + 1));
+	i = -1;
+	while (cenv[++i])
+	{
+		env[i] = ft_strdup(cenv[i]);
+		if (!(env)[i])
+			return (clean_env(&env, --i), NULL);
+	}
+	env[i] = NULL;
+	return (env);
+}
+
 /*TODO por algun motivo al poner adios el history falla*/
 int	main(int argc, char *argv[], char *env[])
 {
@@ -83,7 +151,26 @@ int	main(int argc, char *argv[], char *env[])
 	(void)argc;
 	(void)argv;
 	data = NULL;
+	mat = NULL;
 	setup_signal_handlers();
+	mat = create_env_first(env);
+	// TODO si da error que hay que hacer desde aqui?
+	if (!mat)
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+	key = ft_strdup("SHLVL");
+	if (!key)
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+	key = key_to_res(&key, mat);
+	if (!key)
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+	fd = ft_atoi(key) + 1;
+	free(key);
+	key = ft_itoa(fd);
+	if (!key)
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+	if (!set_env("SHLVL", key, &mat))
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+	free (key);
 	while (1)
 	{
 		if (data)
@@ -94,8 +181,7 @@ int	main(int argc, char *argv[], char *env[])
 			input = (char *) NULL;
 		}
 		fd = open("/tmp/env.env", O_RDONLY, 777);
-		mat = NULL;
-		if (fd >= 0)
+		if (!mat && fd >= 0)
 		{
 			mat = get_env_file(fd);
 			unlink("/tmp/env.env");
@@ -123,6 +209,7 @@ int	main(int argc, char *argv[], char *env[])
 			chdir(key);
 			free(key);
 		}
+		// print_data(data);
 		if (data && data->next)
 		{
 			execute_pipeline(&data);
