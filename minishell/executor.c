@@ -243,6 +243,30 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 	}
 	return (res);
 }
+
+/*
+ Abre el archivo, revisa permisos (hay que indicarlo en mayuscula) y cambia g_status si lo necesita, retorna 0 si está OK
+ F = existe? retorna 1 cuando no.
+ R = se puede leer? retorna 2 cuando no.
+ W = se puede escribir? retorna 3 cuando no.
+ X = se puede ejecutar? retorna 4 cuando no.
+ si fd es -1 retorna 5.
+*/
+int	is_valid_file(char *filename, int fd, char *check)
+{
+	if (ft_strchr(check, 'F') && !access(filename, F_OK))
+		return (perror("El archivo no existe"), sc_error(SC_KEY_HAS_EXPIRED), 1);
+	if (ft_strchr(check, 'R') && !access(filename, R_OK))
+		return (perror("El archivo no tiene permisos de lectura"), sc_error(EXIT_FAILURE), 2);
+	if (ft_strchr(check, 'W') && !access(filename, W_OK))
+		return (perror("El archivo no tiene permisos de escritura"), sc_error(EXIT_FAILURE), 3);
+	if (ft_strchr(check, 'X') && !access(filename, X_OK))
+		return (perror("El archivo no tiene permisos de ejecución"), sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), 4);
+	if (fd < 0)
+		return(sc_error(EXIT_FAILURE), 5);
+	return (0);
+}
+
 // TODO gestionar los exit con exit status
 int	heredoc(t_data *data) 
 {
@@ -255,11 +279,8 @@ int	heredoc(t_data *data)
 	aux = data->redir;
 	filename = "/tmp/heredoc";
 	fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	if (fd == -1)
-	{
-		perror("open");
-		exit(EXIT_FAILURE);
-	}
+	if (is_valid_file(filename, fd, "FRWX"))
+		exit(g_stat_code);
 	while (1)
 	{
 		line = readline("> ");
@@ -268,13 +289,13 @@ int	heredoc(t_data *data)
 			free(line);
 			break;
 		}
-		printf("llega\n");
+		// printf("llega\n");
 		expanded_line = heredoc_tokenizer(line, data);
 		ft_putstr_fd(expanded_line, fd);
 		ft_putstr_fd("\n", fd);
 		free(line);
 		free(expanded_line);
-		printf("aqui\n");
+		// printf("aqui\n");
 	}
 	close(fd);
 	return open(filename, O_RDONLY);
