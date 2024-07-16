@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/15 08:18:38 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/16 09:28:23 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ char	**ft_matcpy(char **mat)
 	return (new_mat);
 }
 
-// TODO gestionar g_status
 int	save_env(t_data *data)
 {
 	int		fd;
@@ -44,10 +43,10 @@ int	save_env(t_data *data)
 
 	i = 0;
 	if (!data->env && !data->env[0])
-		return (0);
+		return (sc_error(EXIT_FAILURE), g_stat_code);
 	fd = open("/tmp/env.env", O_WRONLY | O_CREAT | O_APPEND, 777);
 	if (fd < 0)
-		return (0);
+		return (sc_error(SC_FILE_DESCRIPTOR_IN_BAD_STATE), g_stat_code);
 	env = data->env;
 	while (env[i])
 	{
@@ -57,7 +56,7 @@ int	save_env(t_data *data)
 		i++;
 	}
 	close(fd);
-	return (1);
+	return (sc_error(SC_SUCCESS), g_stat_code);
 }
 
 int	file_exist(char *file)
@@ -128,12 +127,14 @@ char	**create_env_first(char **cenv)
 	while (cenv[i])
 		i++;
 	env = (char **)malloc(sizeof(char *) * (i + 1));
+	if (!env)
+		return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	i = -1;
 	while (cenv[++i])
 	{
 		env[i] = ft_strdup(cenv[i]);
 		if (!(env)[i])
-			return (clean_env(&env, --i), NULL);
+			return (clean_env(&env, --i), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	}
 	env[i] = NULL;
 	return (env);
@@ -157,28 +158,34 @@ int	main(int argc, char *argv[], char *env[])
 	// TODO si da error que hay que hacer desde aqui?
 	if (!mat)
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	key = ft_strdup("SHLVL");
-	if (!key)
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	key = key_to_res(&key, mat);
-	if (!key)
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	fd = ft_atoi(key) + 1;
-	free(key);
-	key = ft_itoa(fd);
-	if (!key)
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	if (!set_env("SHLVL", key, &mat))
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	free (key);
+	else
+	{
+		key = ft_strdup("SHLVL");
+		if (!key)
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		key = key_to_res(&key, mat);
+		if (!key)
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		fd = ft_atoi(key) + 1;
+		free(key);
+		key = ft_itoa(fd);
+		if (!key)
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		if (!set_env("SHLVL", key, &mat))
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		free (key);
+	}
 	while (1)
 	{
 		if (data)
+		{
+			free_data(&data);
 			data = NULL;
+		}
 		if (input)
 		{
 			free (input);
-			input = (char *) NULL;
+			input = NULL;
 		}
 		fd = open("/tmp/env.env", O_RDONLY, 777);
 		if (!mat && fd >= 0)
@@ -217,20 +224,19 @@ int	main(int argc, char *argv[], char *env[])
 		}
 		else if (data)
 		{
-			printf("llamada\n");
+			// printf("llamada\n");
 			is_valid_command(data, 0);
-			printf("el codigo es: %d\n", g_stat_code);
+			// printf("el codigo es: %d\n", g_stat_code);
 		}
 		if (data && !file_exist("/tmp/env.env"))
 		{
-			if (!save_env(data))
-				return (1);
+			if (save_env(data))
+				printf("Error saving envoirment\n");
 			if (mat)
 				clean_env(&mat, -1);
 		}
 		free_data(&data);
 		data = NULL;
-		g_stat_code = 0;
 	}
 	free_data(&data);
 	free(input);
