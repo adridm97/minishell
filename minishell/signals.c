@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   executor.c                                         :+:      :+:    :+:   */
+/*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/06/26 23:28:35 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/07/16 08:30:01 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,11 @@ void	setup_signal_handlers(void)
 	if (signal(SIGINT, handle_sigint) == SIG_ERR)
 	{
 		perror("Error al configurar el manejador de SIGINT");
-		exit(EXIT_FAILURE);
+		sc_error(EXIT_FAILURE), exit(g_stat_code);
 	}
 	if (signal(SIGQUIT, handle_sigquit) == SIG_ERR)
 	{
 		perror("Error al configurar el manejador de SIGQUIT");
-		exit(EXIT_FAILURE);
+		sc_error(EXIT_FAILURE), exit(EXIT_FAILURE);
 	}
 }

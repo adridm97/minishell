@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/12 09:11:28 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/17 20:47:08 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -387,24 +387,24 @@ t_data	*lexer(char *input, t_data **data, char **env)
 			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token, 0))
 				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), NULL);
+						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 		else
 		{
 			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token))
 				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), NULL);
+						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 	}
 	check_closed(token, &error);
 	check_gramathic(token, &error);
 	if (error.is_error)
 		return (is_error(& (t_error){"Syntax error",1}), \
-				free(error.error), free_data(data), free_token(&token), NULL);
+				free(error.error), free_data(data), free_token(&token), sc_error(EXIT_FAILURE), NULL);
 	else if (!split_token(token, env, data))
 		return (is_error(& (t_error){"Memory error",1}), \
-				free_data(data), free_token(&token), NULL);
+				free_data(data), free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	// print_data(data);
 	free_token(&token);
 	return (*data);

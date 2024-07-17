@@ -292,6 +292,30 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 // 	return open(filename, O_RDONLY);
 // }
 
+/*
+ Abre el archivo, revisa permisos (hay que indicarlo en mayuscula) y cambia g_status si lo necesita, retorna 0 si está OK
+ F = existe? retorna 1 cuando no.
+ R = se puede leer? retorna 2 cuando no.
+ W = se puede escribir? retorna 3 cuando no.
+ X = se puede ejecutar? retorna 4 cuando no.
+ si fd es -1 retorna 5.
+*/
+int	is_valid_file(char *filename, int fd, char *check)
+{
+	if (ft_strchr(check, 'F') && access(filename, F_OK))
+		return (perror("El archivo no existe"), sc_error(SC_KEY_HAS_EXPIRED), 1);
+	if (ft_strchr(check, 'R') && access(filename, R_OK))
+		return (perror("El archivo no tiene permisos de lectura"), sc_error(EXIT_FAILURE), 2);
+	if (ft_strchr(check, 'W') && access(filename, W_OK))
+		return (perror("El archivo no tiene permisos de escritura"), sc_error(EXIT_FAILURE), 3);
+	if (ft_strchr(check, 'X') && access(filename, X_OK))
+		return (perror("El archivo no tiene permisos de ejecución"), sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), 4);
+	if (fd < 0)
+		return(sc_error(EXIT_FAILURE), 5);
+	return (0);
+}
+
+// TODO gestionar los exit con exit status
 int	heredoc(t_data *data) 
 {
 	int		fd;
@@ -305,14 +329,13 @@ int	heredoc(t_data *data)
 	unlink(filename);
 	while (1)
 	{
-		if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
-		{
-			perror("Error al configurar el manejador de SIGINT");
-			exit(EXIT_FAILURE);
-		}
+		// if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
+		// {
+		// 	perror("Error al configurar el manejador de SIGINT");
+		// 	exit(EXIT_FAILURE);
+		// }
 		if (g_stat_code == -1)
 		{
-			printf("\n1\n");
 			close(fd);
 			close(0);
 			sc_error(SC_OWNER_DIED), exit(g_stat_code);
@@ -323,13 +346,12 @@ int	heredoc(t_data *data)
 			free(line);
 			break;
 		}
-		expanded_line = heredoc_tokenizer(line, data);
 		fd = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
-		if (fd == -1)
-		{
-			perror("open");
-			exit(EXIT_FAILURE);
-		}
+		if (is_valid_file(filename, fd, "FRW"))
+			exit(g_stat_code);
+		expanded_line = heredoc_tokenizer(line, data);
+		if (!expanded_line)
+			close(fd), free(line), exit(g_stat_code);
 		ft_putstr_fd(expanded_line, fd);
 		ft_putstr_fd("\n", fd);
 		free(line);
@@ -339,6 +361,7 @@ int	heredoc(t_data *data)
 	return open(filename, O_RDONLY);
 }
 
+// TODO gestionar los exit con exit status
 void	handle_redir(t_data *data)
 {
 	int 	fd;
@@ -460,6 +483,7 @@ void	handle_redir(t_data *data)
 // }
 
 // TODO Gestiona ~ y oldpwd no debe asignarse si el path es inválido
+// Gestionar cd - que vaya al ultimo directorio
 void	b_cd(t_data *data)
 {
 	int		i;
@@ -493,10 +517,10 @@ void	b_cd(t_data *data)
 	// }
 	if (!data->args[1])
 		data->args[1] = ft_strdup("/");
-	printf("tiene: %s\n", data->args[1]);
+	// printf("tiene: %s\n", data->args[1]);
 	if (!chdir(data->args[1]))
 	{
-		printf("PETO, 1 last pwd es: %s\n", last_pwd);	
+		// printf("PETO, 1 last pwd es: %s\n", last_pwd);	
 		i = index_env(data, "PWD");
 		if(i < 0)
 		{
@@ -510,7 +534,7 @@ void	b_cd(t_data *data)
 			// free(last_pwd);
 			free(res);
 		}
-		printf("PETO, 2\n");
+		// printf("PETO, 2\n");
 		//es posible que aquí pierda memoria memory leak
 		size = 1;
 		while (!pwd)
@@ -523,7 +547,7 @@ void	b_cd(t_data *data)
 			// printf("PETO, no guardo en data env\n");	
 			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
 		}
-		if (!save_env(data))
+		if (save_env(data))
 		{
 			// printf("PETO, no guardo archivo en save env\n");	
 			exit(g_stat_code);
@@ -548,7 +572,7 @@ void	b_cd(t_data *data)
 			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
 		(data)->env = ft_matadd(&(data)->env, res);
 		if (!(data)->env)
-			exit (g_stat_code);
+			exit(g_stat_code);
 		// creo que no he de liberarlo
 		// free(last_pwd);
 		free(res);
@@ -715,9 +739,9 @@ void	b_export(t_data **data)
 	}
 	// printf("ENTRO AQUI y es: %s\n", (*data)->env[i]);
 	unlink("/tmp/env.env");
-	if (!save_env(cdata))
+	if (save_env(cdata))
 		exit(g_stat_code);
-	exit(EXIT_SUCCESS);
+	sc_error(SC_SUCCESS), exit(g_stat_code);
 }
 
 char	**ft_mat_rem_index(char ***mat, int index)
@@ -771,9 +795,9 @@ void	b_unset(t_data *data)
 	if (i != -1)
 		data->env = ft_mat_rem_index(&data->env, i);
 	unlink("/tmp/env.env");
-	if (!save_env(data))
-		exit(EXIT_FAILURE);
-	exit(EXIT_SUCCESS);
+	if (save_env(data))
+		exit(g_stat_code);
+	sc_error(SC_SUCCESS), exit(g_stat_code);
 }
 
 void	b_env(t_data *data)
@@ -789,7 +813,7 @@ void	b_env(t_data *data)
 				printf("%s\n", data->env[i]);
 		}
 	}
-	exit(EXIT_SUCCESS);
+	sc_error(SC_SUCCESS), exit(g_stat_code);
 }
 
 void	switch_builtin(t_data **ddata)
@@ -861,6 +885,7 @@ int	is_builtin(char *comand)
 	return (0);
 }
 
+// TODO gestionar los exit con exit status
 void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 {
 	pid_t	pid;
@@ -881,7 +906,7 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 				&& heredoc_processed == 0)
 		{
 			heredoc_fd = heredoc(data);
-			if (dup2(heredoc_fd, STDIN_FILENO) == -1)
+			if (heredoc_fd != -1 && dup2(heredoc_fd, STDIN_FILENO) == -1)
 			{
 				perror("dup2");
 				exit(EXIT_FAILURE);
@@ -893,7 +918,7 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 		if (ft_strcmp(command_path, "is_builtinOMG") == 0)
 		{
 			switch_builtin(ddata);
-			exit(EXIT_SUCCESS);
+			exit(g_stat_code);
 		}
 		else
 		{
@@ -997,9 +1022,9 @@ void	execute_pipeline(t_data **data)
 			if (!is_valid_command(current, heredoc_processed))
 			{
 				printf("Comando no encontrado: %s\n", current->comand);
-				exit(SC_KEY_HAS_EXPIRED);
+				sc_error(SC_KEY_HAS_EXPIRED), exit(g_stat_code);
 			}
-			exit(EXIT_SUCCESS);
+			sc_error(SC_SUCCESS), exit(g_stat_code);
 		}
 		else
 		{
@@ -1071,6 +1096,7 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 	}
 	token = ft_split(path, ':');
 	free(path);
+	is_valid_file(data->comand,)
 	if (access(data->comand, X_OK) == 0)
 	{
 		execute_command(&data, data->comand, heredoc_processed);
@@ -1082,12 +1108,15 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		tmp = ft_strjoin(token[i], "/");
 		comand_path = ft_strjoin(tmp, data->comand);
 		free(tmp);
-		if (access(comand_path, X_OK) == 0)
+		if(access(comand_path, F_OK) == 0)
 		{
-			execute_command(&data, comand_path, heredoc_processed);
-			free(comand_path);
-			free_args(token);
-			return (1);
+			if (access(comand_path, X_OK) == 0)
+			{
+				execute_command(&data, comand_path, heredoc_processed);
+				free(comand_path);
+				free_args(token);
+				return (1);
+			}
 		}
 		free(comand_path);
 		i++;
