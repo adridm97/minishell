@@ -254,13 +254,13 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 */
 int	is_valid_file(char *filename, int fd, char *check)
 {
-	if (ft_strchr(check, 'F') && !access(filename, F_OK))
+	if (ft_strchr(check, 'F') && access(filename, F_OK))
 		return (perror("El archivo no existe"), sc_error(SC_KEY_HAS_EXPIRED), 1);
-	if (ft_strchr(check, 'R') && !access(filename, R_OK))
+	if (ft_strchr(check, 'R') && access(filename, R_OK))
 		return (perror("El archivo no tiene permisos de lectura"), sc_error(EXIT_FAILURE), 2);
-	if (ft_strchr(check, 'W') && !access(filename, W_OK))
+	if (ft_strchr(check, 'W') && access(filename, W_OK))
 		return (perror("El archivo no tiene permisos de escritura"), sc_error(EXIT_FAILURE), 3);
-	if (ft_strchr(check, 'X') && !access(filename, X_OK))
+	if (ft_strchr(check, 'X') && access(filename, X_OK))
 		return (perror("El archivo no tiene permisos de ejecución"), sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), 4);
 	if (fd < 0)
 		return(sc_error(EXIT_FAILURE), 5);
@@ -279,7 +279,7 @@ int	heredoc(t_data *data)
 	aux = data->redir;
 	filename = "/tmp/heredoc";
 	fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	if (is_valid_file(filename, fd, "FRWX"))
+	if (is_valid_file(filename, fd, "FRW"))
 		exit(g_stat_code);
 	while (1)
 	{
