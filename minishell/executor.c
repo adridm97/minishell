@@ -291,6 +291,8 @@ int	heredoc(t_data *data)
 		}
 		// printf("llega\n");
 		expanded_line = heredoc_tokenizer(line, data);
+		if (!expanded_line)
+			close(fd), free(line), exit(g_stat_code);
 		ft_putstr_fd(expanded_line, fd);
 		ft_putstr_fd("\n", fd);
 		free(line);
