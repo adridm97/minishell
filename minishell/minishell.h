@@ -182,6 +182,11 @@ void	setup_signal_handlers();
 # define CYAN "\x1b[36m"
 # define WHITE "\x1b[37m"
 
+//signals.c
+
+void	handle_sigint_heredoc(int sig);
+void	setup_signal_handlers(void);
+
 extern int	g_stat_code;
 
 # define SC_SUCCESS												0
