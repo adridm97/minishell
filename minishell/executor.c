@@ -1096,7 +1096,6 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 	}
 	token = ft_split(path, ':');
 	free(path);
-	is_valid_file(data->comand,)
 	if (access(data->comand, X_OK) == 0)
 	{
 		execute_command(&data, data->comand, heredoc_processed);
