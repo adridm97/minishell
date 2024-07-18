@@ -21,6 +21,16 @@ void	handle_sigint(int sig)
 	rl_redisplay();
 }
 
+void	handle_sigint_heredoc(int sig)
+{
+	(void)sig;
+	g_stat_code = -1;
+	exit(130);
+	// rl_on_new_line();
+	// rl_replace_line("", 0);
+	// rl_redisplay();
+}
+
 void	handle_sigquit(int sig)
 {
 	(void)sig;

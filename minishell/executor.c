@@ -202,6 +202,8 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 	char	*res;
 
 	//c_token = token;
+	if (str == NULL || str[0] == '\0')
+		return (ft_strdup("\n"));
 	res = NULL;
 	input = ft_strdup(str);
 	if (!input)
@@ -244,6 +246,52 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 	return (res);
 }
 
+// int	heredoc(t_data *data) 
+// {
+// 	int		fd;
+// 	char	*line;
+// 	char	*filename;
+// 	char	*expanded_line;
+// 	t_redir	*aux;
+
+// 	aux = data->redir;
+// 	filename = "/tmp/heredoc";
+// 	fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+// 	if (fd == -1)
+// 	{
+// 		perror("open");
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	while (1)
+// 	{
+// 		if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
+// 		{
+// 			perror("Error al configurar el manejador de SIGINT");
+// 			exit(EXIT_FAILURE);
+// 		}
+// 		if (g_stat_code == -1)
+// 		{
+// 			printf("\n1\n");
+// 			close(fd);
+// 			close(0);
+// 			sc_error(SC_OWNER_DIED), exit(g_stat_code);
+// 		}
+// 		line = readline("> ");
+// 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
+// 		{
+// 			free(line);
+// 			break;
+// 		}
+// 		expanded_line = heredoc_tokenizer(line, data);
+// 		ft_putstr_fd(expanded_line, fd);
+// 		ft_putstr_fd("\n", fd);
+// 		free(line);
+// 		free(expanded_line);
+// 	}
+// 	close(fd);
+// 	return open(filename, O_RDONLY);
+// }
+
 /*
  Abre el archivo, revisa permisos (hay que indicarlo en mayuscula) y cambia g_status si lo necesita, retorna 0 si está OK
  F = existe? retorna 1 cuando no.
@@ -278,18 +326,29 @@ int	heredoc(t_data *data)
 
 	aux = data->redir;
 	filename = "/tmp/heredoc";
-	fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	if (is_valid_file(filename, fd, "FRW"))
-		exit(g_stat_code);
+	unlink(filename);
 	while (1)
 	{
+		// if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
+		// {
+		// 	perror("Error al configurar el manejador de SIGINT");
+		// 	exit(EXIT_FAILURE);
+		// }
+		if (g_stat_code == -1)
+		{
+			close(fd);
+			close(0);
+			sc_error(SC_OWNER_DIED), exit(g_stat_code);
+		}
 		line = readline("> ");
 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
 		{
 			free(line);
 			break;
 		}
-		// printf("llega\n");
+		fd = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
+		if (is_valid_file(filename, fd, "FRW"))
+			exit(g_stat_code);
 		expanded_line = heredoc_tokenizer(line, data);
 		if (!expanded_line)
 			close(fd), free(line), exit(g_stat_code);
@@ -297,9 +356,8 @@ int	heredoc(t_data *data)
 		ft_putstr_fd("\n", fd);
 		free(line);
 		free(expanded_line);
-		// printf("aqui\n");
+		close(fd);
 	}
-	close(fd);
 	return open(filename, O_RDONLY);
 }
 
@@ -425,6 +483,7 @@ void	handle_redir(t_data *data)
 // }
 
 // TODO Gestiona ~ y oldpwd no debe asignarse si el path es inválido
+// Gestionar cd - que vaya al ultimo directorio
 void	b_cd(t_data *data)
 {
 	int		i;
@@ -847,7 +906,7 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 				&& heredoc_processed == 0)
 		{
 			heredoc_fd = heredoc(data);
-			if (dup2(heredoc_fd, STDIN_FILENO) == -1)
+			if (heredoc_fd != -1 && dup2(heredoc_fd, STDIN_FILENO) == -1)
 			{
 				perror("dup2");
 				exit(EXIT_FAILURE);
@@ -969,6 +1028,7 @@ void	execute_pipeline(t_data **data)
 		}
 		else
 		{
+			setpgid(pid, 0);
 			if (input_fd != STDIN_FILENO)
 				close(input_fd);
 			if (current->next != NULL)
@@ -1036,6 +1096,7 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 	}
 	token = ft_split(path, ':');
 	free(path);
+	is_valid_file(data->comand,)
 	if (access(data->comand, X_OK) == 0)
 	{
 		execute_command(&data, data->comand, heredoc_processed);
@@ -1047,12 +1108,15 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		tmp = ft_strjoin(token[i], "/");
 		comand_path = ft_strjoin(tmp, data->comand);
 		free(tmp);
-		if (access(comand_path, X_OK) == 0)
+		if(access(comand_path, F_OK) == 0)
 		{
-			execute_command(&data, comand_path, heredoc_processed);
-			free(comand_path);
-			free_args(token);
-			return (1);
+			if (access(comand_path, X_OK) == 0)
+			{
+				execute_command(&data, comand_path, heredoc_processed);
+				free(comand_path);
+				free_args(token);
+				return (1);
+			}
 		}
 		free(comand_path);
 		i++;

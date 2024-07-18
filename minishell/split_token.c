@@ -318,7 +318,6 @@ int	is_expandsor(t_token **token, char **str, char **env)
 		}
 		else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€$"))
 		{
-			printf("LLEGO AQUI\n");
 			status_code = ft_itoa(g_stat_code);
 			if (!*str)
 					res = ft_strjoin("", status_code);
