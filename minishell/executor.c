@@ -516,7 +516,30 @@ void	b_cd(t_data *data)
 	// 	free(res);
 	// }
 	if (!data->args[1])
-		data->args[1] = ft_strdup("/");
+	{
+		res = ft_strdup("HOME");
+		if(!res)
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
+		res = key_to_res(&res, data->env);
+		if (!res)
+			sc_error(EXIT_FAILURE), perror("HOME no está definido"), exit(g_stat_code);
+		data->args[1] = ft_strdup(res);
+		free(res);
+	}
+	else
+	{
+		if(!ft_strcmp(data->args[1], "-"))
+			{
+				res = ft_strdup("OLDPWD");
+				if(!res)
+					sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
+				res = key_to_res(&res, data->env);
+				if (!res)
+					sc_error(EXIT_FAILURE), perror("OLDPWD no está definido"), exit(g_stat_code);
+				data->args[1] = ft_strdup(res);
+				free(res);
+			}
+	}
 	// printf("tiene: %s\n", data->args[1]);
 	if (!chdir(data->args[1]))
 	{
@@ -540,16 +563,47 @@ void	b_cd(t_data *data)
 		while (!pwd)
 			pwd = getcwd(pwd, size++);
 		i = index_env(data, "PWD");
-		printf("PETO, 3 e i es: %s\n", pwd);
+		// printf("PETO, 3 e i es: %s\n", pwd);
 		data->env[i] = ft_strjoin("PWD=",pwd);
+		// printf("pwd es: %s\n",pwd);
 		if(!data->env[i])
 		{
 			// printf("PETO, no guardo en data env\n");	
 			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
 		}
+		// printf("PETO, 3 e i es: %s\n", pwd);
+		i = index_env(data, "OLDPWD");
+		if(i >= 0)
+			data->env[i] = ft_strjoin("OLDPWD=",last_pwd);
+		else
+		{
+			if(i == -2)
+				sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE), exit(g_stat_code);
+			res = ft_strjoin("OLDPWD=", last_pwd);
+			if (!res)
+				sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
+			(data)->env = ft_matadd(&(data)->env, res);
+			if (!(data)->env)
+				exit(g_stat_code);
+			// creo que no he de liberarlo
+			// free(last_pwd);
+			free(res);
+			// printf("last pwd i: %i\n", i);
+		}
+		if(!data->env[i])
+		{
+			// printf("if data env in\n");
+			// printf("PETO, no guardo en data env\n");	
+			free(data->env[index_env(data, "PWD")]), sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
+			// printf("if data out in\n");
+		}
+		unlink("/tmp/env.env");
 		if (save_env(data))
 		{
 			// printf("PETO, no guardo archivo en save env\n");	
+			free(data->env[index_env(data, "PWD")]);
+			free(data->env[index_env(data, "OLDPWD")]);
+			free(last_pwd);
 			exit(g_stat_code);
 		}
 		// printf("data env: %s\n", data->env[i]);
@@ -559,25 +613,7 @@ void	b_cd(t_data *data)
 		printf("La ruta especificada no existe\n");	
     	sc_error(SC_NOT_A_DIRECTORY), exit(g_stat_code);
 	}
-	i = index_env(data, "OLDPWD");
-	// Se debe guardar al confirmar el cd
-	if(i >= 0)
-		data->env[i] = ft_strjoin("OLDPWD=",last_pwd);
-	else
-	{
-		if(i == -2)
-			sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE), exit(g_stat_code);
-		res = ft_strjoin("OLDPWD=", last_pwd);
-		if (!res)
-			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
-		(data)->env = ft_matadd(&(data)->env, res);
-		if (!(data)->env)
-			exit(g_stat_code);
-		// creo que no he de liberarlo
-		// free(last_pwd);
-		free(res);
-	}
-		free(data->env[i]);
+	free(data->env[i]);
     sc_error(SC_SUCCESS), exit(g_stat_code);
 }
 
@@ -766,7 +802,7 @@ char	**ft_mat_rem_index(char ***mat, int index)
 	free_args(*mat);
 	return (new_mat);
 }
-
+// retorna el index de env o -1 si index no existe o -2 si env no existe
 int	index_env(t_data *data, char *str)
 {
 	int		i;
