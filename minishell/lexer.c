@@ -276,7 +276,7 @@ int	create_env(t_data **data, char **env)
 	(*data)->env = (char **)malloc(sizeof(char *) * (i + 1));
 	i = -1;
 	if (!(*data)->env)
-		return (0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY),0);
 	while (env[++i])
 	{
 		(*data)->env[i] = ft_strdup(env[i]);
@@ -344,7 +344,7 @@ int	get_file_env(int fd, t_data **data)
 	(*data)->env = (char **)malloc(sizeof(char **) * ++i);
 	i = -1;
 	if (!(*data)->env)
-		return (0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 	env = get_next_line(fd);
 	while (env)
 	{
@@ -358,7 +358,7 @@ int	init_data(t_data **data, char **env)
 {
 	*data = (t_data *)malloc(sizeof(t_data));
 	if (!*data)
-		return (0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 	(*data)->args = NULL;
 	(*data)->comand = NULL;
 	(*data)->next = NULL;

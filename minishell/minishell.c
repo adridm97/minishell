@@ -195,9 +195,9 @@ int	main(int argc, char *argv[], char *env[])
 		}
 		input = readline(BLUE"Minishell: "BLACK);
 		if (input == NULL) {
-            printf("\n");
-            break; // Salir del bucle si se presionó Ctrl + D (EOF)
-        }
+			printf("\n");
+			break;
+		}
 		if (!strcmp(input, "exit")) //TODO Exit ha de permitir 1 arg y solo 1 ademas solo permite 
 									//numeros y hay que hacer modulo de 256 para que no se exceda.
 									//si el 1º argumento es erróneo "ejemplo letras", ha de salir y 
@@ -216,18 +216,10 @@ int	main(int argc, char *argv[], char *env[])
 			chdir(key);
 			free(key);
 		}
-		// print_data(data);
 		if (data && data->next)
-		{
 			execute_pipeline(&data);
-			printf("el codigo es: %d\n", g_stat_code);
-		}
 		else if (data)
-		{
-			// printf("llamada\n");
 			is_valid_command(data, 0);
-			// printf("el codigo es: %d\n", g_stat_code);
-		}
 		if (data && !file_exist("/tmp/env.env"))
 		{
 			if (save_env(data))

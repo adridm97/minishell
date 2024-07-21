@@ -329,18 +329,19 @@ int	heredoc(t_data *data)
 	unlink(filename);
 	while (1)
 	{
-		// if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
-		// {
-		// 	perror("Error al configurar el manejador de SIGINT");
-		// 	exit(EXIT_FAILURE);
-		// }
-		if (g_stat_code == -1)
+		if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
 		{
-			close(fd);
-			close(0);
-			sc_error(SC_OWNER_DIED), exit(g_stat_code);
+			perror("Error al configurar el manejador de SIGINT");
+			exit(EXIT_FAILURE);
 		}
 		line = readline("> ");
+		// if (g_stat_code == -1)
+		// {
+		// 	//free(line);
+		// 	//close(fd);
+		// 	//unlink(filename);
+		// 	//sc_error(SC_OWNER_DIED), exit(g_stat_code);
+		// }
 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
 		{
 			free(line);
@@ -934,15 +935,9 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 		while ((pid = wait(&status)) > 0)
 		{
 			if (WIFEXITED(status))
-			{
 				g_stat_code = WEXITSTATUS(status);
-				printf("Proceso padre: El proceso hijo con PID %d terminó con código de salida %d\n", pid, g_stat_code);
-			}	
 			else if (WIFSIGNALED(status))
-			{
 				g_stat_code = WTERMSIG(status);
-				printf("Proceso padre: El proceso hijo con PID %d fue terminado por la señal %d\n", pid, g_stat_code);
-			}
 		}
 	}
 }
@@ -971,6 +966,11 @@ void	execute_pipeline(t_data **data)
 				heredoc_fd = heredoc(current);
 				heredoc_processed = 1;
 			}
+		}
+		if (signal(SIGINT, handle_sigint_heredoc) != SIG_ERR && heredoc_fd != -1)
+		{
+			close(heredoc_fd);
+			sc_error(SC_OWNER_DIED), exit(g_stat_code);
 		}
 			//heredoc_fd = heredoc(current);
 		if (current->next != NULL)
@@ -1020,15 +1020,11 @@ void	execute_pipeline(t_data **data)
 			if (current->redir != NULL)
 				handle_redir(current);
 			if (!is_valid_command(current, heredoc_processed))
-			{
-				printf("Comando no encontrado: %s\n", current->comand);
 				sc_error(SC_KEY_HAS_EXPIRED), exit(g_stat_code);
-			}
 			sc_error(SC_SUCCESS), exit(g_stat_code);
 		}
 		else
 		{
-			setpgid(pid, 0);
 			if (input_fd != STDIN_FILENO)
 				close(input_fd);
 			if (current->next != NULL)
@@ -1048,16 +1044,9 @@ void	execute_pipeline(t_data **data)
 	while ((pid = wait(&status)) > 0)
     {
         if (pid > last_pid && WIFEXITED(status))
-		{
             g_stat_code = WEXITSTATUS(status);
-            printf("Proceso padre: El proceso hijo con PID %d terminó con código de salida %d\n", pid, g_stat_code);
-		}
-			
         else if (pid > last_pid && WIFSIGNALED(status))
-        {
             g_stat_code = WTERMSIG(status);
-            printf("Proceso padre: El proceso hijo con PID %d fue terminado por la señal %d\n", pid, g_stat_code);
-        }
 		last_pid = pid;
     }
 }
@@ -1084,7 +1073,6 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		{
 			handle_redir(data);
 		}
-		//printf("No se pudo obtener el valor de PATH\n");
 		free(path);
 		return (0);
 	}
@@ -1095,13 +1083,21 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		return (1);
 	}
 	token = ft_split(path, ':');
-	free(path);
-	is_valid_file(data->comand,)
-	if (access(data->comand, X_OK) == 0)
+	free(path);	
+	if (access(data->comand, F_OK) == 0)
 	{
-		execute_command(&data, data->comand, heredoc_processed);
-		free_args(token);
-		return (1);
+		if (access(data->comand, X_OK) == 0)
+		{
+			execute_command(&data, data->comand, heredoc_processed);
+			free_args(token);
+			return (1);
+		}
+		else
+		{
+			sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE);
+			free_args(token);
+			exit(126);
+		}
 	}
 	while (token[i] != NULL)
 	{
@@ -1117,10 +1113,12 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 				free_args(token);
 				return (1);
 			}
+			sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), exit(126);
 		}
 		free(comand_path);
 		i++;
 	}
 	free_args(token);
-	return (0);
+	printf("%s: command not found\n", data->comand);
+	return (sc_error(SC_KEY_HAS_EXPIRED), 0);
 }
