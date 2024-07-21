@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/15 22:01:44 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/20 12:47:14 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,7 @@ void	clean_env(char ***env, int i);
 int		save_env(t_data *data);
 int		file_exist(char *file);
 
+
 // split things
 char	**special_split(char const *s);
 int		split_token(t_token *token, char **env, t_data **data);
@@ -152,8 +153,9 @@ int		is_valid_command(t_data *data, int heredoc_processed);
 int		ft_matsize(char **mat);
 void	print_env(t_data *data, char *str);
 void	print_env_env(char **env, char *str);
-int	index_env(t_data *data, char *str);
-void sc_error(int sce);
+int		index_env(t_data *data, char *str);
+void	sc_error(int sce);
+int		is_valid_file(char *filename, int fd, char *check);
 
 //split_token
 int	is_expandsor(t_token **token, char **str, char **env);

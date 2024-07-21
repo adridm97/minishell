@@ -335,13 +335,13 @@ int	heredoc(t_data *data)
 			exit(EXIT_FAILURE);
 		}
 		line = readline("> ");
-		// if (g_stat_code == -1)
-		// {
-		// 	//free(line);
-		// 	//close(fd);
-		// 	//unlink(filename);
-		// 	//sc_error(SC_OWNER_DIED), exit(g_stat_code);
-		// }
+		if (g_stat_code == -1)
+		{
+			free(line);
+			close(fd);
+			unlink(filename);
+			sc_error(SC_OWNER_DIED), exit(g_stat_code);
+		}
 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
 		{
 			free(line);
@@ -409,83 +409,8 @@ void	handle_redir(t_data *data)
 	}
 }
 
-// void	b_cd(t_data *data)
-// {
-// 	int		i;
-// 	char	*last_pwd;
-// 	char	*pwd;
-// 	char	*res;
-
-// 	last_pwd = NULL;
-// 	pwd = NULL;
-// 	while (!last_pwd)
-// 		last_pwd = getcwd(last_pwd, i++);
-// 	printf("ESTO ES Last pwd: %s\n", last_pwd);
-// 	i = index_env(data, "OLDPWD");
-// 	// Se debe guardar al confirmar el cd
-// 	if(i >= 0)
-// 		data->env[i] = ft_strjoin("OLDPWD=",last_pwd);
-// 	else
-// 	{
-// 		if(i == -2)
-// 			sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE), exit(g_stat_code);
-// 		res = ft_strjoin("OLDPWD=", last_pwd);
-// 		if (!res)
-// 			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
-// 		(data)->env = ft_matadd(&(data)->env, res);
-// 		if (!(data)->env)
-// 			exit (g_stat_code);
-// 		// creo que no he de liberarlo
-// 		// free(last_pwd);
-// 		free(res);
-// 	}
-// 	if (data->args[1] && !chdir(data->args[1]))
-// 	{
-// 		// printf("PETO, 1\n");	
-// 		i = index_env(data, "PWD");
-// 		if(i < 0)
-// 		{
-// 			res = ft_strjoin("PWD=", "PWD");
-// 			if (!res)
-// 				sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
-// 			(data)->env = ft_matadd(&(data)->env, res);
-// 			if (!(data)->env)
-// 				free(res), exit(g_stat_code);
-// 			// creo que no he de liberarlo
-// 			// free(last_pwd);
-// 			free(res);
-// 			i = index_env(data, "PWD");
-// 		}
-// 		// printf("PETO, 2\n");	
-// 		// printf("PETO, 3\n");
-// 		//es posible que aquí pierda memoria memory leak
-// 		while (!pwd)
-// 			pwd = getcwd(pwd, i++);
-// 		data->env[i] = ft_strjoin("PWD=",pwd);
-// 		if(!data->env[i])
-// 		{
-// 			// printf("PETO, no guardo en data env\n");	
-// 			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
-// 		}
-// 		if (!save_env(data))
-// 		{
-// 			// printf("PETO, no guardo archivo en save env\n");	
-// 			exit(g_stat_code);
-// 		}
-// 		// printf("data env: %s\n", data->env[i]);
-// 	}
-// 	else
-// 	{
-// 		// printf("PETO Y NO CAMBIO\n");	
-//     	sc_error(SC_SUCCESS), exit(g_stat_code);
-// 	}
-// 		free(data->env[i]);
-//     sc_error(SC_SUCCESS), exit(g_stat_code);
-// }
-
-// TODO Gestiona ~ y oldpwd no debe asignarse si el path es inválido
-// Gestionar cd - que vaya al ultimo directorio
-void	b_cd(t_data *data)
+//TODO al hacer cd exitea con error 11.
+void	b_cd(t_data *data, char *home)
 {
 	int		i;
 	size_t	size;
@@ -496,32 +421,46 @@ void	b_cd(t_data *data)
 	last_pwd = NULL;
 	pwd = NULL;
 	size = 1;
+	if (data->args[1])
+		pwd = ft_strdup(data->args[1]);
 	while (!last_pwd)
 		last_pwd = getcwd(last_pwd, size++);
-	// i = index_env(data, "OLDPWD");
-	// // Se debe guardar al confirmar el cd
-	// if(i >= 0)
-	// 	data->env[i] = ft_strjoin("OLDPWD=",last_pwd);
-	// else
-	// {
-	// 	if(i == -2)
-	// 		sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE), exit(g_stat_code);
-	// 	res = ft_strjoin("OLDPWD=", last_pwd);
-	// 	if (!res)
-	// 		sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
-	// 	(data)->env = ft_matadd(&(data)->env, res);
-	// 	if (!(data)->env)
-	// 		exit (g_stat_code);
-	// 	// creo que no he de liberarlo
-	// 	// free(last_pwd);
-	// 	free(res);
-	// }
-	if (!data->args[1])
-		data->args[1] = ft_strdup("/");
-	// printf("tiene: %s\n", data->args[1]);
-	if (!chdir(data->args[1]))
+	if (!pwd)
 	{
-		// printf("PETO, 1 last pwd es: %s\n", last_pwd);	
+		res = ft_strdup("HOME");
+		if(!res)
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
+		res = key_to_res(&res, data->env);
+		if (!res)
+			sc_error(EXIT_FAILURE), perror("HOME no está definido"), exit(g_stat_code);
+		pwd = ft_strdup(res);
+		free(res);
+	}
+	else
+	{
+		if(!ft_strcmp(pwd, "-"))
+			{
+				res = ft_strdup("OLDPWD");
+				if(!res)
+					sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
+				res = key_to_res(&res, data->env);
+				if (!res)
+					sc_error(EXIT_FAILURE), perror("OLDPWD no está definido"), exit(g_stat_code);
+				pwd = ft_strdup(res);
+				free(res);
+			}
+	}
+	if (ft_strrchr(pwd, '~'))
+	{
+		res = ft_substr(pwd, 1, ft_strlen(pwd) - 1);
+		pwd = ft_strjoin(home, res);
+		printf("data args 1 es: %s", pwd);
+	}
+	// printf("tiene: %s\n", data->args[1]);
+	if (!chdir(pwd))
+	{
+		free(pwd);
+		pwd = NULL;
 		i = index_env(data, "PWD");
 		if(i < 0)
 		{
@@ -531,54 +470,53 @@ void	b_cd(t_data *data)
 			(data)->env = ft_matadd(&(data)->env, res);
 			if (!(data)->env)
 				free(res), exit(g_stat_code);
-			// creo que no he de liberarlo
-			// free(last_pwd);
 			free(res);
 		}
-		// printf("PETO, 2\n");
-		//es posible que aquí pierda memoria memory leak
 		size = 1;
 		while (!pwd)
 			pwd = getcwd(pwd, size++);
 		i = index_env(data, "PWD");
-		printf("PETO, 3 e i es: %s\n", pwd);
 		data->env[i] = ft_strjoin("PWD=",pwd);
 		if(!data->env[i])
 		{
-			// printf("PETO, no guardo en data env\n");	
 			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
 		}
+		i = index_env(data, "OLDPWD");
+		if(i >= 0)
+			data->env[i] = ft_strjoin("OLDPWD=",last_pwd);
+		else
+		{
+			if(i == -2)
+				sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE), exit(g_stat_code);
+			res = ft_strjoin("OLDPWD=", last_pwd);
+			if (!res)
+				sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
+			(data)->env = ft_matadd(&(data)->env, res);
+			if (!(data)->env)
+				exit(g_stat_code);
+			free(res);
+		}
+		if(!data->env[i])
+		{
+			free(data->env[index_env(data, "PWD")]), sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
+		}
+		unlink("/tmp/env.env");
 		if (save_env(data))
 		{
-			// printf("PETO, no guardo archivo en save env\n");	
+			free(data->env[index_env(data, "PWD")]);
+			free(data->env[index_env(data, "OLDPWD")]);
+			free(last_pwd);
 			exit(g_stat_code);
 		}
-		// printf("data env: %s\n", data->env[i]);
 	}
 	else
 	{
+		free(pwd);
+		pwd = NULL;
 		printf("La ruta especificada no existe\n");	
-    	sc_error(SC_NOT_A_DIRECTORY), exit(g_stat_code);
+    	sc_error(EXIT_FAILURE), exit(g_stat_code);
 	}
-	i = index_env(data, "OLDPWD");
-	// Se debe guardar al confirmar el cd
-	if(i >= 0)
-		data->env[i] = ft_strjoin("OLDPWD=",last_pwd);
-	else
-	{
-		if(i == -2)
-			sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE), exit(g_stat_code);
-		res = ft_strjoin("OLDPWD=", last_pwd);
-		if (!res)
-			sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code);
-		(data)->env = ft_matadd(&(data)->env, res);
-		if (!(data)->env)
-			exit(g_stat_code);
-		// creo que no he de liberarlo
-		// free(last_pwd);
-		free(res);
-	}
-		free(data->env[i]);
+	free(data->env[i]);
     sc_error(SC_SUCCESS), exit(g_stat_code);
 }
 
@@ -767,7 +705,7 @@ char	**ft_mat_rem_index(char ***mat, int index)
 	free_args(*mat);
 	return (new_mat);
 }
-
+// retorna el index de env o -1 si index no existe o -2 si env no existe
 int	index_env(t_data *data, char *str)
 {
 	int		i;
@@ -801,6 +739,32 @@ void	b_unset(t_data *data)
 	sc_error(SC_SUCCESS), exit(g_stat_code);
 }
 
+void	b_exit(t_data *data)
+{
+	int	i;
+
+	i = -1;
+	while (data->args[i])
+		i++;
+	if (i > 2)
+		sc_error(EXIT_FAILURE), perror("demasiados argumentos\n"), exit(g_stat_code);
+	if (data->args[1])
+	{
+		while(data->args[1][++i])
+		{
+			if (!ft_isdigit(data->args[1][i]))
+				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), perror("se requiere un argumento numérico\n"), exit(g_stat_code);
+		}
+		sc_error(ft_atoi(data->args[1]) % 256);
+		if (ft_atoi(data->args[1]) % 256)
+			perror("exit\n");
+		else
+			printf("exit\n");
+		exit(g_stat_code);
+	}
+	printf("exit\n"), exit(g_stat_code);
+}
+
 void	b_env(t_data *data)
 {
 	int	i;
@@ -825,7 +789,7 @@ void	switch_builtin(t_data **ddata)
 	if (!ft_strcmp(data->comand, "echo"))
 		b_echo(data);
 	else if (!ft_strcmp(data->comand, "cd"))
-		b_cd(data);
+		b_cd(data, getenv("HOME"));
 	else if (!ft_strcmp(data->comand, "pwd"))
 		b_pwd();
 	else if (!ft_strcmp(data->comand, "export"))
@@ -834,6 +798,8 @@ void	switch_builtin(t_data **ddata)
 		b_unset(data);
 	else if (!ft_strcmp(data->comand, "env"))
 		b_env(data);
+	else if (!ft_strcmp(data->comand, "exit"))
+		b_exit(data);
 	return ;
 }
 
@@ -966,11 +932,6 @@ void	execute_pipeline(t_data **data)
 				heredoc_fd = heredoc(current);
 				heredoc_processed = 1;
 			}
-		}
-		if (signal(SIGINT, handle_sigint_heredoc) != SIG_ERR && heredoc_fd != -1)
-		{
-			close(heredoc_fd);
-			sc_error(SC_OWNER_DIED), exit(g_stat_code);
 		}
 			//heredoc_fd = heredoc(current);
 		if (current->next != NULL)
@@ -1118,6 +1079,8 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		free(comand_path);
 		i++;
 	}
+	if (data->redir != NULL)
+		execute_command(&data, data->path, heredoc_processed);
 	free_args(token);
 	printf("%s: command not found\n", data->comand);
 	return (sc_error(SC_KEY_HAS_EXPIRED), 0);

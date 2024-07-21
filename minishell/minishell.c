@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/16 09:28:23 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/21 16:40:36 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,9 @@ int	save_env(t_data *data)
 	i = 0;
 	if (!data->env && !data->env[0])
 		return (sc_error(EXIT_FAILURE), g_stat_code);
+	unlink("/tmp/env.env");
 	fd = open("/tmp/env.env", O_WRONLY | O_CREAT | O_APPEND, 777);
+	// printf("en save env el fd es: %i\n", fd);
 	if (fd < 0)
 		return (sc_error(SC_FILE_DESCRIPTOR_IN_BAD_STATE), g_stat_code);
 	env = data->env;
@@ -56,14 +58,14 @@ int	save_env(t_data *data)
 		i++;
 	}
 	close(fd);
-	return (sc_error(SC_SUCCESS), g_stat_code);
+	return (0);
 }
 
 int	file_exist(char *file)
 {
 	int	fd;
 
-	fd = open(file, O_RDONLY, 777);
+	fd = open(file, O_RDONLY);
 	if (fd < 0)
 		return (0);
 	close(fd);
@@ -187,32 +189,37 @@ int	main(int argc, char *argv[], char *env[])
 			free (input);
 			input = NULL;
 		}
-		fd = open("/tmp/env.env", O_RDONLY, 777);
+		fd = open("/tmp/env.env", O_RDONLY);
+		// printf("el fd es: %i y mat es:%p\n", fd, mat);
 		if (!mat && fd >= 0)
 		{
 			mat = get_env_file(fd);
+			close(fd);
+			// printf("env.env ha sido eliminado\n");
 			unlink("/tmp/env.env");
 		}
 		input = readline(BLUE"Minishell: "BLACK);
 		if (input == NULL) {
-			printf("\n");
-			break;
-		}
-		if (!strcmp(input, "exit")) //TODO Exit ha de permitir 1 arg y solo 1 ademas solo permite 
-									//numeros y hay que hacer modulo de 256 para que no se exceda.
-									//si el 1º argumento es erróneo "ejemplo letras", ha de salir y 
-									//obviar el resto de args, no ocurre igual si solo pasas 2 parametros validos
-			break ;
+            printf("\nexit\n");
+            break; // Salir del bucle si se presionó Ctrl + D (EOF)
+        }
 		if (input && *input)
 			add_history (input);
 		if (mat)
+		{
+			// printf("Entro a lexer con MAT\n");
 			data = lexer(input, &data, mat);
+		}
 		else
+		{
+			// printf("Entro a lexer con ENV\n");
 			data = lexer(input, &data, env);
+		}
 		if (data)
 		{
 			key = ft_strdup("PWD");
 			key = key_to_res(&key, data->env);
+			// printf("el pwd en main es: %s\n", key);
 			chdir(key);
 			free(key);
 		}
@@ -220,19 +227,28 @@ int	main(int argc, char *argv[], char *env[])
 			execute_pipeline(&data);
 		else if (data)
 			is_valid_command(data, 0);
+		if (!strcmp(data->comand, "exit"))
+		{
+			break;
+		}
 		if (data && !file_exist("/tmp/env.env"))
 		{
+			// printf("en main: guardando env\n");
 			if (save_env(data))
 				printf("Error saving envoirment\n");
 			if (mat)
 				clean_env(&mat, -1);
 		}
+
+		if (mat)
+			clean_env(&mat, -1);
 		free_data(&data);
 		data = NULL;
+
 	}
 	free_data(&data);
 	free(input);
-	return (0);
+	return (g_stat_code);
 }
 
 /*int es_comando_valido(char *comando) {

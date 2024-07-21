@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/17 20:47:08 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/20 23:25:42 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,7 +243,6 @@ void	free_data(t_data **data)
 	free(*data);
 	*data = NULL;
 }
-
 void	clean_env(char ***env, int i)
 {
 	if(i == -1)
@@ -260,6 +259,7 @@ void	clean_env(char ***env, int i)
 			free(env[0][i]);
 		free(*env);
 	}
+	*env = NULL;
 }
 
 int	create_env(t_data **data, char **env)
