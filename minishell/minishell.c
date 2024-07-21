@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/21 11:42:55 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/21 12:34:52 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,11 +203,14 @@ int	main(int argc, char *argv[], char *env[])
             printf("\n");
             break; // Salir del bucle si se presionó Ctrl + D (EOF)
         }
-		if (!strcmp(input, "exit")) //TODO Exit ha de permitir 1 arg y solo 1 ademas solo permite 
-									//numeros y hay que hacer modulo de 256 para que no se exceda.
-									//si el 1º argumento es erróneo "ejemplo letras", ha de salir y 
-									//obviar el resto de args, no ocurre igual si solo pasas 2 parametros validos
-			break ;
+		//TODO Exit ha de permitir 1 arg y solo 1 ademas solo permite 
+		//numeros y hay que hacer modulo de 256 para que no se exceda.
+		//si el 1º argumento es erróneo "ejemplo letras", ha de salir y 
+		//obviar el resto de args, no ocurre igual si solo pasas 2 parametros validos
+		// if (!strcmp(input, "exit"))
+		// {
+		// 	break;
+		// }
 		if (input && *input)
 			add_history (input);
 		if (mat)
@@ -240,6 +243,10 @@ int	main(int argc, char *argv[], char *env[])
 			is_valid_command(data, 0);
 			// printf("el codigo es: %d\n", g_stat_code);
 		}
+		if (!strcmp(data->comand, "exit"))
+		{
+			break;
+		}
 		if (data && !file_exist("/tmp/env.env"))
 		{
 			// printf("en main: guardando env\n");
@@ -257,7 +264,7 @@ int	main(int argc, char *argv[], char *env[])
 	}
 	free_data(&data);
 	free(input);
-	return (0);
+	return (g_stat_code);
 }
 
 /*int es_comando_valido(char *comando) {

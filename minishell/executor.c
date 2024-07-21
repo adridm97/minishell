@@ -408,6 +408,7 @@ void	handle_redir(t_data *data)
 	}
 }
 
+//TODO al hacer cd exitea con error 11.
 void	b_cd(t_data *data, char *home)
 {
 	int		i;
@@ -736,6 +737,32 @@ void	b_unset(t_data *data)
 	sc_error(SC_SUCCESS), exit(g_stat_code);
 }
 
+void	b_exit(t_data *data)
+{
+	int	i;
+
+	i = -1;
+	while (data->args[i])
+		i++;
+	if (i > 2)
+		sc_error(EXIT_FAILURE), perror("demasiados argumentos\n"), exit(g_stat_code);
+	if (data->args[1])
+	{
+		while(data->args[1][++i])
+		{
+			if (!ft_isdigit(data->args[1][i]))
+				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), perror("se requiere un argumento numérico\n"), exit(g_stat_code);
+		}
+		sc_error(ft_atoi(data->args[1]) % 256);
+		
+		if (ft_atoi(data->args[1]) % 256)
+			perror("exit\n");
+		else
+			printf("exit\n");
+		exit(g_stat_code);
+	}
+}
+
 void	b_env(t_data *data)
 {
 	int	i;
@@ -769,6 +796,8 @@ void	switch_builtin(t_data **ddata)
 		b_unset(data);
 	else if (!ft_strcmp(data->comand, "env"))
 		b_env(data);
+	else if (!ft_strcmp(data->comand, "exit"))
+		b_exit(data);
 	return ;
 }
 
