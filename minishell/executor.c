@@ -511,7 +511,7 @@ void	b_cd(t_data *data, char *home)
 		free(pwd);
 		pwd = NULL;
 		printf("La ruta especificada no existe\n");	
-    	sc_error(SC_NOT_A_DIRECTORY), exit(g_stat_code);
+    	sc_error(EXIT_FAILURE), exit(g_stat_code);
 	}
 	free(data->env[i]);
     sc_error(SC_SUCCESS), exit(g_stat_code);

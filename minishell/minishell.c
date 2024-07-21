@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/20 13:16:11 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/21 11:42:55 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int	save_env(t_data *data)
 		i++;
 	}
 	close(fd);
-	return (sc_error(SC_SUCCESS), g_stat_code);
+	return (0);
 }
 
 int	file_exist(char *file)
@@ -248,10 +248,12 @@ int	main(int argc, char *argv[], char *env[])
 			if (mat)
 				clean_env(&mat, -1);
 		}
+
 		if (mat)
 			clean_env(&mat, -1);
 		free_data(&data);
 		data = NULL;
+
 	}
 	free_data(&data);
 	free(input);
