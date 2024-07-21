@@ -302,6 +302,8 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 */
 int	is_valid_file(char *filename, int fd, char *check)
 {
+	if (fd < 0)
+		return(sc_error(EXIT_FAILURE), 5);
 	if (ft_strchr(check, 'F') && access(filename, F_OK))
 		return (perror("El archivo no existe"), sc_error(SC_KEY_HAS_EXPIRED), 1);
 	if (ft_strchr(check, 'R') && access(filename, R_OK))
@@ -310,8 +312,6 @@ int	is_valid_file(char *filename, int fd, char *check)
 		return (perror("El archivo no tiene permisos de escritura"), sc_error(EXIT_FAILURE), 3);
 	if (ft_strchr(check, 'X') && access(filename, X_OK))
 		return (perror("El archivo no tiene permisos de ejecución"), sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), 4);
-	if (fd < 0)
-		return(sc_error(EXIT_FAILURE), 5);
 	return (0);
 }
 
@@ -408,7 +408,6 @@ void	handle_redir(t_data *data)
 	}
 }
 
-//TODO al hacer cd exitea con error 11.
 void	b_cd(t_data *data, char *home)
 {
 	int		i;
@@ -1043,6 +1042,7 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 	{
 		if (data->redir != NULL && data->redir->type == D_MINOR)
 		{
+			//TODO no está entrando en este caso: a>a b>b hola (debería crear a y b saltando error)
 			heredoc(data);
 			return (0);
 		}

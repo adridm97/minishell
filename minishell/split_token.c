@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/07/13 22:02:56 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/21 18:48:34 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -441,19 +441,6 @@ void	include_comand(t_data **data)
 		ldata = ldata->next;
 	}
 }
-/*TODO Poner en path el path || OJOOOO $PATH hola Pierde la h
-¿El siguiente comando da este resultado. Es correcto?
-a>a a>a hola
-data 0
-Comand: (null)|
-arg[0]: a|
-arg[1]: a|
-arg[2]: hola|
-Redirs
-path: a, type: 2
-Redirs
-path: a, type: 2
-*/
 
 int	split_token(t_token *token, char **env, t_data **data)
 {

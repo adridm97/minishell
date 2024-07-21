@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/21 16:40:36 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/21 18:48:20 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,21 @@ char	**create_env_first(char **cenv)
 	return (env);
 }
 
-/*TODO por algun motivo al poner adios el history falla*/
+int	check_pwd(t_data *data)
+{
+	char	*key;
+
+	key = ft_strdup("PWD");
+	if (!key)
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), g_stat_code);
+	key = key_to_res(&key, data->env);
+	if (!key)
+		return (g_stat_code);
+	chdir(key);
+	free(key);
+	return (0);
+}
+
 int	main(int argc, char *argv[], char *env[])
 {
 	static char	*input;
@@ -190,7 +204,8 @@ int	main(int argc, char *argv[], char *env[])
 			input = NULL;
 		}
 		fd = open("/tmp/env.env", O_RDONLY);
-		// printf("el fd es: %i y mat es:%p\n", fd, mat);
+		if (is_valid_file("/tmp/env.env", fd, "R"))
+			sc_error(SC_PERMISSION_DENIED), close(fd);
 		if (!mat && fd >= 0)
 		{
 			mat = get_env_file(fd);
@@ -216,18 +231,11 @@ int	main(int argc, char *argv[], char *env[])
 			data = lexer(input, &data, env);
 		}
 		if (data)
-		{
-			key = ft_strdup("PWD");
-			key = key_to_res(&key, data->env);
-			// printf("el pwd en main es: %s\n", key);
-			chdir(key);
-			free(key);
-		}
-		// print_data(data);
+			check_pwd(data);
 		if (data && data->next)
 		{
 			execute_pipeline(&data);
-			printf("el codigo es: %d\n", g_stat_code);
+			// printf("el codigo es: %d\n", g_stat_code);
 		}
 		else if (data)
 		{
@@ -246,12 +254,10 @@ int	main(int argc, char *argv[], char *env[])
 			if (mat)
 				clean_env(&mat, -1);
 		}
-
 		if (mat)
 			clean_env(&mat, -1);
 		free_data(&data);
 		data = NULL;
-
 	}
 	free_data(&data);
 	free(input);
