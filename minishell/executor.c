@@ -21,6 +21,8 @@ int	ft_strcmp(const char *s1, const char *s2)
 	unsigned char	*str1;
 
 	i = 0;
+	if (!s1 || !s2)
+		return (1);
 	str = (unsigned char *)s1;
 	str1 = (unsigned char *)s2;
 	while ((str[i] != '\0' || str1[i] != '\0'))
@@ -368,11 +370,12 @@ void	handle_redir(t_data *data)
 	t_redir *redir;
 	
 	redir = data->redir;
-
 	while (redir != NULL)
 	{
 		if (redir->type == MAJOR)
+		{
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		}
 		else if (redir->type == D_MAJOR)
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		else if (redir->type == MINOR)
@@ -403,6 +406,7 @@ void	handle_redir(t_data *data)
 				exit(EXIT_FAILURE);
 			}
 		}
+
 		close(fd);
 		redir = redir->next;
 	}
@@ -857,7 +861,6 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 	t_data	*data;
 	int		heredoc_fd;
 	int		status;
-
 	pid = fork();
 	data = *ddata;
 	if (pid == -1)
@@ -890,7 +893,7 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 			if (execve(command_path, data->args, data->env) == -1)
 			{
 				perror("execve");
-				exit(EXIT_FAILURE);
+				exit(SC_KEY_HAS_EXPIRED);
 			}
 		}
 	}
@@ -1042,7 +1045,6 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 	{
 		if (data->redir != NULL && data->redir->type == D_MINOR)
 		{
-			//TODO no está entrando en este caso: a>a b>b hola (debería crear a y b saltando error)
 			heredoc(data);
 			return (0);
 		}
@@ -1085,6 +1087,11 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		}
 		free(comand_path);
 		i++;
+	}
+	if (data->redir != NULL)
+	{
+		execute_command(&data, data->path, 1);
+		return (1);
 	}
 	free_args(token);
 	return (0);

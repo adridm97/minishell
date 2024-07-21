@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/21 18:48:20 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/21 19:49:16 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -250,7 +250,7 @@ int	main(int argc, char *argv[], char *env[])
 		{
 			// printf("en main: guardando env\n");
 			if (save_env(data))
-				printf("Error saving envoirment\n");
+				perror("Error saving envoirment\n");
 			if (mat)
 				clean_env(&mat, -1);
 		}
