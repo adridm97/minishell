@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/20 23:25:42 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/21 17:59:45 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,11 +179,11 @@ void	print_data(t_data *data)
 		while (data->args && data->args[++j])
 			printf("arg[%i]: %s|\nnext = %p\n", j, data->args[j], data->next);
 		j = -1;
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 		print_redir(data->redir);
 		data = data->next;
 		j = -1;
 		i++;
-		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	}
 }
 
@@ -287,7 +287,6 @@ int	create_env(t_data **data, char **env)
 	return (1);
 }
 
-// TODO leaks
 char	**get_env_file(int fd)
 {
 	int		i;
@@ -307,14 +306,18 @@ char	**get_env_file(int fd)
 	}
 	close(fd);
 	fd = open("/tmp/env.env", O_RDONLY, 777);
-	mat = (char **)malloc(sizeof(char **) * (i + 1));
-	i = -1;
+	if (is_valid_file("/tmp/env.env", fd, "R"))
+		return (sc_error(SC_PERMISSION_DENIED), NULL);
+	mat = (char **)malloc(sizeof(char *) * (i + 1));
 	if (!mat)
-		return (0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+	i = -1;
 	env = get_next_line(fd);
 	while (env)
 	{
 		clean = ft_strtrim(env, "\n");
+		if (!clean)
+			return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), clean_env(&mat, --i), NULL);
 		mat[++i] = clean;
 		free(env);
 		env = get_next_line(fd);

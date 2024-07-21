@@ -21,6 +21,8 @@ int	ft_strcmp(const char *s1, const char *s2)
 	unsigned char	*str1;
 
 	i = 0;
+	if (!s1 || !s2)
+		return (1);
 	str = (unsigned char *)s1;
 	str1 = (unsigned char *)s2;
 	while ((str[i] != '\0' || str1[i] != '\0'))
@@ -302,6 +304,8 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 */
 int	is_valid_file(char *filename, int fd, char *check)
 {
+	if (fd < 0)
+		return(sc_error(EXIT_FAILURE), 5);
 	if (ft_strchr(check, 'F') && access(filename, F_OK))
 		return (perror("El archivo no existe"), sc_error(SC_KEY_HAS_EXPIRED), 1);
 	if (ft_strchr(check, 'R') && access(filename, R_OK))
@@ -310,8 +314,6 @@ int	is_valid_file(char *filename, int fd, char *check)
 		return (perror("El archivo no tiene permisos de escritura"), sc_error(EXIT_FAILURE), 3);
 	if (ft_strchr(check, 'X') && access(filename, X_OK))
 		return (perror("El archivo no tiene permisos de ejecución"), sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), 4);
-	if (fd < 0)
-		return(sc_error(EXIT_FAILURE), 5);
 	return (0);
 }
 
@@ -329,18 +331,13 @@ int	heredoc(t_data *data)
 	unlink(filename);
 	while (1)
 	{
-		if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
-		{
-			perror("Error al configurar el manejador de SIGINT");
-			exit(EXIT_FAILURE);
-		}
 		line = readline("> ");
-		if (g_stat_code == -1)
+		if (g_stat_code == 130)
 		{
+			printf("aaaa\n");
 			free(line);
-			close(fd);
 			unlink(filename);
-			sc_error(SC_OWNER_DIED), exit(g_stat_code);
+			exit(g_stat_code);
 		}
 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
 		{
@@ -369,11 +366,12 @@ void	handle_redir(t_data *data)
 	t_redir *redir;
 	
 	redir = data->redir;
-
 	while (redir != NULL)
 	{
 		if (redir->type == MAJOR)
+		{
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		}
 		else if (redir->type == D_MAJOR)
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		else if (redir->type == MINOR)
@@ -404,12 +402,12 @@ void	handle_redir(t_data *data)
 				exit(EXIT_FAILURE);
 			}
 		}
+
 		close(fd);
 		redir = redir->next;
 	}
 }
 
-//TODO al hacer cd exitea con error 11.
 void	b_cd(t_data *data, char *home)
 {
 	int		i;
@@ -859,7 +857,6 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 	t_data	*data;
 	int		heredoc_fd;
 	int		status;
-
 	pid = fork();
 	data = *ddata;
 	if (pid == -1)
@@ -889,6 +886,8 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 		}
 		else
 		{
+			if (!command_path)
+				exit(SC_KEY_HAS_EXPIRED);
 			if (execve(command_path, data->args, data->env) == -1)
 			{
 				perror("execve");
@@ -923,6 +922,11 @@ void	execute_pipeline(t_data **data)
 	heredoc_fd = -1;
 	input_fd = STDIN_FILENO;
 	current = *data;
+	if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
+	{
+		perror("Error al configurar el manejador de SIGINT");
+		exit(EXIT_FAILURE);
+	}
 	while (current != NULL)
 	{
 		if (current->redir != NULL && current->redir->type == D_MINOR)
@@ -1010,6 +1014,9 @@ void	execute_pipeline(t_data **data)
             g_stat_code = WTERMSIG(status);
 		last_pid = pid;
     }
+	signal(SIGINT, SIG_DFL);
+	if(g_stat_code == 130)
+		write(STDOUT_FILENO, "\n", 1);
 }
 
 int	is_valid_command(t_data *data, int heredoc_processed)
@@ -1043,6 +1050,7 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		free(path);
 		return (1);
 	}
+
 	token = ft_split(path, ':');
 	free(path);	
 	if (access(data->comand, F_OK) == 0)
@@ -1054,12 +1062,9 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 			return (1);
 		}
 		else
-		{
 			sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE);
-			free_args(token);
-			exit(126);
-		}
 	}
+
 	while (token[i] != NULL)
 	{
 		tmp = ft_strjoin(token[i], "/");
