@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/21 12:34:52 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/21 16:40:36 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,17 +200,9 @@ int	main(int argc, char *argv[], char *env[])
 		}
 		input = readline(BLUE"Minishell: "BLACK);
 		if (input == NULL) {
-            printf("\n");
+            printf("\nexit\n");
             break; // Salir del bucle si se presionó Ctrl + D (EOF)
         }
-		//TODO Exit ha de permitir 1 arg y solo 1 ademas solo permite 
-		//numeros y hay que hacer modulo de 256 para que no se exceda.
-		//si el 1º argumento es erróneo "ejemplo letras", ha de salir y 
-		//obviar el resto de args, no ocurre igual si solo pasas 2 parametros validos
-		// if (!strcmp(input, "exit"))
-		// {
-		// 	break;
-		// }
 		if (input && *input)
 			add_history (input);
 		if (mat)
@@ -239,7 +231,6 @@ int	main(int argc, char *argv[], char *env[])
 		}
 		else if (data)
 		{
-			// printf("llamada\n");
 			is_valid_command(data, 0);
 			// printf("el codigo es: %d\n", g_stat_code);
 		}

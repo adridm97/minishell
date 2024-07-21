@@ -420,7 +420,8 @@ void	b_cd(t_data *data, char *home)
 	last_pwd = NULL;
 	pwd = NULL;
 	size = 1;
-	pwd = ft_strdup(data->args[1]);
+	if (data->args[1])
+		pwd = ft_strdup(data->args[1]);
 	while (!last_pwd)
 		last_pwd = getcwd(last_pwd, size++);
 	if (!pwd)
@@ -754,13 +755,13 @@ void	b_exit(t_data *data)
 				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), perror("se requiere un argumento numérico\n"), exit(g_stat_code);
 		}
 		sc_error(ft_atoi(data->args[1]) % 256);
-		
 		if (ft_atoi(data->args[1]) % 256)
 			perror("exit\n");
 		else
 			printf("exit\n");
 		exit(g_stat_code);
 	}
+	printf("exit\n"), exit(g_stat_code);
 }
 
 void	b_env(t_data *data)
