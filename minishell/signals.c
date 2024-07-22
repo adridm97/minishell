@@ -25,7 +25,6 @@ void	handle_sigint_heredoc(int sig)
 {
 	(void)sig;
 	g_stat_code = 130;
-	signal(SIGINT, SIG_DFL);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();

@@ -331,13 +331,19 @@ int	heredoc(t_data *data)
 	unlink(filename);
 	while (1)
 	{
+		if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
+		{
+			perror("Error al configurar el manejador de SIGINT");
+			exit(EXIT_FAILURE);
+		}
 		line = readline("> ");
 		if (g_stat_code == 130)
 		{
-			printf("aaaa\n");
 			free(line);
 			unlink(filename);
-			exit(g_stat_code);
+			//kill(0, SIGINT);
+			//exit(g_stat_code);
+			close(fd);
 		}
 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
 		{
@@ -452,9 +458,7 @@ void	b_cd(t_data *data, char *home)
 	{
 		res = ft_substr(pwd, 1, ft_strlen(pwd) - 1);
 		pwd = ft_strjoin(home, res);
-		printf("data args 1 es: %s", pwd);
 	}
-	// printf("tiene: %s\n", data->args[1]);
 	if (!chdir(pwd))
 	{
 		free(pwd);
@@ -669,12 +673,10 @@ void	b_export(t_data **data)
 	}
 	else
 	{
-		// printf("NO TENGO QUE ENTRAR AQUI\n");
 		(cdata)->env = ft_matadd(&(cdata)->env, (cdata)->args[1]);
 		if (!(cdata)->env)
 			exit(g_stat_code);
 	}
-	// printf("ENTRO AQUI y es: %s\n", (*data)->env[i]);
 	unlink("/tmp/env.env");
 	if (save_env(cdata))
 		exit(g_stat_code);
@@ -922,11 +924,6 @@ void	execute_pipeline(t_data **data)
 	heredoc_fd = -1;
 	input_fd = STDIN_FILENO;
 	current = *data;
-	if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
-	{
-		perror("Error al configurar el manejador de SIGINT");
-		exit(EXIT_FAILURE);
-	}
 	while (current != NULL)
 	{
 		if (current->redir != NULL && current->redir->type == D_MINOR)
