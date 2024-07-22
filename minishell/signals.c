@@ -28,6 +28,8 @@ void	handle_sigint_heredoc(int sig)
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
+	printf("holaaaa1\n");
+	close(0);
 }
 
 void	handle_sigquit(int sig)

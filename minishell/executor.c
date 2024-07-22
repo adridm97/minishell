@@ -329,26 +329,26 @@ int	heredoc(t_data *data)
 	aux = data->redir;
 	filename = "/tmp/heredoc";
 	unlink(filename);
+	if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
+	{
+		perror("Error al configurar el manejador de SIGINT");
+		exit(EXIT_FAILURE);
+	}
 	while (1)
 	{
-		if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
-		{
-			perror("Error al configurar el manejador de SIGINT");
-			exit(EXIT_FAILURE);
-		}
 		line = readline("> ");
 		if (g_stat_code == 130)
 		{
+			printf("1\n");
 			free(line);
 			unlink(filename);
-			//kill(0, SIGINT);
-			//exit(g_stat_code);
-			close(fd);
+			printf("holaa\n");
+			close(0);
 		}
 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
 		{
 			free(line);
-			break;
+			break ;
 		}
 		fd = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
 		if (is_valid_file(filename, fd, "FRW"))
@@ -932,7 +932,7 @@ void	execute_pipeline(t_data **data)
 			{
 				heredoc_fd = heredoc(current);
 				heredoc_processed = 1;
-			}
+			}printf("adios\n");
 		}
 			//heredoc_fd = heredoc(current);
 		if (current->next != NULL)
@@ -953,6 +953,7 @@ void	execute_pipeline(t_data **data)
 		{
 			if (heredoc_fd != -1)
 			{
+				printf("erhhnid\n");
 				if (dup2(heredoc_fd, STDIN_FILENO) == -1)
 				{
 					perror("dup2");
