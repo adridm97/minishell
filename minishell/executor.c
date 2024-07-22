@@ -307,13 +307,13 @@ int	is_valid_file(char *filename, int fd, char *check)
 	if (fd < 0)
 		return(sc_error(EXIT_FAILURE), 5);
 	if (ft_strchr(check, 'F') && access(filename, F_OK))
-		return (perror("El archivo no existe"), sc_error(SC_KEY_HAS_EXPIRED), 1);
+		return (close(fd), perror("El archivo no existe"), sc_error(SC_KEY_HAS_EXPIRED), 1);
 	if (ft_strchr(check, 'R') && access(filename, R_OK))
-		return (perror("El archivo no tiene permisos de lectura"), sc_error(EXIT_FAILURE), 2);
+		return (close(fd), perror("El archivo no tiene permisos de lectura"), sc_error(EXIT_FAILURE), 2);
 	if (ft_strchr(check, 'W') && access(filename, W_OK))
-		return (perror("El archivo no tiene permisos de escritura"), sc_error(EXIT_FAILURE), 3);
+		return (close(fd), perror("El archivo no tiene permisos de escritura"), sc_error(EXIT_FAILURE), 3);
 	if (ft_strchr(check, 'X') && access(filename, X_OK))
-		return (perror("El archivo no tiene permisos de ejecución"), sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), 4);
+		return (close(fd), perror("El archivo no tiene permisos de ejecución"), sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), 4);
 	return (0);
 }
 
@@ -607,7 +607,7 @@ int	ft_matsize(char **mat)
 	return (size);
 }
 
-//manage g_status_code
+//TODO manage g_status_code
 char	**ft_matadd(char ***mat, char *str)
 {
 	int		size;
