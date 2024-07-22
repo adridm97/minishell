@@ -329,19 +329,20 @@ int	heredoc(t_data *data)
 	aux = data->redir;
 	filename = "/tmp/heredoc";
 	unlink(filename);
-	if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
-	{
-		perror("Error al configurar el manejador de SIGINT");
-		exit(EXIT_FAILURE);
-	}
+	// if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
+	// {
+	// 	perror("Error al configurar el manejador de SIGINT");
+	// 	exit(EXIT_FAILURE);
+	// }
 	while (1)
 	{
 		line = readline("> ");
-		if (g_stat_code == 130)
-		{
-			free(line);
-			unlink(filename);
-		}
+		// if (g_stat_code == 130)
+		// {
+		// 	free(line);
+		// 	unlink(filename);
+		// 	exit(130);
+		// }
 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
 		{
 			free(line);
@@ -359,6 +360,7 @@ int	heredoc(t_data *data)
 		free(expanded_line);
 		close(fd);
 	}
+	printf("hola\n");
 	return open(filename, O_RDONLY);
 }
 
@@ -869,12 +871,15 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 				&& heredoc_processed == 0)
 		{
 			heredoc_fd = heredoc(data);
+			printf("1\n");
 			if (heredoc_fd != -1 && dup2(heredoc_fd, STDIN_FILENO) == -1)
 			{
 				perror("dup2");
 				exit(EXIT_FAILURE);
 			}
+
 			close(heredoc_fd);
+			printf("2\n");
 		}
 		if (data->redir != NULL)
 			handle_redir(data);
@@ -887,8 +892,11 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 		{
 			if (!command_path)
 				exit(SC_KEY_HAS_EXPIRED);
+			printf("command path: %s\n", command_path);
+			print_data(data);
 			if (execve(command_path, data->args, data->env) == -1)
 			{
+			printf("3\n");
 				perror("execve");
 				exit(EXIT_FAILURE);
 			}
@@ -929,7 +937,7 @@ void	execute_pipeline(t_data **data)
 			{
 				heredoc_fd = heredoc(current);
 				heredoc_processed = 1;
-			}printf("adios\n");
+			}
 		}
 			//heredoc_fd = heredoc(current);
 		if (current->next != NULL)
@@ -950,7 +958,6 @@ void	execute_pipeline(t_data **data)
 		{
 			if (heredoc_fd != -1)
 			{
-				printf("erhhnid\n");
 				if (dup2(heredoc_fd, STDIN_FILENO) == -1)
 				{
 					perror("dup2");
@@ -1032,7 +1039,6 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 			execute_command(&data, data->comand, heredoc_processed);
 			return (1);
 		}
-		printf("llega\n");
 		if (data->redir != NULL)
 		{
 			handle_redir(data);
@@ -1046,7 +1052,6 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		free(path);
 		return (1);
 	}
-
 	token = ft_split(path, ':');
 	free(path);	
 	if (access(data->comand, F_OK) == 0)
