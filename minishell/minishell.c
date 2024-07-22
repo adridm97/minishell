@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/08 09:00:39 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/21 19:49:16 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ char	**ft_matcpy(char **mat)
 	return (new_mat);
 }
 
-// TODO gestionar g_status
 int	save_env(t_data *data)
 {
 	int		fd;
@@ -44,10 +43,12 @@ int	save_env(t_data *data)
 
 	i = 0;
 	if (!data->env && !data->env[0])
-		return (0);
+		return (sc_error(EXIT_FAILURE), g_stat_code);
+	unlink("/tmp/env.env");
 	fd = open("/tmp/env.env", O_WRONLY | O_CREAT | O_APPEND, 777);
+	// printf("en save env el fd es: %i\n", fd);
 	if (fd < 0)
-		return (0);
+		return (sc_error(SC_FILE_DESCRIPTOR_IN_BAD_STATE), g_stat_code);
 	env = data->env;
 	while (env[i])
 	{
@@ -57,21 +58,105 @@ int	save_env(t_data *data)
 		i++;
 	}
 	close(fd);
-	return (1);
+	return (0);
 }
 
 int	file_exist(char *file)
 {
 	int	fd;
 
-	fd = open(file, O_RDONLY, 777);
+	fd = open(file, O_RDONLY);
 	if (fd < 0)
 		return (0);
 	close(fd);
 	return (1);
 }
 
-/*TODO por algun motivo al poner adios el history falla*/
+int	index_env_env(char **env, char *str)
+{
+	int		i;
+
+	i = -1;
+	if (!env)
+		return (-2);
+	while (env[++i])
+	{
+		if (ft_strnstr(env[i], str, ft_strlen(str)) && \
+				(env[i][ft_strlen(str)] \
+				== '=' || env[i][ft_strlen(str)] == '\0'))
+			return (i);
+	}
+	return (-1);
+}
+
+int	set_env(char *key, char *val, char ***env)
+{
+	int		i;
+	char	*res;
+	char	*str;
+
+	str = ft_strjoin(key, "=");
+	if (!str)
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+	res = ft_strjoin(str, val);
+	if (!res)
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+	i = index_env_env(*env, key);
+	if (i >= 0)
+	{
+		free((*env)[i]);
+		(*env)[i] = res;
+	}
+	else if (i == -1)
+	{
+		*env = ft_matadd(env, res);
+		if (*env)
+			return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+	}
+	else
+		return (sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE), 0);
+	return (free(str), 1);
+}
+
+char	**create_env_first(char **cenv)
+{
+	int		i;
+	char	**env;
+
+	i = 0;
+	if (!cenv || !cenv[0])
+		return (NULL);
+	while (cenv[i])
+		i++;
+	env = (char **)malloc(sizeof(char *) * (i + 1));
+	if (!env)
+		return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+	i = -1;
+	while (cenv[++i])
+	{
+		env[i] = ft_strdup(cenv[i]);
+		if (!(env)[i])
+			return (clean_env(&env, --i), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+	}
+	env[i] = NULL;
+	return (env);
+}
+
+int	check_pwd(t_data *data)
+{
+	char	*key;
+
+	key = ft_strdup("PWD");
+	if (!key)
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), g_stat_code);
+	key = key_to_res(&key, data->env);
+	if (!key)
+		return (g_stat_code);
+	chdir(key);
+	free(key);
+	return (0);
+}
+
 int	main(int argc, char *argv[], char *env[])
 {
 	static char	*input;
@@ -83,63 +168,94 @@ int	main(int argc, char *argv[], char *env[])
 	(void)argc;
 	(void)argv;
 	data = NULL;
+	mat = NULL;
 	setup_signal_handlers();
+	mat = create_env_first(env);
+	// TODO si da error que hay que hacer desde aqui?
+	if (!mat)
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+	else
+	{
+		key = ft_strdup("SHLVL");
+		if (!key)
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		key = key_to_res(&key, mat);
+		if (!key)
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		fd = ft_atoi(key) + 1;
+		free(key);
+		key = ft_itoa(fd);
+		if (!key)
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		if (!set_env("SHLVL", key, &mat))
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		free (key);
+	}
 	while (1)
 	{
 		if (data)
+		{
+			free_data(&data);
 			data = NULL;
+		}
 		if (input)
 		{
 			free (input);
-			input = (char *) NULL;
+			input = NULL;
 		}
-		fd = open("/tmp/env.env", O_RDONLY, 777);
-		mat = NULL;
-		if (fd >= 0)
+		fd = open("/tmp/env.env", O_RDONLY);
+		if (is_valid_file("/tmp/env.env", fd, "R"))
+			sc_error(SC_PERMISSION_DENIED), close(fd);
+		if (!mat && fd >= 0)
 		{
 			mat = get_env_file(fd);
+			close(fd);
+			// printf("env.env ha sido eliminado\n");
 			unlink("/tmp/env.env");
 		}
 		input = readline(BLUE"Minishell: "BLACK);
 		if (input == NULL) {
-            printf("\n");
+            printf("\nexit\n");
             break; // Salir del bucle si se presionó Ctrl + D (EOF)
         }
-		if (!strcmp(input, "exit")) //TODO Exit ha de permitir 1 arg y solo 1 ademas solo permite 
-									//numeros y hay que hacer modulo de 256 para que no se exceda.
-									//si el 1º argumento es erróneo "ejemplo letras", ha de salir y 
-									//obviar el resto de args, no ocurre igual si solo pasas 2 parametros validos
-			break ;
 		if (input && *input)
 			add_history (input);
 		if (mat)
-			data = lexer(input, &data, mat);
-		else
-			data = lexer(input, &data, env);
-		if (data)
 		{
-			key = ft_strdup("PWD");
-			key = key_to_res(&key, data->env);
-			chdir(key);
-			free(key);
+			// printf("Entro a lexer con MAT\n");
+			data = lexer(input, &data, mat);
 		}
+		else
+		{
+			// printf("Entro a lexer con ENV\n");
+			data = lexer(input, &data, env);
+		}
+		if (data)
+			check_pwd(data);
 		if (data && data->next)
-			execute_pipeline(data);
+			execute_pipeline(&data);
 		else if (data)
-			is_valid_command(data);
+			is_valid_command(data, 0);
+		if (!strcmp(data->comand, "exit"))
+		{
+			break;
+		}
 		if (data && !file_exist("/tmp/env.env"))
 		{
-			if (!save_env(data))
-				return (1);
+			// printf("en main: guardando env\n");
+			if (save_env(data))
+				perror("Error saving envoirment\n");
 			if (mat)
 				clean_env(&mat, -1);
 		}
+		if (mat)
+			clean_env(&mat, -1);
 		free_data(&data);
 		data = NULL;
 	}
 	free_data(&data);
 	free(input);
-	return (0);
+	return (g_stat_code);
 }
 
 /*int es_comando_valido(char *comando) {

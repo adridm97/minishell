@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/08 08:02:16 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/20 12:47:14 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,18 +141,21 @@ void	clean_env(char ***env, int i);
 int		save_env(t_data *data);
 int		file_exist(char *file);
 
+
 // split things
 char	**special_split(char const *s);
 int		split_token(t_token *token, char **env, t_data **data);
 
 //executor.c
 char	**ft_matadd(char ***mat, char *str);
-void	execute_pipeline(t_data *data);
-int		is_valid_command(t_data *data);
+void	execute_pipeline(t_data **data);
+int		is_valid_command(t_data *data, int heredoc_processed);
 int		ft_matsize(char **mat);
 void	print_env(t_data *data, char *str);
-int	index_env(t_data *data, char *str);
-void sc_error(int sce);
+void	print_env_env(char **env, char *str);
+int		index_env(t_data *data, char *str);
+void	sc_error(int sce);
+int		is_valid_file(char *filename, int fd, char *check);
 
 //split_token
 int	is_expandsor(t_token **token, char **str, char **env);
@@ -162,7 +165,7 @@ int		add_args(char ***arg, char **str);
 int		add_last_data(t_data **data, char **str);
 char	*key_to_res(char **key, char **env);
 int		is_special(char c, char *comp);
-void	execute_command(t_data **ddata, char *command_path);
+void	execute_command(t_data **ddata, char *command_path, int heredoc_processed);
 void	handle_redir(t_data *data);
 int		heredoc(t_data *data);
 char	*charstr(char c);
@@ -180,6 +183,11 @@ void	setup_signal_handlers();
 # define MAGENTA "\x1b[35m"
 # define CYAN "\x1b[36m"
 # define WHITE "\x1b[37m"
+
+//signals.c
+
+void	handle_sigint_heredoc(int sig);
+void	setup_signal_handlers(void);
 
 extern int	g_stat_code;
 

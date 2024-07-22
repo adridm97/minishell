@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/06/26 23:28:35 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/07/21 19:28:40 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,15 @@ void	handle_sigint(int sig)
 {
 	(void)sig;
 	printf("\n");
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+}
+
+void	handle_sigint_heredoc(int sig)
+{
+	(void)sig;
+	g_stat_code = 130;
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();

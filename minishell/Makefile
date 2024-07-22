@@ -1,6 +1,6 @@
 NAME            = minishell
 CC              = gcc
-CFLAGS          = -Wall -Wextra -Werror -fPIE -g
+CFLAGS          = -Wall -Wextra -Werror -fPIE
 SOURCES         = minishell.c lexer.c executor.c special_split.c split_token.c signals.c
 OBJS_PATH       = ./build
 HEADER          = minishell.h

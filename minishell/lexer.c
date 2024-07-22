@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/09 23:33:20 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/21 17:59:45 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,11 +179,11 @@ void	print_data(t_data *data)
 		while (data->args && data->args[++j])
 			printf("arg[%i]: %s|\nnext = %p\n", j, data->args[j], data->next);
 		j = -1;
+		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 		print_redir(data->redir);
 		data = data->next;
 		j = -1;
 		i++;
-		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	}
 }
 
@@ -243,7 +243,6 @@ void	free_data(t_data **data)
 	free(*data);
 	*data = NULL;
 }
-
 void	clean_env(char ***env, int i)
 {
 	if(i == -1)
@@ -260,6 +259,7 @@ void	clean_env(char ***env, int i)
 			free(env[0][i]);
 		free(*env);
 	}
+	*env = NULL;
 }
 
 int	create_env(t_data **data, char **env)
@@ -276,7 +276,7 @@ int	create_env(t_data **data, char **env)
 	(*data)->env = (char **)malloc(sizeof(char *) * (i + 1));
 	i = -1;
 	if (!(*data)->env)
-		return (0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY),0);
 	while (env[++i])
 	{
 		(*data)->env[i] = ft_strdup(env[i]);
@@ -287,7 +287,6 @@ int	create_env(t_data **data, char **env)
 	return (1);
 }
 
-// TODO leaks
 char	**get_env_file(int fd)
 {
 	int		i;
@@ -307,14 +306,18 @@ char	**get_env_file(int fd)
 	}
 	close(fd);
 	fd = open("/tmp/env.env", O_RDONLY, 777);
-	mat = (char **)malloc(sizeof(char **) * (i + 1));
-	i = -1;
+	if (is_valid_file("/tmp/env.env", fd, "R"))
+		return (sc_error(SC_PERMISSION_DENIED), NULL);
+	mat = (char **)malloc(sizeof(char *) * (i + 1));
 	if (!mat)
-		return (0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+	i = -1;
 	env = get_next_line(fd);
 	while (env)
 	{
 		clean = ft_strtrim(env, "\n");
+		if (!clean)
+			return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), clean_env(&mat, --i), NULL);
 		mat[++i] = clean;
 		free(env);
 		env = get_next_line(fd);
@@ -344,7 +347,7 @@ int	get_file_env(int fd, t_data **data)
 	(*data)->env = (char **)malloc(sizeof(char **) * ++i);
 	i = -1;
 	if (!(*data)->env)
-		return (0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 	env = get_next_line(fd);
 	while (env)
 	{
@@ -358,7 +361,7 @@ int	init_data(t_data **data, char **env)
 {
 	*data = (t_data *)malloc(sizeof(t_data));
 	if (!*data)
-		return (0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 	(*data)->args = NULL;
 	(*data)->comand = NULL;
 	(*data)->next = NULL;
@@ -387,24 +390,24 @@ t_data	*lexer(char *input, t_data **data, char **env)
 			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token, 0))
 				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), NULL);
+						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 		else
 		{
 			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token))
 				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), NULL);
+						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 	}
 	check_closed(token, &error);
 	check_gramathic(token, &error);
 	if (error.is_error)
 		return (is_error(& (t_error){"Syntax error",1}), \
-				free(error.error), free_data(data), free_token(&token), NULL);
+				free(error.error), free_data(data), free_token(&token), sc_error(EXIT_FAILURE), NULL);
 	else if (!split_token(token, env, data))
 		return (is_error(& (t_error){"Memory error",1}), \
-				free_data(data), free_token(&token), NULL);
+				free_data(data), free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	// print_data(data);
 	free_token(&token);
 	return (*data);
