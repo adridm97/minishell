@@ -339,11 +339,8 @@ int	heredoc(t_data *data)
 		line = readline("> ");
 		if (g_stat_code == 130)
 		{
-			printf("1\n");
 			free(line);
 			unlink(filename);
-			printf("holaa\n");
-			close(0);
 		}
 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
 		{
@@ -1032,14 +1029,15 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 	{
 		if (data->redir != NULL && data->redir->type == D_MINOR)
 		{
-			heredoc(data);
-			return (0);
+			execute_command(&data, data->comand, heredoc_processed);
+			return (1);
 		}
+		printf("llega\n");
 		if (data->redir != NULL)
 		{
 			handle_redir(data);
 		}
-		free(path);
+		//free(path);
 		return (0);
 	}
 	if (is_builtin(data->comand))

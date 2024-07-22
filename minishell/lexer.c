@@ -173,6 +173,7 @@ void	print_data(t_data *data)
 
 	i = 0;
 	j = -1;
+	printf("Estoy adentro[%p]\n", data);
 	while (data)
 	{
 		printf("data %i\nComand: %s|\n", i, data->comand);
@@ -185,6 +186,8 @@ void	print_data(t_data *data)
 		j = -1;
 		i++;
 	}
+	printf("Estoy fuera[%p]\n", data);
+
 }
 
 void	free_redir(t_redir **redir)

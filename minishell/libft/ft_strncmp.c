@@ -18,6 +18,8 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	size_t	count;
 
+	if(!s1 || !s2)
+		return (-1);
 	count = 0;
 	while (n && s1[count] && s2[count] && (s1[count] == s2[count]))
 	{

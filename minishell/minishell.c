@@ -232,11 +232,16 @@ int	main(int argc, char *argv[], char *env[])
 		}
 		if (data)
 			check_pwd(data);
+		printf("antes de entrar rn print data [%p]", data);
+		print_data(data);
 		if (data && data->next)
-			execute_pipeline(&data);
+		{
+			printf("2\n");
+			//execute_pipeline(&data);
+		}
 		else if (data)
 			is_valid_command(data, 0);
-		if (!strcmp(data->comand, "exit"))
+		if (!ft_strncmp(data->comand, "exit", 5))
 		{
 			break;
 		}
