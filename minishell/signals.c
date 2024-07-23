@@ -24,11 +24,11 @@ void	handle_sigint(int sig)
 void	handle_sigint_heredoc(int sig)
 {
 	(void)sig;
-	g_stat_code = 130;
+	g_stat_code = SC_HEREDOC;
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
-	exit(130);
+	exit(SC_HEREDOC);
 }
 
 void	handle_sigquit(int sig)

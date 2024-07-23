@@ -322,5 +322,5 @@ extern int	g_stat_code;
 # define SC_STATE_NOT_RECOVERABLE								131
 # define SC_OPERATION_NOT_POSSIBLE_DUE_TO_RFKILL				132
 # define SC_MEMORY_PAGE_HAS_HARDWARE_ERROR						133
-
+# define SC_HEREDOC												150
 #endif

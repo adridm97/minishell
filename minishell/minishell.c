@@ -233,9 +233,17 @@ int	main(int argc, char *argv[], char *env[])
 		if (data)
 			check_pwd(data);
 		if (data && data->next)
+		{
 			execute_pipeline(&data);
+			if (g_stat_code == SC_HEREDOC)
+				sc_error(1);
+		}
 		else if (data)
+		{
 			is_valid_command(data, 0);
+			if (g_stat_code == SC_HEREDOC)
+				sc_error(1);
+		}
 		if (!ft_strncmp(data->comand, "exit", 5))
 		{
 			break;

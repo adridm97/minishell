@@ -328,39 +328,39 @@ int	heredoc(t_data *data)
 
 	aux = data->redir;
 	filename = "/tmp/heredoc";
-	unlink(filename);
-	// if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
-	// {
-	// 	perror("Error al configurar el manejador de SIGINT");
-	// 	exit(EXIT_FAILURE);
-	// }
+	fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if (is_valid_file(filename, fd, "FRW"))
+		exit(g_stat_code);
+	if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
+	{
+		perror("Error al configurar el manejador de SIGINT");
+		exit(EXIT_FAILURE);
+	}
 	while (1)
 	{
+		if (g_stat_code == SC_HEREDOC)
+		{
+			close(fd);
+			exit(SC_HEREDOC);
+		}
+		//printf("hola\n");
 		line = readline("> ");
-		// if (g_stat_code == 130)
-		// {
-		// 	free(line);
-		// 	unlink(filename);
-		// 	exit(130);
-		// }
+		//printf("adios\n");
 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
 		{
 			free(line);
 			break ;
 		}
-		fd = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
-		if (is_valid_file(filename, fd, "FRW"))
-			exit(g_stat_code);
 		expanded_line = heredoc_tokenizer(line, data);
 		if (!expanded_line)
 			close(fd), free(line), exit(g_stat_code);
 		ft_putstr_fd(expanded_line, fd);
+		//TODO revisar los saltos de linea condicion intro vacio en la linea de abajo
 		ft_putstr_fd("\n", fd);
 		free(line);
 		free(expanded_line);
-		close(fd);
 	}
-	printf("hola\n");
+		close(fd);
 	return open(filename, O_RDONLY);
 }
 
@@ -871,15 +871,17 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 				&& heredoc_processed == 0)
 		{
 			heredoc_fd = heredoc(data);
-			printf("1\n");
-			if (heredoc_fd != -1 && dup2(heredoc_fd, STDIN_FILENO) == -1)
+			if (heredoc_fd == -1)
+			{
+				perror("heredoc\n");
+				exit(EXIT_FAILURE);
+			}
+			if (dup2(heredoc_fd, STDIN_FILENO) == -1)
 			{
 				perror("dup2");
 				exit(EXIT_FAILURE);
 			}
-
 			close(heredoc_fd);
-			printf("2\n");
 		}
 		if (data->redir != NULL)
 			handle_redir(data);
@@ -892,11 +894,8 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 		{
 			if (!command_path)
 				exit(SC_KEY_HAS_EXPIRED);
-			printf("command path: %s\n", command_path);
-			print_data(data);
 			if (execve(command_path, data->args, data->env) == -1)
 			{
-			printf("3\n");
 				perror("execve");
 				exit(EXIT_FAILURE);
 			}
@@ -925,28 +924,18 @@ void	execute_pipeline(t_data **data)
 	int		status;
 	int		last_pid;
 
+	pid = 0;
 	heredoc_processed = 0;
 	heredoc_fd = -1;
 	input_fd = STDIN_FILENO;
 	current = *data;
+	last_pid = 0;
 	while (current != NULL)
 	{
-		if (current->redir != NULL && current->redir->type == D_MINOR)
+		if (pipe(fd) == -1)
 		{
-			if (heredoc_fd == -1)
-			{
-				heredoc_fd = heredoc(current);
-				heredoc_processed = 1;
-			}
-		}
-			//heredoc_fd = heredoc(current);
-		if (current->next != NULL)
-		{
-			if (pipe(fd) == -1)
-			{
-				perror("pipe");
-				exit(EXIT_FAILURE);
-			}
+			perror("pipe");
+			exit(EXIT_FAILURE);
 		}
 		pid = fork();
 		if (pid == -1)
@@ -956,14 +945,20 @@ void	execute_pipeline(t_data **data)
 		}
 		else if (pid == 0)
 		{
-			if (heredoc_fd != -1)
+			if (current->redir != NULL && current->redir->type == D_MINOR && !heredoc_processed)
 			{
+				heredoc_fd = heredoc(current);
+				if (heredoc_fd == -1)
+					heredoc_processed = 1;
 				if (dup2(heredoc_fd, STDIN_FILENO) == -1)
 				{
 					perror("dup2");
 					exit(EXIT_FAILURE);
 				}
+				if (g_stat_code == SC_HEREDOC)
+					sc_error(1), exit(1);
 				close(heredoc_fd);
+				heredoc_processed = 1;
 			}
 			else if (input_fd != STDIN_FILENO)
 			{
@@ -976,14 +971,14 @@ void	execute_pipeline(t_data **data)
 			}
 			if (current->next != NULL)
 			{
-				close(fd[0]);
 				if (dup2(fd[1], STDOUT_FILENO) == -1)
 				{
 					perror("dup2");
 					exit(EXIT_FAILURE);
 				}
-				close(fd[1]);
 			}
+			close(fd[0]);
+			close(fd[1]);
 			if (current->redir != NULL)
 				handle_redir(current);
 			if (!is_valid_command(current, heredoc_processed))
@@ -1005,20 +1000,17 @@ void	execute_pipeline(t_data **data)
 				heredoc_fd = -1;
 			}
 			current = current->next;
+			last_pid = 0;
+			while ((pid = wait(&status)) > 0)
+			{
+				if (pid > last_pid && WIFEXITED(status))
+					g_stat_code = WEXITSTATUS(status);
+				else if (pid > last_pid && WIFSIGNALED(status))
+					g_stat_code = WTERMSIG(status);
+				last_pid = pid;
+			}
 		}
 	}
-	last_pid = 0;
-	while ((pid = wait(&status)) > 0)
-    {
-        if (pid > last_pid && WIFEXITED(status))
-            g_stat_code = WEXITSTATUS(status);
-        else if (pid > last_pid && WIFSIGNALED(status))
-            g_stat_code = WTERMSIG(status);
-		last_pid = pid;
-    }
-	signal(SIGINT, SIG_DFL);
-	if(g_stat_code == 130)
-		write(STDOUT_FILENO, "\n", 1);
 }
 
 int	is_valid_command(t_data *data, int heredoc_processed)
