@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/21 19:49:16 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/24 00:39:03 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,7 @@ int	main(int argc, char *argv[], char *env[])
 		}
 		fd = open("/tmp/env.env", O_RDONLY);
 		if (is_valid_file("/tmp/env.env", fd, "R"))
-			sc_error(SC_PERMISSION_DENIED), close(fd);
+			sc_error(SC_PERMISSION_DENIED);
 		if (!mat && fd >= 0)
 		{
 			mat = get_env_file(fd);
@@ -218,8 +218,10 @@ int	main(int argc, char *argv[], char *env[])
             printf("\nexit\n");
             break; // Salir del bucle si se presionó Ctrl + D (EOF)
         }
+		// printf("6\n");
 		if (input && *input)
 			add_history (input);
+		// printf("7\n");
 		if (mat)
 		{
 			// printf("Entro a lexer con MAT\n");
@@ -230,8 +232,11 @@ int	main(int argc, char *argv[], char *env[])
 			// printf("Entro a lexer con ENV\n");
 			data = lexer(input, &data, env);
 		}
+			// printf("El p de data es: %p\n", data);
+		// printf("7\n");
 		if (data)
 			check_pwd(data);
+		// printf("8\n");
 		if (data && data->next)
 		{
 			execute_pipeline(&data);
@@ -244,10 +249,11 @@ int	main(int argc, char *argv[], char *env[])
 			if (g_stat_code == SC_HEREDOC)
 				sc_error(1);
 		}
-		if (!ft_strncmp(data->comand, "exit", 5))
+		if (data && data->comand && !strcmp(data->comand, "exit"))
 		{
 			break;
 		}
+		printf("10\n");
 		if (data && !file_exist("/tmp/env.env"))
 		{
 			// printf("en main: guardando env\n");
@@ -256,11 +262,16 @@ int	main(int argc, char *argv[], char *env[])
 			if (mat)
 				clean_env(&mat, -1);
 		}
+		printf("11\n");
 		if (mat)
 			clean_env(&mat, -1);
-		free_data(&data);
+		printf("12\n");
+		if (data)
+			free_data(&data);
 		data = NULL;
 	}
+	if (mat)
+		clean_env(&mat, -1);
 	free_data(&data);
 	free(input);
 	return (g_stat_code);

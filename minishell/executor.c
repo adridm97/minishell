@@ -307,13 +307,13 @@ int	is_valid_file(char *filename, int fd, char *check)
 	if (fd < 0)
 		return(sc_error(EXIT_FAILURE), 5);
 	if (ft_strchr(check, 'F') && access(filename, F_OK))
-		return (perror("El archivo no existe"), sc_error(SC_KEY_HAS_EXPIRED), 1);
+		return (close(fd), perror("El archivo no existe"), sc_error(SC_KEY_HAS_EXPIRED), 1);
 	if (ft_strchr(check, 'R') && access(filename, R_OK))
-		return (perror("El archivo no tiene permisos de lectura"), sc_error(EXIT_FAILURE), 2);
+		return (close(fd), perror("El archivo no tiene permisos de lectura"), sc_error(EXIT_FAILURE), 2);
 	if (ft_strchr(check, 'W') && access(filename, W_OK))
-		return (perror("El archivo no tiene permisos de escritura"), sc_error(EXIT_FAILURE), 3);
+		return (close(fd), perror("El archivo no tiene permisos de escritura"), sc_error(EXIT_FAILURE), 3);
 	if (ft_strchr(check, 'X') && access(filename, X_OK))
-		return (perror("El archivo no tiene permisos de ejecución"), sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), 4);
+		return (close(fd), perror("El archivo no tiene permisos de ejecución"), sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), 4);
 	return (0);
 }
 
@@ -610,7 +610,7 @@ int	ft_matsize(char **mat)
 	return (size);
 }
 
-//manage g_status_code
+//TODO manage g_status_code
 char	**ft_matadd(char ***mat, char *str)
 {
 	int		size;
@@ -737,7 +737,9 @@ void	b_unset(t_data *data)
 		exit(g_stat_code);
 	sc_error(SC_SUCCESS), exit(g_stat_code);
 }
-
+//TODO si es mayor que 2, too many arguments
+//si el primer valor es correcto y el segundo es incorrecto, no cierra minishell
+//dos parametros validos cierra correctamente
 void	b_exit(t_data *data)
 {
 	int	i;
@@ -745,23 +747,27 @@ void	b_exit(t_data *data)
 	i = -1;
 	while (data->args[i])
 		i++;
-	if (i > 2)
-		sc_error(EXIT_FAILURE), perror("demasiados argumentos\n"), exit(g_stat_code);
+	if (i > 1)
+	{
+		sc_error(EXIT_FAILURE), perror("demasiados argumentos\n"), printf("exit\n");
+		return ;
+	}
 	if (data->args[1])
 	{
+		i = -1;
 		while(data->args[1][++i])
 		{
 			if (!ft_isdigit(data->args[1][i]))
-				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), perror("se requiere un argumento numérico\n"), exit(g_stat_code);
+				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), ft_putstr_fd("se requiere un argumento numérico\n", 2), exit(g_stat_code);
 		}
 		sc_error(ft_atoi(data->args[1]) % 256);
 		if (ft_atoi(data->args[1]) % 256)
-			perror("exit\n");
+			ft_putstr_fd("exit\n", 2);
 		else
 			printf("exit\n");
 		exit(g_stat_code);
 	}
-	printf("exit\n"), exit(g_stat_code);
+	printf("exit\n"), sc_error(SC_SUCCESS), exit(g_stat_code);
 }
 
 void	b_env(t_data *data)
