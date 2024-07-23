@@ -748,19 +748,20 @@ void	b_exit(t_data *data)
 		sc_error(EXIT_FAILURE), perror("demasiados argumentos\n"), exit(g_stat_code);
 	if (data->args[1])
 	{
+		i = -1;
 		while(data->args[1][++i])
 		{
 			if (!ft_isdigit(data->args[1][i]))
-				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), perror("se requiere un argumento numérico\n"), exit(g_stat_code);
+				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), ft_putstr_fd("se requiere un argumento numérico\n", 2), exit(g_stat_code);
 		}
 		sc_error(ft_atoi(data->args[1]) % 256);
 		if (ft_atoi(data->args[1]) % 256)
-			perror("exit\n");
+			ft_putstr_fd("exit\n", 2);
 		else
 			printf("exit\n");
 		exit(g_stat_code);
 	}
-	printf("exit\n"), exit(g_stat_code);
+	printf("exit\n"), sc_error(SC_SUCCESS), exit(g_stat_code);
 }
 
 void	b_env(t_data *data)

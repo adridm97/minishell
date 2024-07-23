@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/22 09:40:14 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/24 00:39:03 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,10 +218,10 @@ int	main(int argc, char *argv[], char *env[])
             printf("\nexit\n");
             break; // Salir del bucle si se presionó Ctrl + D (EOF)
         }
-		printf("6\n");
+		// printf("6\n");
 		if (input && *input)
 			add_history (input);
-		printf("7\n");
+		// printf("7\n");
 		if (mat)
 		{
 			// printf("Entro a lexer con MAT\n");
@@ -232,15 +232,16 @@ int	main(int argc, char *argv[], char *env[])
 			// printf("Entro a lexer con ENV\n");
 			data = lexer(input, &data, env);
 		}
-		printf("7\n");
+			// printf("El p de data es: %p\n", data);
+		// printf("7\n");
 		if (data)
 			check_pwd(data);
-		printf("8\n");
+		// printf("8\n");
 		if (data && data->next)
 			execute_pipeline(&data);
 		else if (data)
 			is_valid_command(data, 0);
-		printf("9\n");
+		// printf("9\n");
 		if (data && data->comand && !strcmp(data->comand, "exit"))
 		{
 			break;
