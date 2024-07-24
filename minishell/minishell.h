@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/24 01:05:46 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/24 09:05:31 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ void	is_error(t_error *error);
 void	free_data(t_data **data);
 int		init_data(t_data **data, char **env);
 void	free_redir(t_redir **redir);
-void	free_args(char **args);
+void	free_args(char ***args);
 void	free_token(t_token **token);
 char	**get_env_file(int fd);
 void	print_data(t_data *data);

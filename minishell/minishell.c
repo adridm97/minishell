@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/24 01:05:44 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/24 09:08:21 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,7 +253,6 @@ int	main(int argc, char *argv[], char *env[])
 		{
 			break;
 		}
-		printf("10\n");
 		if (data && !file_exist("/tmp/env.env"))
 		{
 			// printf("en main: guardando env\n");
@@ -262,10 +261,8 @@ int	main(int argc, char *argv[], char *env[])
 			if (mat)
 				clean_env(&mat, -1);
 		}
-		printf("11\n");
 		if (mat)
 			clean_env(&mat, -1);
-		printf("12\n");
 		if (data)
 			free_data(&data);
 		data = NULL;
