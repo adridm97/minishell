@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/24 09:08:01 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/25 00:07:54 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,7 +227,7 @@ void	free_args(char ***args)
 void	free_data(t_data **data)
 {
 	t_data	*del;
-	
+
 	if (!*data)
 		return ;
 	while ((*data)->next)
@@ -247,11 +247,12 @@ void	free_data(t_data **data)
 	free(*data);
 	*data = NULL;
 }
+
 void	clean_env(char ***env, int i)
 {
 	if (!*env)
 		return ;
-	if(i == -1)
+	if (i == -1)
 	{
 		while (env[0][++i])
 		{
@@ -259,7 +260,7 @@ void	clean_env(char ***env, int i)
 		}
 		free(*env);
 	}
-	else 
+	else
 	{
 		while (--i >= 0)
 			free(env[0][i]);
@@ -282,7 +283,7 @@ int	create_env(t_data **data, char **env)
 	(*data)->env = (char **)malloc(sizeof(char *) * (i + 1));
 	i = -1;
 	if (!(*data)->env)
-		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY),0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 	while (env[++i])
 	{
 		(*data)->env[i] = ft_strdup(env[i]);
@@ -306,9 +307,8 @@ char	**get_env_file(int fd)
 		return (NULL);
 	while (env)
 	{
-		free(env);
+		free(env), add_one(&i);
 		env = get_next_line(fd);
-		i++;
 	}
 	close(fd);
 	fd = open("/tmp/env.env", O_RDONLY, 777);
@@ -323,7 +323,8 @@ char	**get_env_file(int fd)
 	{
 		clean = ft_strtrim(env, "\n");
 		if (!clean)
-			return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), clean_env(&mat, --i), NULL);
+			return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), \
+				clean_env(&mat, --i), NULL);
 		mat[++i] = clean;
 		free(env);
 		env = get_next_line(fd);
@@ -331,6 +332,11 @@ char	**get_env_file(int fd)
 	mat[++i] = NULL;
 	close(fd);
 	return (mat);
+}
+
+void	add_one(int *i)
+{
+	*i = *i +1;
 }
 
 int	get_file_env(int fd, t_data **data)
@@ -344,9 +350,8 @@ int	get_file_env(int fd, t_data **data)
 		return (0);
 	while (env)
 	{
-		free(env);
+		free(env), add_one(&i);
 		env = get_next_line(fd);
-		i++;
 	}
 	close (fd);
 	fd = open("/tmp/env.env", O_RDONLY, 777);
@@ -395,26 +400,25 @@ t_data	*lexer(char *input, t_data **data, char **env)
 		{
 			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token, 0))
-				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+				return (is_error(&(t_error){"Memory error", 1}) \
+						, free_token(&token), sc_error(12), NULL);
 		}
 		else
 		{
 			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token))
-				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+				return (is_error(&(t_error){"Memory error", 1}) \
+						, free_token(&token), sc_error(12), NULL);
 		}
 	}
 	check_closed(token, &error);
 	check_gramathic(token, &error);
 	if (error.is_error)
-		return (is_error(& (t_error){"Syntax error",1}), \
-				free(error.error), free_data(data), free_token(&token), sc_error(EXIT_FAILURE), NULL);
+		return (is_error(&(t_error){"Syntax error", 1}), free(error.error), \
+		free_data(data), free_token(&token), sc_error(EXIT_FAILURE), NULL);
 	else if (!split_token(token, env, data))
-		return (is_error(& (t_error){"Memory error",1}), \
-				free_data(data), free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
-	// print_data(data);
+		return (is_error(&(t_error){"Memory error", 1}), \
+				free_data(data), free_token(&token), sc_error(12), NULL);
 	free_token(&token);
 	return (*data);
 }
