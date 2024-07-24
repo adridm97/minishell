@@ -216,23 +216,24 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 		{
 			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token, 0))
-				return (is_error(& (t_error){"Memory error",1}) \
+				return (is_error(& (t_error){"Memory error",1}), free(input) \
 						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 		else
 		{
 			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token))
-				return (is_error(& (t_error){"Memory error",1}) \
+				return (is_error(& (t_error){"Memory error",1}), free(input) \
 						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 	}
+	free(input);
 	while (token)
 	{
 		if (is_special(token->value, "$") && (!is_special(token->next->value, "\"'")))
 		{
 			if (!is_expandsor(&token, &res, data->env))
-				return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+				return(free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 		else
 		{
@@ -243,6 +244,7 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 			}
 		}	
 	}
+	free_token(&token);
 	return (res);
 }
 
@@ -551,6 +553,7 @@ void	b_echo(t_data *data)
 	else
 		printf("\n");
 	g_stat_code = SC_SUCCESS;
+	free_args(&data->args);
 	// g_stat_code = SC_ADDRESS_ALREADY_IN_USE;
 	// printf("el status antes es: %i\n", g_stat_code);
     exit(g_stat_code);
