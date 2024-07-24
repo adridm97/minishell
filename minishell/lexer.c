@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/25 00:07:54 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/25 00:25:17 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,8 @@ int	check_error(t_token *token, char type)
 		token = token->next;
 		if (token->type != SPACES)
 		{
-			if ((token->type >= PIPE && token->type <= MINOR))
-			{
-				if (type == PIPE && token->type != PIPE)
-					return (0);
+			if (token->type >= PIPE && token->type <= MINOR)
 				return (1);
-			}
 			else
 				return (0);
 		}
@@ -207,21 +203,21 @@ void	free_redir(t_redir **redir)
 	redir = NULL;
 }
 
-void	free_args(char ***args)
+void	free_args(char **args)
 {
 	int	i;
 
 	i = -1;
 	if (*args)
 	{
-		while ((*args)[++i])
+		while (args[++i])
 		{
-			if ((*args)[i])
-				free((*args)[i]);
+			if (args[i])
+				free(args[i]);
 		}
-		free(*args);
+		free(args);
 	}
-	*args = NULL;
+	args = NULL;
 }
 
 void	free_data(t_data **data)
@@ -233,7 +229,7 @@ void	free_data(t_data **data)
 	while ((*data)->next)
 	{
 		del = (*data)->next;
-		free_args(&(*data)->args);
+		free_args((*data)->args);
 		free_redir(&(*data)->redir);
 		clean_env(&(*data)->env, -1);
 		free(*data);
@@ -241,7 +237,7 @@ void	free_data(t_data **data)
 	}
 	clean_env(&(*data)->env, -1);
 	if ((*data)->args)
-		free_args(&(*data)->args);
+		free_args((*data)->args);
 	if ((*data)->redir)
 		free_redir(&(*data)->redir);
 	free(*data);
