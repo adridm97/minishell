@@ -1,6 +1,6 @@
 NAME            = minishell
 CC              = gcc
-CFLAGS          = -Wall -Wextra -Werror -fPIE -fsanitize=address
+CFLAGS          = -Wall -Wextra -Werror -fPIE
 SOURCES         =	minishell.c \
 					lexer.c \
 					executor.c \

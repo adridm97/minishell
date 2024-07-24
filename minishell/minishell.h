@@ -6,13 +6,12 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/25 00:24:51 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/25 00:32:06 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
-
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -136,7 +135,6 @@ void	free_token(t_token **token);
 char	**get_env_file(int fd);
 void	print_data(t_data *data);
 void	clean_env(char ***env, int i);
-void	add_one(int *i);
 
 // minishell.c
 int		save_env(t_data *data);
