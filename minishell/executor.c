@@ -198,12 +198,10 @@ void sc_error(int sce)
 char	*heredoc_tokenizer(char *str, t_data *data)
 {
 	t_token	*token;
-	//t_token	*c_token;
 	int		i;
 	char	*input;
 	char	*res;
 
-	//c_token = token;
 	if (str == NULL || str[0] == '\0')
 		return (ft_strdup("\n"));
 	res = NULL;
@@ -343,9 +341,7 @@ int	heredoc(t_data *data)
 			close(fd);
 			exit(SC_HEREDOC);
 		}
-		//printf("hola\n");
 		line = readline("> ");
-		//printf("adios\n");
 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
 		{
 			free(line);
@@ -355,8 +351,8 @@ int	heredoc(t_data *data)
 		if (!expanded_line)
 			close(fd), free(line), exit(g_stat_code);
 		ft_putstr_fd(expanded_line, fd);
-		//TODO revisar los saltos de linea condicion intro vacio en la linea de abajo
-		ft_putstr_fd("\n", fd);
+		if (!(ft_strlen(expanded_line) == 1 && expanded_line[0] != '\0'))
+			ft_putstr_fd("\n", fd);
 		free(line);
 		free(expanded_line);
 	}
@@ -364,7 +360,6 @@ int	heredoc(t_data *data)
 	return open(filename, O_RDONLY);
 }
 
-// TODO gestionar los exit con exit status
 void	handle_redir(t_data *data)
 {
 	int 	fd;

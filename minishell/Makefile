@@ -1,7 +1,14 @@
 NAME            = minishell
 CC              = gcc
-CFLAGS          = -Wall -Wextra -Werror -fPIE -g
-SOURCES         = minishell.c lexer.c executor.c special_split.c split_token.c signals.c
+CFLAGS          = -Wall -Wextra -Werror -fPIE -fsanitize=address
+SOURCES         =	minishell.c \
+					lexer.c \
+					executor.c \
+					special_split.c \
+					split_token.c \
+					signals.c \
+					env.c \
+					utils.c
 OBJS_PATH       = ./build
 HEADER          = minishell.h
 LIBFT_PATH      = ./libft

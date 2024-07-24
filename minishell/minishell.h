@@ -175,6 +175,20 @@ char	*new_str(char **str, char c);
 //handlers.c
 void	setup_signal_handlers();
 
+//signals.c
+void	handle_sigint_heredoc(int sig);
+void	setup_signal_handlers(void);
+
+//env.c
+int		set_env(char *key, char *val, char ***env);
+char	**create_env_first(char **cenv);
+int		index_env_env(char **env, char *str);
+int		save_env(t_data *data);
+void	ft_set_shell(char *env[], char ***mat);
+
+//utils.c
+void	ft_free_resources(t_data **data, char **input, char ***mat);
+
 // Regular Colors
 # define BLACK "\x1b[0m"
 # define RED "\x1b[31m"
@@ -184,11 +198,6 @@ void	setup_signal_handlers();
 # define MAGENTA "\x1b[35m"
 # define CYAN "\x1b[36m"
 # define WHITE "\x1b[37m"
-
-//signals.c
-
-void	handle_sigint_heredoc(int sig);
-void	setup_signal_handlers(void);
 
 extern int	g_stat_code;
 
