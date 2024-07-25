@@ -620,7 +620,7 @@ char	**ft_matadd(char ***mat, char *str)
 	size = ft_matsize(*mat);
 	new_mat = (char **)malloc(sizeof(char **) * (size + 2));
 	if (!new_mat)
-		return (free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		return (free_args(mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	c_mat = *mat;
 	while (c_mat[++i])
 	{
@@ -628,17 +628,17 @@ char	**ft_matadd(char ***mat, char *str)
 		if (!new_mat[i])
 		{
 			new_mat[i] = NULL;
-			return (free_args(new_mat), free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+			return (free_args(&new_mat), free_args(mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 	}
 	new_mat[i] = ft_strdup(str);
 	if (!new_mat[i])
 		{
 			new_mat[i] = NULL;
-			return (free_args(new_mat), free_args(*mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+			return (free_args(&new_mat), free_args(mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 	new_mat[++i] = NULL;
-	free_args(*mat);
+	free_args(mat);
 	return (new_mat);
 }
 
@@ -699,7 +699,7 @@ char	**ft_mat_rem_index(char ***mat, int index)
 			new_mat[++j] = ft_strdup(c_mat[i]);
 	}
 	new_mat[++j] = NULL;
-	free_args(*mat);
+	free_args(mat);
 	return (new_mat);
 }
 // retorna el index de env o -1 si index no existe o -2 si env no existe
@@ -1089,7 +1089,7 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		if (access(data->comand, X_OK) == 0)
 		{
 			execute_command(&data, data->comand, heredoc_processed);
-			free_args(token);
+			free_args(&token);
 			return (1);
 		}
 		else
@@ -1107,7 +1107,7 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 			{
 				execute_command(&data, comand_path, heredoc_processed);
 				free(comand_path);
-				free_args(token);
+				free_args(&token);
 				return (1);
 			}
 			sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), exit(126);
@@ -1117,7 +1117,7 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 	}
 	if (data->redir != NULL)
 		execute_command(&data, data->path, heredoc_processed);
-	free_args(token);
+	free_args(&token);
 	printf("%s: command not found\n", data->comand);
 	return (sc_error(SC_KEY_HAS_EXPIRED), 0);
 }

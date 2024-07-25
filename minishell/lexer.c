@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/25 22:07:17 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/25 22:09:16 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,7 +203,7 @@ void	free_redir(t_redir **redir)
 	redir = NULL;
 }
 
-void	free_args(char **args)
+void	free_args(char ***args)
 {
 	int	i;
 
@@ -229,7 +229,7 @@ void	free_data(t_data **data)
 	while ((*data)->next)
 	{
 		del = (*data)->next;
-		free_args((*data)->args);
+		free_args(&(*data)->args);
 		free_redir(&(*data)->redir);
 		clean_env(&(*data)->env, -1);
 		free(*data);
@@ -237,7 +237,7 @@ void	free_data(t_data **data)
 	}
 	clean_env(&(*data)->env, -1);
 	if ((*data)->args)
-		free_args((*data)->args);
+		free_args(&(*data)->args);
 	if ((*data)->redir)
 		free_redir(&(*data)->redir);
 	free(*data);
