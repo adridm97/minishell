@@ -113,7 +113,10 @@ int	main(int argc, char *argv[], char *env[])
 				sc_error(1);
 		}
 		if (data && data->comand && !strcmp(data->comand, "exit"))
-			break ;
+		{
+			if (g_stat_code != 1)
+				break ;
+		}
 		if (data && !file_exist("/tmp/env.env"))
 		{
 			if (save_env(data))
