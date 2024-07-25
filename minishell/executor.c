@@ -739,7 +739,7 @@ void	b_exit(t_data *data)
 {
 	int	i;
 
-	i = -1;
+	i = 0;
 	while (data->args[i])
 		i++;
 	if (i > 1)
@@ -749,8 +749,8 @@ void	b_exit(t_data *data)
 	}
 	if (data->args[1])
 	{
-		i = -1;
-		while(data->args[1][++i])
+		i = 0;
+		while(data->args[1][i++])
 		{
 			if (!ft_isdigit(data->args[1][i]))
 				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), ft_putstr_fd("se requiere un argumento numérico\n", 2), exit(g_stat_code);
