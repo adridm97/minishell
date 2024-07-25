@@ -216,23 +216,24 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 		{
 			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token, 0))
-				return (is_error(& (t_error){"Memory error",1}) \
+				return (is_error(& (t_error){"Memory error",1}), free(input) \
 						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 		else
 		{
 			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
 						, &token))
-				return (is_error(& (t_error){"Memory error",1}) \
+				return (is_error(& (t_error){"Memory error",1}), free(input) \
 						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 	}
+	free(input);
 	while (token)
 	{
 		if (is_special(token->value, "$") && (!is_special(token->next->value, "\"'")))
 		{
 			if (!is_expandsor(&token, &res, data->env))
-				return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+				return(free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 		}
 		else
 		{
@@ -243,6 +244,7 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 			}
 		}	
 	}
+	free_token(&token);
 	return (res);
 }
 
@@ -551,6 +553,7 @@ void	b_echo(t_data *data)
 	else
 		printf("\n");
 	g_stat_code = SC_SUCCESS;
+	free_args(&data->args);
 	// g_stat_code = SC_ADDRESS_ALREADY_IN_USE;
 	// printf("el status antes es: %i\n", g_stat_code);
     exit(g_stat_code);
@@ -735,31 +738,65 @@ void	b_unset(t_data *data)
 //TODO si es mayor que 2, too many arguments
 //si el primer valor es correcto y el segundo es incorrecto, no cierra minishell
 //dos parametros validos cierra correctamente
+// void	b_exit(t_data *data)
+// {
+// 	int	i;
+
+// 	i = 0;
+// 	while (data->args[i])
+// 		i++;
+// 	if (i > 1)
+// 	{
+// 		sc_error(EXIT_FAILURE), perror("demasiados argumentos\n"), printf("exit\n");
+// 		return ;
+// 	}
+// 	if (data->args[1])
+// 	{
+// 		i = 0;
+// 		while(data->args[1][i++])
+// 		{
+// 			if (!ft_isdigit(data->args[1][i]))
+// 				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), ft_putstr_fd("se requiere un argumento numérico\n", 2), exit(g_stat_code);
+// 		}
+// 		sc_error(ft_atoi(data->args[1]) % 256);
+// 		if (ft_atoi(data->args[1]) % 256)
+// 			ft_putstr_fd("exit\n", 2);
+// 		else
+// 			printf("exit\n");
+// 		exit(g_stat_code);
+// 	}
+// 	printf("exit\n"), sc_error(SC_SUCCESS), exit(g_stat_code);
+// }
+
 void	b_exit(t_data *data)
 {
 	int	i;
+	int j;
 
-	i = -1;
+	j = 0;
+	i = 0;
 	while (data->args[i])
 		i++;
-	if (i > 1)
+	if (data->args[1])
 	{
-		sc_error(EXIT_FAILURE), perror("demasiados argumentos\n"), printf("exit\n");
+		j = 0;
+		while(data->args[1][j])
+		{
+			if (!ft_isdigit(data->args[1][j]))
+				sc_error(255), printf("exit\n"), ft_putstr_fd("numeric argument required\n", 2), exit(g_stat_code);
+			j++;
+		}
+	}
+	if (i > 2)
+	{
+		sc_error(EXIT_FAILURE), printf("exit\n"), ft_putstr_fd("exit: too many arguments\n", 2);
 		return ;
 	}
 	if (data->args[1])
 	{
-		i = -1;
-		while(data->args[1][++i])
-		{
-			if (!ft_isdigit(data->args[1][i]))
-				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), ft_putstr_fd("se requiere un argumento numérico\n", 2), exit(g_stat_code);
-		}
 		sc_error(ft_atoi(data->args[1]) % 256);
-		if (ft_atoi(data->args[1]) % 256)
-			ft_putstr_fd("exit\n", 2);
-		else
-			printf("exit\n");
+		g_stat_code = ft_atoi(data->args[1]) % 256;
+		printf("exit\n");
 		exit(g_stat_code);
 	}
 	printf("exit\n"), sc_error(SC_SUCCESS), exit(g_stat_code);

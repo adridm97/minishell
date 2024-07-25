@@ -77,16 +77,6 @@ int	main(int argc, char *argv[], char *env[])
 	while (1)
 	{
 		ft_free_resources(&data, &input, &mat);
-		// if (data)
-		// {
-		// 	free_data(&data);
-		// 	data = NULL;
-		// }
-		// if (input)
-		// {
-		// 	free (input);
-		// 	input = NULL;
-		// }
 		fd = open("/tmp/env.env", O_RDONLY);
 		if (is_valid_file("/tmp/env.env", fd, "R"))
 			sc_error(SC_PERMISSION_DENIED);
@@ -97,12 +87,13 @@ int	main(int argc, char *argv[], char *env[])
 			unlink("/tmp/env.env");
 		}
 		input = readline(BLUE"Minishell: "BLACK);
-		if (input == NULL) {
-            printf("\nexit\n");
-            break; 
-        }
+		if (input == NULL)
+		{
+			printf("\nexit\n");
+			break ;
+		}
 		if (input && *input)
-			add_history (input);
+			add_history(input);
 		if (mat)
 			data = lexer(input, &data, mat);
 		else
@@ -122,20 +113,16 @@ int	main(int argc, char *argv[], char *env[])
 				sc_error(1);
 		}
 		if (data && data->comand && !strcmp(data->comand, "exit"))
-			break;
+		{
+			if (g_stat_code != 1)
+				break ;
+		}
 		if (data && !file_exist("/tmp/env.env"))
 		{
 			if (save_env(data))
 				perror("Error saving envoirment\n");
 			ft_free_resources(&data, &input, &mat);
-			// if (mat)
-			// 	clean_env(&mat, -1);
 		}
-		// if (mat)
-		// 	clean_env(&mat, -1);
-		// if (data)
-		// 	free_data(&data);
-		// data = NULL;
 		ft_free_resources(&data, &input, &mat);
 		printf("11\n");
 		if (mat)
@@ -146,9 +133,5 @@ int	main(int argc, char *argv[], char *env[])
 		data = NULL;
 	}
 	ft_free_resources(&data, &input, &mat);
-	// if (mat)
-	// 	clean_env(&mat, -1);
-	// free_data(&data);
-	// free(input);
 	return (g_stat_code);
 }
