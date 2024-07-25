@@ -24,7 +24,7 @@ int	set_env(char *key, char *val, char ***env)
 	else if (i == -1)
 	{
 		*env = ft_matadd(env, res);
-		if (*env)
+		if (!*env)
 			return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 	}
 	else
@@ -80,10 +80,10 @@ int	save_env(t_data *data)
 	char	**env;
 
 	i = 0;
-	if (!data->env && !data->env[0])
+	if (!data->env || !data->env[0])
 		return (sc_error(EXIT_FAILURE), g_stat_code);
 	unlink("/tmp/env.env");
-	fd = open("/tmp/env.env", O_WRONLY | O_CREAT | O_APPEND, 777);
+	fd = open("/tmp/env.env", O_WRONLY | O_CREAT | O_TRUNC, 777);
 	if (fd < 0)
 		return (sc_error(SC_FILE_DESCRIPTOR_IN_BAD_STATE), g_stat_code);
 	env = data->env;
@@ -101,9 +101,8 @@ void	ft_set_shell(char *env[], char ***mat)
 {
 	char	*key;
 	int		fd;
-
 	*mat = create_env_first(env);
-	if (!mat)
+	if (!*mat)
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
 	key = ft_strdup("SHLVL");
 	if (!key)

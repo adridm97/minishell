@@ -65,7 +65,6 @@ int	main(int argc, char *argv[], char *env[])
 {
 	static char	*input;
 	t_data		*data;
-	int			fd;
 	char		**mat;
 
 	(void)argc;
@@ -76,16 +75,7 @@ int	main(int argc, char *argv[], char *env[])
 	ft_set_shell(env, &mat);
 	while (1)
 	{
-		ft_free_resources(&data, &input, &mat);
-		fd = open("/tmp/env.env", O_RDONLY);
-		if (is_valid_file("/tmp/env.env", fd, "R"))
-			sc_error(SC_PERMISSION_DENIED);
-		if (!mat && fd >= 0)
-		{
-			mat = get_env_file(fd);
-			close(fd);
-			unlink("/tmp/env.env");
-		}
+		ft_handle_env_file(&mat);
 		input = readline(BLUE"Minishell: "BLACK);
 		if (input == NULL)
 		{
