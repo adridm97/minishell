@@ -34,162 +34,6 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return (0);
 }
 
-// size_t	calculate_expanded_length(const char *line, char **env)
-// {
-// 	size_t	i;
-// 	size_t	len;
-// 	size_t	j;
-// 	size_t	var_len;
-// 	char	*var_name;
-// 	char	*var_value;
-
-// 	i = 0;
-// 	len = 0;
-// 	while (line[i] != '\0')
-// 	{
-// 		if (line[i] == '$')
-// 		{
-// 			j = i + 1;
-// 			while (line[j] != '\0' && (ft_isalnum(line[j]) || line[j] == '_'))
-// 			j++;
-// 			var_len = j - (i + 1);
-// 			var_name = ft_strndup(line + i + 1, var_len);
-// 			var_value = key_to_res(&var_name, env);
-// 			if (var_value)
-// 			{
-// 				len += ft_strlen(var_value);
-// 				free(var_value);
-// 			}
-// 			else
-// 				len += j - i;
-// 			i = j;
-// 		}
-// 		else
-// 		{
-// 			len++;
-// 			i++;
-// 		}
-// 	}
-// 	return (len);
-// }
-
-// char	*expand_variables(const char *line, char **env)
-// {
-// 	size_t	result_len;
-// 	char	*result;
-// 	size_t	i;
-// 	size_t	k;
-// 	size_t	j;
-// 	size_t	var_len;
-// 	char	*var_name;
-// 	char	*var_value;
-
-// 	i = 0;
-// 	j = 0;
-// 	k = 0;
-//  	result_len = calculate_expanded_length(line, env);
-// 	result = malloc(result_len + 1);
-// 	while (line[i] != '\0')
-// 	{
-// 		if (line[i] == '$')
-// 		{
-// 			j = i + 1;
-// 			while (line[j] != '\0' && (ft_isalnum(line[j]) || line[j] == '_'))
-// 				j++;
-// 			var_len = j - (i + 1);
-// 			var_name = ft_strndup(line + i + 1, var_len);
-// 			var_value = key_to_res(&var_name, env);
-// 			if (var_value)
-// 			{
-// 				ft_strcpy(result + k, var_value);
-// 				k += ft_strlen(var_value);
-// 				free(var_value);
-// 			}
-// 			else
-// 			{
-// 				result[k++] = '$';
-// 				ft_strncpy(result + k, line + i + 1, var_len);
-// 				k += var_len;
-// 			}
-// 			i = j;
-// 		}
-// 		else
-// 		{
-// 			result[k++] = line[i++];
-// 		}
-// 	}
-// 	result[k] = '\0';
-// 	return result;
-// }
-
-// char	*ft_get_key(char *line)
-// {
-// 	int		i;
-// 	int		start;
-// 	char	*res;
-
-// 	i = 0;
-// 	while (line[i] && line[i] != '$')
-// 		i++;
-// 	if (!line[i] || line[i] != '$')
-// 		return (NULL);
-// 	i++;
-// 	start = i;
-// 	while (line[i] && ft_strchr(" <>|'\".,-+*!¡?¿%%=·@#ªº¬€$", line[i]) == NULL)
-// 		i++;
-// 	res = malloc((i - start + 1) * sizeof(char));
-// 	if (!res)
-// 		return (NULL);
-// 	ft_strncpy(res, line + start, i - start);
-// 	res[i - start] = '\0';
-// 	return (res);
-// }
-
-// char	*ft_expand_line(char *str, char start, char *value)
-// {
-// 	int		i;
-// 	int		j;
-// 	int		k;
-// 	int		val_len;
-// 	int		str_len;
-// 	char	*res;
-
-// 	i = 0;
-// 	j = 0;
-// 	k = 0;
-// 	val_len = ft_strlen(value);
-// 	str_len = ft_strlen(str);
-// 	res = malloc(str_len + val_len + 1);
-// 	if (!res)
-// 		return (NULL);
-// 	while (str[i])
-// 	{
-// 		if (str[i] == start)
-// 		{
-// 			i++;
-// 			while (str[i] && ft_strchr(" <>|'\".,-+*!¡?¿%%=·@#ªº¬€", str[i]) == NULL)
-// 				i++;
-// 			while (value[k])
-// 				res[j++] = value[k++];
-// 		}
-// 		else
-// 			res[j++] = str[i++];
-// 	}
-// 	res[j] = '\0';
-// 	return (res);
-// }
-
-/*int	switch_case_heredoc(t_token **token, char **env, t_data **data, char **str)
-{
-	if ((*token)->value == '\'')
-		is_simple_string(token, env, str);
-	else if ((*token)->value == '"')
-		is_double_string(token, env, str);
-	else if ((*token)->value == '$')
-		is_expandsor(token, str, env);
-	return (1);
-}*/
-
 void sc_error(int sce)
 {
 	g_stat_code = sce;
@@ -247,52 +91,6 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 	free_token(&token);
 	return (res);
 }
-
-// int	heredoc(t_data *data) 
-// {
-// 	int		fd;
-// 	char	*line;
-// 	char	*filename;
-// 	char	*expanded_line;
-// 	t_redir	*aux;
-
-// 	aux = data->redir;
-// 	filename = "/tmp/heredoc";
-// 	fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-// 	if (fd == -1)
-// 	{
-// 		perror("open");
-// 		exit(EXIT_FAILURE);
-// 	}
-// 	while (1)
-// 	{
-// 		if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
-// 		{
-// 			perror("Error al configurar el manejador de SIGINT");
-// 			exit(EXIT_FAILURE);
-// 		}
-// 		if (g_stat_code == -1)
-// 		{
-// 			printf("\n1\n");
-// 			close(fd);
-// 			close(0);
-// 			sc_error(SC_OWNER_DIED), exit(g_stat_code);
-// 		}
-// 		line = readline("> ");
-// 		if (line == NULL || ft_strcmp(line, aux->path) == 0)
-// 		{
-// 			free(line);
-// 			break;
-// 		}
-// 		expanded_line = heredoc_tokenizer(line, data);
-// 		ft_putstr_fd(expanded_line, fd);
-// 		ft_putstr_fd("\n", fd);
-// 		free(line);
-// 		free(expanded_line);
-// 	}
-// 	close(fd);
-// 	return open(filename, O_RDONLY);
-// }
 
 /*
  Abre el archivo, revisa permisos (hay que indicarlo en mayuscula) y cambia g_status si lo necesita, retorna 0 si está OK
@@ -985,7 +783,7 @@ void	execute_pipeline(t_data **data)
 		}
 		else if (pid == 0)
 		{
-			if (current->redir != NULL && current->redir->type == D_MINOR && !heredoc_processed)
+			if (heredoc_processed == 0 && current->redir != NULL && current->redir->type == D_MINOR)
 			{
 				heredoc_fd = heredoc(current);
 				if (heredoc_fd == -1)
@@ -1034,13 +832,18 @@ void	execute_pipeline(t_data **data)
 				close(fd[1]);
 				input_fd = fd[0];
 			}
+			else
+			{
+				close(fd[0]);
+				close(fd[1]);
+			}
 			if (heredoc_fd != -1)
 			{
 				close(heredoc_fd);
 				heredoc_fd = -1;
 			}
 			current = current->next;
-			last_pid = 0;
+			last_pid = pid;
 			while ((pid = wait(&status)) > 0)
 			{
 				if (pid > last_pid && WIFEXITED(status))
