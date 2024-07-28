@@ -186,6 +186,7 @@ void	ft_set_shell(char *env[], char ***mat);
 
 //utils.c
 void	ft_free_resources(t_data **data, char **input, char ***mat);
+void	ft_handle_env_file(char ***mat);
 
 // Regular Colors
 # define BLACK "\x1b[0m"
