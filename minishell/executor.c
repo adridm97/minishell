@@ -316,27 +316,48 @@ void	b_cd(t_data *data, char *home)
     sc_error(SC_SUCCESS), exit(g_stat_code);
 }
 
-void	b_echo(t_data *data)
+int	ft_is_n(char *str)
 {
 	int	i;
 
-	i = 1;
-	if (data->args[1] && ft_strcmp(data->args[1], "-n"))
+	i = 0;
+	if (str[i] != '-')
+		return (1);
+	while(str[++i])
 	{
+		if (str[i] != 'n')
+		return (1);
+	}
+	return (0);
+}
+
+//TODO mirar el error del open que no hay permisos al usar is_valid_file salta error
+void	b_echo(t_data *data)
+{
+	int	i;
+	int	fd;
+
+	i = 1;
+	if (data->args[i] && !ft_is_n(data->args[i]))
+	{
+		i++;
+		fd = open("/tmp/echoafjnaifsnk", O_WRONLY | O_CREAT | O_APPEND, 777);
+		// if (!is_valid_file("/tmp/echoafjnaifsnk", fd, "FW"))
+		// 	close(fd), unlink("/tmp/echoafjnaifsnk"), exit(g_stat_code);
 		while (data->args[i])
 		{
-			data->args[i] = heredoc_tokenizer(data->args[i],data);
+			data->args[i] = heredoc_tokenizer(data->args[i], data);
 			if (!data->args[i])
 				exit(g_stat_code);
-			printf("%s", data->args[i]);
+			ft_putstr_fd(data->args[i], fd);
 			if (data->args[++i])
-			printf(" ");
-			}
-			printf("\n");
+				ft_putstr_fd(" ", fd);
+		}
+		ft_putstr_fd("Minishell: ", fd);
+		close(fd);
     }
-    else if (data->args[1])
+    else if (data->args[i])
     {
-        i++;
         while (data->args[i])
         {
 			data->args[i] = heredoc_tokenizer(data->args[i],data);
@@ -750,7 +771,7 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 		}
 	}
 }
-e
+
 void	execute_pipeline(t_data **data)
 {
 	t_data	*current;
@@ -832,6 +853,11 @@ void	execute_pipeline(t_data **data)
 				close(fd[1]);
 				input_fd = fd[0];
 			}
+			else
+			{
+				close(fd[0]);
+				close(fd[1]);
+			}
 			if (heredoc_fd != -1)
 			{
 				close(heredoc_fd);
@@ -839,15 +865,27 @@ void	execute_pipeline(t_data **data)
 			}
 			current = current->next;
 			last_pid = 0;
-			while ((pid = wait(&status)) > 0)
+			if ((*data)->heredoc == 1)
 			{
-				if (pid > last_pid && WIFEXITED(status))
-					g_stat_code = WEXITSTATUS(status);
-				else if (pid > last_pid && WIFSIGNALED(status))
-					g_stat_code = WTERMSIG(status);
-				last_pid = pid;
+				while ((pid = wait(&status)) > 0)
+				{
+					if (pid > last_pid && WIFEXITED(status))
+						g_stat_code = WEXITSTATUS(status);
+					else if (pid > last_pid && WIFSIGNALED(status))
+						g_stat_code = WTERMSIG(status);
+					last_pid = pid;
+				}
+				heredoc_processed = 0;
 			}
 		}
+	}
+	while ((pid = wait(&status)) > 0)
+	{
+		if (pid > last_pid && WIFEXITED(status))
+			g_stat_code = WEXITSTATUS(status);
+		else if (pid > last_pid && WIFSIGNALED(status))
+			g_stat_code = WTERMSIG(status);
+		last_pid = pid;
 	}
 }
 
