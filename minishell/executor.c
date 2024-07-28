@@ -750,7 +750,7 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 		}
 	}
 }
-
+e
 void	execute_pipeline(t_data **data)
 {
 	t_data	*current;
@@ -783,7 +783,7 @@ void	execute_pipeline(t_data **data)
 		}
 		else if (pid == 0)
 		{
-			if (heredoc_processed == 0 && current->redir != NULL && current->redir->type == D_MINOR)
+			if (current->redir != NULL && current->redir->type == D_MINOR && !heredoc_processed)
 			{
 				heredoc_fd = heredoc(current);
 				if (heredoc_fd == -1)
@@ -832,18 +832,13 @@ void	execute_pipeline(t_data **data)
 				close(fd[1]);
 				input_fd = fd[0];
 			}
-			else
-			{
-				close(fd[0]);
-				close(fd[1]);
-			}
 			if (heredoc_fd != -1)
 			{
 				close(heredoc_fd);
 				heredoc_fd = -1;
 			}
 			current = current->next;
-			last_pid = pid;
+			last_pid = 0;
 			while ((pid = wait(&status)) > 0)
 			{
 				if (pid > last_pid && WIFEXITED(status))

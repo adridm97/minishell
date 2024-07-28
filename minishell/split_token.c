@@ -189,6 +189,7 @@ void	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 	{
 		*token = (*token)->next;
 		init_redir(token, data, env, D_MINOR);
+		(*data)->heredoc = 1;
 	}
 	else if ((*token)->value == '>')
 	{
