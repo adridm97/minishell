@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/25 00:28:36 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/28 10:48:03 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,10 +114,8 @@ int	main(int argc, char *argv[], char *env[])
 			ft_free_resources(&data, &input, &mat);
 		}
 		ft_free_resources(&data, &input, &mat);
-		printf("11\n");
 		if (mat)
 			clean_env(&mat, -1);
-		printf("12\n");
 		if (data)
 			free_data(&data);
 		data = NULL;

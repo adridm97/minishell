@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/25 22:09:16 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/28 10:47:32 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,12 +210,12 @@ void	free_args(char ***args)
 	i = -1;
 	if (*args)
 	{
-		while (args[++i])
+		while ((*args)[++i])
 		{
-			if (args[i])
-				free(args[i]);
+			if ((*args)[i])
+				free((*args)[i]);
 		}
-		free(args);
+		free(*args);
 	}
 	args = NULL;
 }
