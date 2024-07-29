@@ -341,9 +341,9 @@ void	b_echo(t_data *data)
 	if (data->args[i] && !ft_is_n(data->args[i]))
 	{
 		i++;
-		fd = open("/tmp/echoafjnaifsnk", O_WRONLY | O_CREAT | O_APPEND, 777);
-		// if (!is_valid_file("/tmp/echoafjnaifsnk", fd, "FW"))
-		// 	close(fd), unlink("/tmp/echoafjnaifsnk"), exit(g_stat_code);
+		fd = open("/tmp/echoafjnaifsnk", O_WRONLY | O_CREAT | O_APPEND, 0777);
+		if (is_valid_file("/tmp/echoafjnaifsnk", fd, "FW"))
+			close(fd), unlink("/tmp/echoafjnaifsnk"), exit(g_stat_code);
 		while (data->args[i])
 		{
 			data->args[i] = heredoc_tokenizer(data->args[i], data);
@@ -353,7 +353,7 @@ void	b_echo(t_data *data)
 			if (data->args[++i])
 				ft_putstr_fd(" ", fd);
 		}
-		ft_putstr_fd("Minishell: ", fd);
+		ft_putstr_fd(BLUE"Minishell: "BLACK, fd);
 		close(fd);
     }
     else if (data->args[i])
@@ -373,8 +373,6 @@ void	b_echo(t_data *data)
 		printf("\n");
 	g_stat_code = SC_SUCCESS;
 	free_args(&data->args);
-	// g_stat_code = SC_ADDRESS_ALREADY_IN_USE;
-	// printf("el status antes es: %i\n", g_stat_code);
     exit(g_stat_code);
 }
 

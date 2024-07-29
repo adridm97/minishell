@@ -87,7 +87,7 @@ int	main(int argc, char *argv[], char *env[])
 			input = readline(prompt);
 		}
 		else
-			input = readline("Minishell: ");
+			input = readline(BLUE"Minishell: "BLACK);
 		if (input == NULL)
 		{
 			printf("\nexit\n");
