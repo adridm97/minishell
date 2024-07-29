@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/24 09:08:21 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/28 10:48:03 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,11 @@ int	main(int argc, char *argv[], char *env[])
 			ft_free_resources(&data, &input, &mat);
 		}
 		ft_free_resources(&data, &input, &mat);
+		if (mat)
+			clean_env(&mat, -1);
+		if (data)
+			free_data(&data);
+		data = NULL;
 	}
 	ft_free_resources(&data, &input, &mat);
 	return (g_stat_code);

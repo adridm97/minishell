@@ -6,13 +6,12 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/24 09:05:31 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/25 22:08:36 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
-
 
 # include <stdio.h>
 # include <stdlib.h>

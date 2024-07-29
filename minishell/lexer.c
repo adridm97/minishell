@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/25 01:01:14 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/28 10:47:32 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,8 @@ int	check_error(t_token *token, char type)
 		token = token->next;
 		if (token->type != SPACES)
 		{
-			if ((token->type >= PIPE && token->type <= MINOR))
-			{
-				if (type == PIPE && token->type != PIPE)
-					return (0);
+			if (token->type >= PIPE && token->type <= MINOR)
 				return (1);
-			}
 			else
 				return (0);
 		}
@@ -221,7 +217,7 @@ void	free_args(char ***args)
 		}
 		free(*args);
 	}
-	*args = NULL;
+	args = NULL;
 }
 
 void	free_data(t_data **data)

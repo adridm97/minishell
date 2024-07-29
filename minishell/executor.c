@@ -403,6 +403,31 @@ void	print_env(t_data *data, char *str)
 	}
 }
 
+void	print_export(t_data *data, char *str)
+{
+	int		i;
+	char	*key;
+	i = -1;
+	if (data->env)
+	{
+		while (data->env[++i])
+		{
+			if(ft_strchr(data->env[i], '='))
+			{
+				key = (char *)malloc(sizeof(char) * (ft_strchr(data->env[i], '=') - data->env[i]) + 2);
+				if (key)
+				{
+					ft_strncpy(key, data->env[i], ft_strchr(data->env[i], '=') - data->env[i] + 1);
+					printf("%s%s\"%s\"\n", str, key, data->env[i] + ft_strlen(key));
+					free(key);
+				}
+			}
+			else
+				printf("%s%s\n", str, data->env[i]);
+		}
+	}
+}
+
 void	print_env_env(char **env, char *str)
 {
 	int	i;
@@ -461,7 +486,7 @@ char	**ft_matadd(char ***mat, char *str)
 	return (new_mat);
 }
 
-//TODO hay que ponerle, no cambia las variables, no llega al data.env correctamente tras pasarlo a una funcion.
+// hay que ponerle, no cambia las variables, no llega al data.env correctamente tras pasarlo a una funcion.
 void	b_export(t_data **data)
 {
 	int		i;
@@ -470,7 +495,7 @@ void	b_export(t_data **data)
 	t_data	*cdata;
 	
 	if (!(*data)->args[1])
-		return(print_env(*data, "declare -x "));
+		return(print_export(*data, "declare -x "));
 	cdata = *data;
 	need = ft_strnstr((cdata)->args[1],"=", ft_strlen((cdata)->args[1]));
 	if(need)

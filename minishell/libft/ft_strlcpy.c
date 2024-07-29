@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strlcpy.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kluna-bo <kluna-bo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/23 14:23:09 by kluna-bo          #+#    #+#             */
-/*   Updated: 2023/10/01 20:16:24 by kluna-bo         ###   ########.fr       */
+/*   Updated: 2024/07/29 20:52:35 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ char	*ft_strncpy(char *dst, const char *src, size_t n)
 		dst[i] = '\0';
 		i++;
 	}
+	dst[i] = '\0';
 	return (dst);
 }
 
