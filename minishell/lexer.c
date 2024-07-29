@@ -370,6 +370,7 @@ int	init_data(t_data **data, char **env)
 	(*data)->path = NULL;
 	(*data)->redir = NULL;
 	(*data)->env = NULL;
+	(*data)->heredoc = 0;
 	if (!create_env(data, env))
 		return (0);
 	return (1);

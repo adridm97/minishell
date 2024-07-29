@@ -119,6 +119,7 @@ typedef struct s_data
 	struct s_redir	*redir;
 	struct s_error	error;
 	char			**env;
+	int				heredoc;
 }	t_data;
 
 // lexer.c

@@ -66,6 +66,8 @@ int	main(int argc, char *argv[], char *env[])
 	static char	*input;
 	t_data		*data;
 	char		**mat;
+	int			fd;
+	char		*prompt;
 
 	(void)argc;
 	(void)argv;
@@ -76,7 +78,16 @@ int	main(int argc, char *argv[], char *env[])
 	while (1)
 	{
 		ft_handle_env_file(&mat);
-		input = readline(BLUE"Minishell: "BLACK);
+		if (!access("/tmp/echoafjnaifsnk", F_OK))
+		{
+			fd = open("/tmp/echoafjnaifsnk", O_RDONLY);
+			prompt = get_next_line(fd);
+			close(fd);
+			unlink("/tmp/echoafjnaifsnk");
+			input = readline(prompt);
+		}
+		else
+			input = readline(BLUE"Minishell: "BLACK);
 		if (input == NULL)
 		{
 			printf("\nexit\n");
