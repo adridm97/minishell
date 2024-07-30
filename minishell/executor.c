@@ -347,15 +347,9 @@ void	b_echo(t_data *data)
 			close(fd), unlink("/tmp/echoafjnaifsnk"), exit(g_stat_code);
 		while (data->args[i])
 		{
-<<<<<<< HEAD
-			//data->args[i] = heredoc_tokenizer(data->args[i], data);
-			if (!data->args[i])
-				exit(g_stat_code);
-=======
 			// data->args[i] = heredoc_tokenizer(data->args[i], data);
 			// if (!data->args[i])
 			// 	exit(g_stat_code);
->>>>>>> kluna-bo
 			ft_putstr_fd(data->args[i], fd);
 			if (data->args[++i])
 				ft_putstr_fd(" ", fd);
@@ -367,15 +361,9 @@ void	b_echo(t_data *data)
     {
         while (data->args[i])
         {
-<<<<<<< HEAD
-			//data->args[i] = heredoc_tokenizer(data->args[i],data);
-			if (!data->args[i])
-				exit(g_stat_code);
-=======
 			// data->args[i] = heredoc_tokenizer(data->args[i],data);
 			// if (!data->args[i])
 			// 	exit(g_stat_code);
->>>>>>> kluna-bo
             printf("%s", data->args[i]);
             if (data->args[++i])
                 printf(" ");
