@@ -338,6 +338,7 @@ void	b_echo(t_data *data)
 	int	fd;
 
 	i = 1;
+	print_data(data);
 	if (data->args[i] && !ft_is_n(data->args[i]))
 	{
 		i++;
@@ -346,9 +347,9 @@ void	b_echo(t_data *data)
 			close(fd), unlink("/tmp/echoafjnaifsnk"), exit(g_stat_code);
 		while (data->args[i])
 		{
-			data->args[i] = heredoc_tokenizer(data->args[i], data);
-			if (!data->args[i])
-				exit(g_stat_code);
+			// data->args[i] = heredoc_tokenizer(data->args[i], data);
+			// if (!data->args[i])
+			// 	exit(g_stat_code);
 			ft_putstr_fd(data->args[i], fd);
 			if (data->args[++i])
 				ft_putstr_fd(" ", fd);
@@ -360,9 +361,9 @@ void	b_echo(t_data *data)
     {
         while (data->args[i])
         {
-			data->args[i] = heredoc_tokenizer(data->args[i],data);
-			if (!data->args[i])
-				exit(g_stat_code);
+			// data->args[i] = heredoc_tokenizer(data->args[i],data);
+			// if (!data->args[i])
+			// 	exit(g_stat_code);
             printf("%s", data->args[i]);
             if (data->args[++i])
                 printf(" ");
@@ -651,6 +652,8 @@ void	b_env(t_data *data)
 	int	i;
 
 	i = -1;
+	if(data->args[1])
+		ft_putstr_fd("Error, env not accept arguments\n", 2), sc_error(SC_KEY_HAS_EXPIRED), exit(g_stat_code);
 	if (data->env)
 	{
 		while (data->env[++i])

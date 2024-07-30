@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/28 10:48:03 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/30 08:10:10 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ int	main(int argc, char *argv[], char *env[])
 	(void)argv;
 	data = NULL;
 	mat = NULL;
+	// printf("%i\n", getpid());
 	setup_signal_handlers();
 	ft_set_shell(env, &mat);
 	while (1)
@@ -99,6 +100,7 @@ int	main(int argc, char *argv[], char *env[])
 			data = lexer(input, &data, mat);
 		else
 			data = lexer(input, &data, env);
+		print_data(data);
 		if (data)
 			check_pwd(data);
 		if (data && data->next)
