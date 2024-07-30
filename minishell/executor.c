@@ -487,37 +487,43 @@ char	**ft_matadd(char ***mat, char *str)
 	return (new_mat);
 }
 
-// hay que ponerle, no cambia las variables, no llega al data.env correctamente tras pasarlo a una funcion.
+// TODO liberar key???
 void	b_export(t_data **data)
 {
 	int		i;
 	char	*key;
 	char	*need;
 	t_data	*cdata;
-	
+	int		j;
+
+	j = 0;
 	if (!(*data)->args[1])
 		return(print_export(*data, "declare -x "));
 	cdata = *data;
-	need = ft_strnstr((cdata)->args[1],"=", ft_strlen((cdata)->args[1]));
-	if(need)
+	while ((*data)->args[++j])
 	{
-		key = (char*)malloc((need - (cdata)->args[1]) +1);
-		ft_strlcpy(key, (cdata)->args[1], ((need - (cdata)->args[1]) + 1));
-	}
-	else
-		key = ft_strdup((cdata)->args[1]);
-	// printf("la i es %s\n", key);
-	if (index_env(cdata, key) >= 0)
-	{
-		i = index_env(cdata, key);
-		// printf("la i es %i\n", i);
-		(cdata)->env[i] = (cdata)->args[1];
-	}
-	else
-	{
-		(cdata)->env = ft_matadd(&(cdata)->env, (cdata)->args[1]);
-		if (!(cdata)->env)
-			exit(g_stat_code);
+		need = ft_strnstr((cdata)->args[j],"=", ft_strlen((cdata)->args[j]));
+		if(need)
+		{
+			key = (char*)malloc((need - (cdata)->args[j]) +1);
+			ft_strlcpy(key, (cdata)->args[j], ((need - (cdata)->args[j]) + 1));
+		}
+		else
+			key = ft_strdup((cdata)->args[j]);
+		// printf("la i es %s\n", key);
+		if (index_env(cdata, key) >= 0)
+		{
+			i = index_env(cdata, key);
+			// printf("la i es %i\n", i);
+			if(need && need[0] == '=')
+				(cdata)->env[i] = (cdata)->args[j];
+		}
+		else
+		{
+			(cdata)->env = ft_matadd(&(cdata)->env, (cdata)->args[j]);
+			if (!(cdata)->env)
+				exit(g_stat_code);
+		}
 	}
 	unlink("/tmp/env.env");
 	if (save_env(cdata))
@@ -570,11 +576,16 @@ int	index_env(t_data *data, char *str)
 void	b_unset(t_data *data)
 {
 	int	i;
+	int	j;
 
-	i = index_env(data, data->args[1]);
-	// printf("%i\n", i);
-	if (i != -1)
-		data->env = ft_mat_rem_index(&data->env, i);
+	j = 0; 
+	while(data->args[++j])
+	{
+		i = index_env(data, data->args[j]);
+		// printf("%i\n", i);
+		if (i != -1)
+			data->env = ft_mat_rem_index(&data->env, i);
+	}
 	unlink("/tmp/env.env");
 	if (save_env(data))
 		exit(g_stat_code);

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/28 10:47:32 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/31 00:26:24 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -371,6 +371,7 @@ int	init_data(t_data **data, char **env)
 	(*data)->redir = NULL;
 	(*data)->env = NULL;
 	(*data)->heredoc = 0;
+	(*data)->is_ex = 0;
 	if (!create_env(data, env))
 		return (0);
 	return (1);
