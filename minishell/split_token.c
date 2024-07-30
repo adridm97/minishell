@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/07/21 18:48:34 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/31 00:34:16 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ void	is_simple_string(t_token **token, char **env, char **str)
 	char	*res;
 
 	res = NULL;
+	printf("HOLAA\n");
 	if (*str)
 		res = ft_strdup(*str);
 	*token = (*token)->next;
@@ -83,7 +84,9 @@ void	is_simple_string(t_token **token, char **env, char **str)
 	if (*token)
 		*token = (*token)->next;
 	free(*str);
+	printf("ADIOS\n");
 	*str = res;
+	printf("res = %s\n", res);
 }
 
 // save in str the string
@@ -95,12 +98,12 @@ void	is_double_string(t_token **token, char **env, char **str)
 	if (*str)
 		res = ft_strdup(*str);
 	*token = (*token)->next;
+
 	while (*token && (*token)->value != '"')
 	{
 		if ((*token)->value == '$')
 		{
 			is_expandsor(token, &res, env);
-			break ;
 		}
 		res = new_str(&res, (*token)->value);
 		if (*token)
@@ -246,10 +249,14 @@ int	is_pipe(t_token **token, t_data **data, char **str)
 
 int	take_key(t_token **token, char **key, char *str)
 {
-	while (*token && !is_special((*token)->value, str))
+	t_token *ctoken;
+
+	ctoken = *token;
+	while (ctoken && !is_special(ctoken->value, str))
 	{
-		*key = new_str(key, (*token)->value);
-		*token = (*token)->next;
+		*key = new_str(key, ctoken->value);
+		ctoken = ctoken->next;
+		(*token) = ctoken;
 	}
 	if (*key)
 		return (1);
@@ -285,6 +292,7 @@ int	is_expandsor(t_token **token, char **str, char **env)
 	char	*res;
 	char	*status_code;
 
+
 	status_code = NULL;
 	key = NULL;
 	// printf("inicio de is_expand\n");
@@ -301,7 +309,7 @@ int	is_expandsor(t_token **token, char **str, char **env)
 	}
 	else
 	{
-		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€$"))
+		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€"))
 		{
 			key = key_to_res(&key, env);
 			if (key)
@@ -317,7 +325,7 @@ int	is_expandsor(t_token **token, char **str, char **env)
 			else
 				return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 		}
-		else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€$"))
+		else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€"))
 		{
 			status_code = ft_itoa(g_stat_code);
 			if (!*str)
@@ -412,7 +420,10 @@ int	switch_case(t_token **token, char **env, t_data **data, char **str)
 	else if ((*token)->value == '|')
 		return (is_pipe(token, data, str));
 	else if ((*token)->value == '$')
+	{
 		is_expandsor(token, str, env);
+		(*data)->is_ex = 1;
+	}
 	else if ((*token)->value == ' ')
 		is_space(token, data, str);
 	return (1);
@@ -421,11 +432,29 @@ int	switch_case(t_token **token, char **env, t_data **data, char **str)
 int	add_last_data(t_data **data, char **str)
 {
 	t_data	*n_data;
+	char	**mat;
+	int		i;
 
+	i = 0;
 	n_data = *data;
 	while (n_data->next)
 		n_data = n_data->next;
-	if (!add_args(&n_data->args, str))
+	if((*data)->is_ex)
+	{
+		mat = ft_split(*str, ' ');
+		if (!mat)
+			return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+		while(mat[i])
+		{
+			if (!add_args(&n_data->args, &mat[i]))
+				return (free_args(&mat), 0);
+			i++;
+		}
+		free(mat);
+		// free(str);
+		str = NULL;
+	}
+	else if (!add_args(&n_data->args, str))
 		return (0);
 	return (1);
 }
