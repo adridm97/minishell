@@ -100,7 +100,6 @@ int	main(int argc, char *argv[], char *env[])
 			data = lexer(input, &data, mat);
 		else
 			data = lexer(input, &data, env);
-		print_data(data);
 		if (data)
 			check_pwd(data);
 		if (data && data->next)

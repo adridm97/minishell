@@ -338,7 +338,6 @@ void	b_echo(t_data *data)
 	int	fd;
 
 	i = 1;
-	print_data(data);
 	if (data->args[i] && !ft_is_n(data->args[i]))
 	{
 		i++;
