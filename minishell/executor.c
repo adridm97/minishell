@@ -937,7 +937,7 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 	i = 0;
 	path = ft_strdup("PATH");
 	path = key_to_res(&path, data->env);
-	if (!path || !data->comand)
+	if ((!path || !data->comand) && !is_builtin(data->comand))
 	{
 		if (data->redir != NULL && data->redir->type == D_MINOR)
 		{
@@ -949,6 +949,7 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 			handle_redir(data);
 		}
 		//free(path);
+		ft_putstr_fd("Comand not found\n", 2);
 		return (0);
 	}
 	if (is_builtin(data->comand))

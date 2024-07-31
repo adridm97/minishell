@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/07/31 00:34:16 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/31 23:39:37 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,6 @@ void	is_simple_string(t_token **token, char **env, char **str)
 	char	*res;
 
 	res = NULL;
-	printf("HOLAA\n");
 	if (*str)
 		res = ft_strdup(*str);
 	*token = (*token)->next;
@@ -84,9 +83,7 @@ void	is_simple_string(t_token **token, char **env, char **str)
 	if (*token)
 		*token = (*token)->next;
 	free(*str);
-	printf("ADIOS\n");
 	*str = res;
-	printf("res = %s\n", res);
 }
 
 // save in str the string
@@ -132,7 +129,11 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 	t_redir	*redir;
 	t_redir	*l_redir;
 	t_data	*c_data;
+	int		exp;
 
+	exp = 1;
+	if (type == D_MINOR)
+		exp = 0;
 	c_data = *data;
 	redir = (t_redir *)malloc(sizeof(t_redir));
 	redir->next = NULL;
@@ -141,7 +142,7 @@ void	init_redir(t_token **token, t_data **data, char **env, int type)
 	str = NULL;
 	while ((*token))
 	{
-		if (is_special((*token)->value, "'\"$"))
+		if (is_special((*token)->value, "'\"$" ) && exp)
 			switch_case_redir(token, &str, env);
 		else if (is_special((*token)->value, "| <>") && str)
 		{

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/30 08:10:10 by kevin            ###   ########.fr       */
+/*   Updated: 2024/07/31 23:19:58 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,9 @@ int	main(int argc, char *argv[], char *env[])
 		if (input && *input)
 			add_history(input);
 		if (mat)
+		{
 			data = lexer(input, &data, mat);
+		}
 		else
 			data = lexer(input, &data, env);
 		print_data(data);
