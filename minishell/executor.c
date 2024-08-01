@@ -12,7 +12,6 @@
 
 #include "minishell.h"
 
-void	handle_redir(t_data *data);
 
 int	ft_strcmp(const char *s1, const char *s2)
 {
@@ -116,15 +115,13 @@ int	is_valid_file(char *filename, int fd, char *check)
 }
 
 // TODO gestionar los exit con exit status
-int	heredoc(t_data *data) 
+int	heredoc(t_redir	*aux, t_data *data) 
 {
 	int		fd;
 	char	*line;
 	char	*filename;
 	char	*expanded_line;
-	t_redir	*aux;
 
-	aux = data->redir;
 	filename = "/tmp/heredoc";
 	fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (is_valid_file(filename, fd, "FRW"))
@@ -160,15 +157,20 @@ int	heredoc(t_data *data)
 	return open(filename, O_RDONLY);
 }
 
-void	handle_redir(t_data *data)
+void	handle_redir(t_data *data, int heredoc_processed)
 {
 	int 	fd;
 	t_redir *redir;
-	
+
 	redir = data->redir;
 	while (redir != NULL)
 	{
-		if (redir->type == MAJOR)
+		if (data && (data->redir != NULL && data->redir->type == D_MINOR) \
+				&& heredoc_processed == 0)
+		{
+			fd = heredoc(redir, data);
+		}
+		else if (redir->type == MAJOR)
 		{
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		}
@@ -202,12 +204,19 @@ void	handle_redir(t_data *data)
 				exit(EXIT_FAILURE);
 			}
 		}
-
+		else if (!heredoc_processed && !redir->next && redir->type == D_MINOR && data->comand != NULL)
+		{
+			if (dup2(fd, STDIN_FILENO) == -1)
+			{
+				perror("dup2");
+				exit(EXIT_FAILURE);
+			}
+		}
 		close(fd);
 		redir = redir->next;
 	}
 }
-
+// cat << a cat << b cat << c
 void	b_cd(t_data *data, char *home)
 {
 	int		i;
@@ -487,6 +496,20 @@ char	**ft_matadd(char ***mat, char *str)
 	return (new_mat);
 }
 
+int	is_special_string(char *c, char *comp)
+{
+	char	*str;
+
+	while (*c)
+	{
+		str = ft_strchr(comp, *c);
+		if (str)
+			return (1);
+		c++;
+	}
+		return (0);
+}
+
 // TODO liberar key???
 void	b_export(t_data **data)
 {
@@ -507,9 +530,21 @@ void	b_export(t_data **data)
 		{
 			key = (char*)malloc((need - (cdata)->args[j]) +1);
 			ft_strlcpy(key, (cdata)->args[j], ((need - (cdata)->args[j]) + 1));
+			if(!*key || is_special_string(key, " <>|'\".,-+*!¡?¿%%=·@$#ªº¬€"))
+			{
+				free(key);
+				return (sc_error(SC_INVALID_ARGUMENT), printf("export: `%s': not a valid identifier\n", (cdata)->args[j]), exit(g_stat_code));
+			}
 		}
 		else
+		{
 			key = ft_strdup((cdata)->args[j]);
+			if(!*key || is_special_string(key, " <>|'\".,-+*!¡?¿%%=·@$#ªº¬€"))
+			{
+				free(key);
+				return (sc_error(SC_INVALID_ARGUMENT), printf("export: `%s': not a valid identifier\n", (cdata)->args[j]), exit(g_stat_code));
+			}
+		}
 		// printf("la i es %s\n", key);
 		if (index_env(cdata, key) >= 0)
 		{
@@ -639,7 +674,7 @@ void	b_exit(t_data *data)
 		while(data->args[1][j])
 		{
 			if (!ft_isdigit(data->args[1][j]))
-				sc_error(255), printf("exit\n"), ft_putstr_fd("numeric argument required\n", 2), exit(g_stat_code);
+				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), printf("exit\n"), ft_putstr_fd("numeric argument required\n", 2), exit(g_stat_code);
 			j++;
 		}
 	}
@@ -752,7 +787,7 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 {
 	pid_t	pid;
 	t_data	*data;
-	int		heredoc_fd;
+
 	int		status;
 	wait_signal(0);
 	pid = fork();
@@ -764,24 +799,8 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 	}
 	else if (pid == 0)
 	{
-		if (data && (data->redir != NULL && data->redir->type == D_MINOR) \
-				&& heredoc_processed == 0)
-		{
-			heredoc_fd = heredoc(data);
-			if (heredoc_fd == -1)
-			{
-				perror("heredoc\n");
-				exit(EXIT_FAILURE);
-			}
-			if (dup2(heredoc_fd, STDIN_FILENO) == -1)
-			{
-				perror("dup2");
-				exit(EXIT_FAILURE);
-			}
-			close(heredoc_fd);
-		}
 		if (data->redir != NULL)
-			handle_redir(data);
+			handle_redir(data, heredoc_processed);
 		if (ft_strcmp(command_path, "is_builtinOMG") == 0)
 		{
 			switch_builtin(ddata);
@@ -844,7 +863,7 @@ void	execute_pipeline(t_data **data)
 		{
 			if (current->redir != NULL && current->redir->type == D_MINOR && !heredoc_processed)
 			{
-				heredoc_fd = heredoc(current);
+				heredoc_fd = heredoc(current->redir, current);
 				if (heredoc_fd == -1)
 					heredoc_processed = 1;
 				if (dup2(heredoc_fd, STDIN_FILENO) == -1)
@@ -877,7 +896,7 @@ void	execute_pipeline(t_data **data)
 			close(fd[0]);
 			close(fd[1]);
 			if (current->redir != NULL)
-				handle_redir(current);
+				handle_redir(current, heredoc_processed);
 			if (!is_valid_command(current, heredoc_processed))
 				sc_error(SC_KEY_HAS_EXPIRED), exit(g_stat_code);
 			sc_error(SC_SUCCESS), exit(g_stat_code);
@@ -947,7 +966,7 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		}
 		if (data->redir != NULL)
 		{
-			handle_redir(data);
+			handle_redir(data, heredoc_processed);
 		}
 		//free(path);
 		ft_putstr_fd("Comand not found\n", 2);

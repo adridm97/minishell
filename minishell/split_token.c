@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/01 21:42:56 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/02 00:34:28 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -298,7 +298,7 @@ int	is_expandsor(t_token **token, char **str, char **env)
 	key = NULL;
 	// printf("inicio de is_expand\n");
 	*token = (*token)->next;
-	if (!*token || is_special((*token)->value, "<> |"))
+	if (!*token || is_special((*token)->value, "<> |\0"))
 		*str = new_str(str, '$');
 	else if ((*token)->value == '"')
 	{
@@ -310,7 +310,7 @@ int	is_expandsor(t_token **token, char **str, char **env)
 	}
 	else
 	{
-		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€"))
+		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€$"))
 		{
 			key = key_to_res(&key, env);
 			if (key)
@@ -326,7 +326,7 @@ int	is_expandsor(t_token **token, char **str, char **env)
 			else
 				return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 		}
-		else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€"))
+		else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€$"))
 		{
 			status_code = ft_itoa(g_stat_code);
 			if (!*str)
@@ -338,7 +338,10 @@ int	is_expandsor(t_token **token, char **str, char **env)
 			*str = res;
 		}
 		else
-			return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+		{
+			*str = new_str(str, '$');
+			return(1);
+		}
 	}
 	return (1);
 }
@@ -452,7 +455,6 @@ int	add_last_data(t_data **data, char **str)
 			i++;
 		}
 		free(mat);
-		// free(str);
 		str = NULL;
 	}
 	else if (!add_args(&n_data->args, str))

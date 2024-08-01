@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/01 22:57:48 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/02 00:03:25 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ int	main(int argc, char *argv[], char *env[])
 			input = readline(BLUE"Minishell: "BLACK);
 		if (input == NULL)
 		{
-			printf("\nexit\n");
+			printf("\n\n");
 			break ;
 		}
 		if (input && *input)

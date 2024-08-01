@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/31 00:26:24 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/02 00:09:25 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -329,6 +329,7 @@ char	**get_env_file(int fd)
 	return (mat);
 }
 
+// TODO extraer la funcion de contar la líneas de un archivo
 int	get_file_env(int fd, t_data **data)
 {
 	int		i;

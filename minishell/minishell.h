@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/01 23:01:41 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/01 23:56:53 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,8 +167,8 @@ int		add_last_data(t_data **data, char **str);
 char	*key_to_res(char **key, char **env);
 int		is_special(char c, char *comp);
 void	execute_command(t_data **ddata, char *command_path, int heredoc_processed);
-void	handle_redir(t_data *data);
-int		heredoc(t_data *data);
+void	handle_redir(t_data *data, int heredoc_processed);
+int		heredoc(t_redir	*aux, t_data *data) ;
 char	*charstr(char c);
 char	*new_str(char **str, char c);
 
