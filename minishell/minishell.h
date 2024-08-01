@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/31 00:19:02 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/01 23:01:41 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,12 +172,11 @@ int		heredoc(t_data *data);
 char	*charstr(char c);
 char	*new_str(char **str, char c);
 
-//handlers.c
-void	setup_signal_handlers();
-
 //signals.c
 void	handle_sigint_heredoc(int sig);
+void	wait_signal(int i);
 void	setup_signal_handlers(void);
+void	child_handler(int signal);
 
 //env.c
 int		set_env(char *key, char *val, char ***env);

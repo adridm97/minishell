@@ -754,6 +754,7 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 	t_data	*data;
 	int		heredoc_fd;
 	int		status;
+	wait_signal(0);
 	pid = fork();
 	data = *ddata;
 	if (pid == -1)

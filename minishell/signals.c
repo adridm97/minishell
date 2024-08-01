@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   executor.c                                         :+:      :+:    :+:   */
+/*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/07/21 19:28:40 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/01 23:09:10 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,48 @@ void	handle_sigquit(int sig)
 	(void)sig;
 }
 
-void	setup_signal_handlers(void)
+void	child_handler(int signal)
 {
-	if (signal(SIGINT, handle_sigint) == SIG_ERR)
+	if (signal == SIGINT)
+		g_stat_code = 130;
+	else if (signal == SIGQUIT)
 	{
-		perror("Error al configurar el manejador de SIGINT");
-		exit(EXIT_FAILURE);
+		printf("Quit: 3\n");
+		g_stat_code = 131;
 	}
-	if (signal(SIGQUIT, handle_sigquit) == SIG_ERR)
+	return ;
+}
+
+// void	setup_signal_handlers(void)
+// {
+// 	if (signal(SIGINT, handle_sigint) == SIG_ERR)
+// 	{
+// 		perror("Error al configurar el manejador de SIGINT");
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	if (signal(SIGQUIT, handle_sigquit) == SIG_ERR)
+// 	{
+// 		perror("Error al configurar el manejador de SIGQUIT");
+// 		exit(EXIT_FAILURE);
+// 	}
+// }
+
+void	wait_signal(int i)
+{
+	struct sigaction	sa;
+
+	if (i)
 	{
-		perror("Error al configurar el manejador de SIGQUIT");
-		exit(EXIT_FAILURE);
+
+		sa.sa_handler = &handle_sigint;
 	}
+	else
+	{
+
+		sa.sa_handler = &child_handler;
+	}
+	sa.sa_flags = SA_RESTART;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
 }

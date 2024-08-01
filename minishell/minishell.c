@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/31 23:19:58 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/01 22:57:48 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ int	file_exist(char *file)
 	return (1);
 }
 
+
+
 int	check_pwd(t_data *data)
 {
 	char	*key;
@@ -74,8 +76,8 @@ int	main(int argc, char *argv[], char *env[])
 	data = NULL;
 	mat = NULL;
 	// printf("%i\n", getpid());
-	setup_signal_handlers();
 	ft_set_shell(env, &mat);
+	wait_signal(1);
 	while (1)
 	{
 		ft_handle_env_file(&mat);
@@ -117,6 +119,7 @@ int	main(int argc, char *argv[], char *env[])
 			if (g_stat_code == SC_HEREDOC)
 				sc_error(1);
 		}
+		wait_signal(1);
 		if (data && data->comand && !strcmp(data->comand, "exit"))
 		{
 			if (g_stat_code != 1)
