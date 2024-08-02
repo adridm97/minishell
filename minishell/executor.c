@@ -468,7 +468,6 @@ char	**ft_matadd(char ***mat, char *str)
 	int		i;
 	char	**c_mat;
 
-	printf("3\n");
 	i = -1;
 	size = ft_matsize(*mat);
 	new_mat = (char **)malloc(sizeof(char **) * (size + 2));
