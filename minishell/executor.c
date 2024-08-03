@@ -825,6 +825,7 @@ void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
 				g_stat_code = WTERMSIG(status);
 		}
 	}
+	
 }
 
 void	execute_pipeline(t_data **data)
@@ -966,7 +967,6 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		{
 			handle_redir(data, heredoc_processed);
 		}
-		//free(path);
 		ft_putstr_fd("Comand not found\n", 2);
 		return (0);
 	}

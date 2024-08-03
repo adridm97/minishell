@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/03 14:08:30 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/03 14:19:44 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,11 +118,10 @@ int	main(int argc, char *argv[], char *env[])
 	(void)argv;
 	data = NULL;
 	mat = NULL;
-	// printf("%i\n", getpid());
-	setup_signal_handlers();
 	ft_set_shell(env, &mat);
 	while (1)
 	{
+		wait_signal(1);
 		ft_handle_env_file(&mat);
 		input = get_input();
 		if (input == NULL)

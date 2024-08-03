@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/03 13:58:33 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/03 14:14:10 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,20 +47,6 @@ void	child_handler(int signal)
 	}
 	return ;
 }
-
-// void	setup_signal_handlers(void)
-// {
-// 	if (signal(SIGINT, handle_sigint) == SIG_ERR)
-// 	{
-// 		perror("Error al configurar el manejador de SIGINT");
-// 		exit(EXIT_FAILURE);
-// 	}
-// 	if (signal(SIGQUIT, handle_sigquit) == SIG_ERR)
-// 	{
-// 		perror("Error al configurar el manejador de SIGQUIT");
-// 		exit(EXIT_FAILURE);
-// 	}
-// }
 
 void	wait_signal(int i)
 {
