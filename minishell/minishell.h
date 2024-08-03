@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/03 16:27:41 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/03 18:19:53 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,14 @@ typedef struct s_redir
 	char			*path;
 	struct s_redir	*next;
 }	t_redir;
+
+typedef struct s_exec_vars
+{
+	int		input_fd;
+	int		heredoc_fd;
+	int		heredoc_processed;
+	int		last_pid;
+}	t_exec_vars;
 
 /*
 typedef struct s_heredoc
@@ -167,7 +175,7 @@ void	b_cd(t_data *data, char *home);
 void	b_pwd(void);
 
 //split_token
-int	is_expandsor(t_token **token, char **str, char **env);
+int		is_expandsor(t_token **token, char **str, char **env);
 void	is_expandsor_str_simple(t_token **token, char **str, char **env);
 int		switch_case(t_token **token, char **env, t_data **data, char **str);
 int		add_args(char ***arg, char **str);
@@ -179,6 +187,7 @@ void	handle_redir(t_data *data, int heredoc_processed);
 int		heredoc(t_redir	*aux, t_data *data) ;
 char	*charstr(char c);
 char	*new_str(char **str, char c);
+int	count_args(char **args);
 
 //signals.c
 void	handle_sigint_heredoc(int sig);

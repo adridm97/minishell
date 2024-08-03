@@ -6,65 +6,94 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/03 16:25:40 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/03 21:00:34 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// TODO liberar key???
-void	b_export(t_data **data)
+void	update_env(t_data *cdata, char *key, char *arg)
 {
-	int		i;
-	char	*key;
-	char	*need;
-	t_data	*cdata;
-	int		j;
+	int	i;
 
-	j = 0;
-	if (!(*data)->args[1])
-		return(print_export(*data, "declare -x "));
-	cdata = *data;
-	while ((*data)->args[++j])
+	i = index_env(cdata, key);
+	if (i >= 0)
 	{
-		need = ft_strnstr((cdata)->args[j],"=", ft_strlen((cdata)->args[j]));
-		if(need)
-		{
-			key = (char*)malloc((need - (cdata)->args[j]) +1);
-			ft_strlcpy(key, (cdata)->args[j], ((need - (cdata)->args[j]) + 1));
-			if(!*key || is_special_string(key, " <>|'\".,-+*!¡?¿%%=·@$#ªº¬€"))
-			{
-				free(key);
-				return (sc_error(SC_INVALID_ARGUMENT), printf("export: `%s': not a valid identifier\n", (cdata)->args[j]), exit(g_stat_code));
-			}
-		}
-		else
-		{
-			key = ft_strdup((cdata)->args[j]);
-			if(!*key || is_special_string(key, " <>|'\".,-+*!¡?¿%%=·@$#ªº¬€"))
-			{
-				free(key);
-				return (sc_error(SC_INVALID_ARGUMENT), printf("export: `%s': not a valid identifier\n", (cdata)->args[j]), exit(g_stat_code));
-			}
-		}
-		// printf("la i es %s\n", key);
-		if (index_env(cdata, key) >= 0)
-		{
-			i = index_env(cdata, key);
-			if(need && need[0] == '=')
-				(cdata)->env[i] = (cdata)->args[j];
-		}
-		else
-		{
-			(cdata)->env = ft_matadd(&(cdata)->env, (cdata)->args[j]);
-			if (!(cdata)->env)
-				exit(g_stat_code);
-		}
+		if (ft_strnstr(arg, "=", ft_strlen(arg)))
+			cdata->env[i] = arg;
 	}
+	else
+	{
+		cdata->env = ft_matadd(&(cdata)->env, arg);
+		if (!cdata->env)
+			exit(g_stat_code);
+	}
+}
+
+char	*extract_key(char *arg)
+{
+	char	*need;
+	char	*key;
+
+	need = ft_strnstr(arg, "=", ft_strlen(arg));
+	if (need)
+	{
+		key = (char *)malloc((need - arg) + 1);
+		if (!key)
+			exit(g_stat_code);
+		ft_strlcpy(key, arg, (need - arg) + 1);
+	}
+	else
+	{
+		key = ft_strdup(arg);
+		if (!key)
+			exit(g_stat_code);
+	}
+	return (key);
+}
+
+int	is_valid_key(char *key)
+{
+	return (*key && !is_special_string(key, " <>|'\".,-+*!¡?¿%%=·@$#ªº¬€"));
+}
+
+void	process_argument(t_data *cdata, char *arg)
+{
+	char	*key;
+
+	key = extract_key(arg);
+	if (!is_valid_key(key))
+	{
+		free(key);
+		return (sc_error(SC_INVALID_ARGUMENT), \
+		printf("export: `%s': not a valid identifier\n", arg), \
+		exit(g_stat_code));
+	}
+	update_env(cdata, key, arg);
+	free(key);
+}
+
+void	finalize_export(t_data *cdata)
+{
 	unlink("/tmp/env.env");
 	if (save_env(cdata))
 		exit(g_stat_code);
-	sc_error(SC_SUCCESS), exit(g_stat_code);
+	sc_error(SC_SUCCESS);
+	exit(g_stat_code);
+}
+
+void	b_export(t_data **data)
+{
+	int	j;
+
+	j = 0;
+	if (!(*data)->args[1])
+		return (print_export(*data, "declare -x "));
+	while ((*data)->args[++j])
+	{
+		process_argument(*data, (*data)->args[j]);
+	}
+	finalize_export(*data);
 }
 
 char	**ft_mat_rem_index(char ***mat, int index)
@@ -89,6 +118,7 @@ char	**ft_mat_rem_index(char ***mat, int index)
 	free_args(mat);
 	return (new_mat);
 }
+
 // retorna el index de env o -1 si index no existe o -2 si env no existe
 int	index_env(t_data *data, char *str)
 {
@@ -114,74 +144,51 @@ void	b_unset(t_data *data)
 	int	i;
 	int	j;
 
-	j = 0; 
-	while(data->args[++j])
+	j = 0;
+	while (data->args[++j])
 	{
 		i = index_env(data, data->args[j]);
-		// printf("%i\n", i);
 		if (i != -1)
 			data->env = ft_mat_rem_index(&data->env, i);
 	}
 	unlink("/tmp/env.env");
 	if (save_env(data))
 		exit(g_stat_code);
-	sc_error(SC_SUCCESS), exit(g_stat_code);
+	sc_error(SC_SUCCESS);
+	exit(g_stat_code);
 }
-//TODO si es mayor que 2, too many arguments
-//si el primer valor es correcto y el segundo es incorrecto, no cierra minishell
-//dos parametros validos cierra correctamente
-// void	b_exit(t_data *data)
-// {
-// 	int	i;
 
-// 	i = 0;
-// 	while (data->args[i])
-// 		i++;
-// 	if (i > 1)
-// 	{
-// 		sc_error(EXIT_FAILURE), perror("demasiados argumentos\n"), printf("exit\n");
-// 		return ;
-// 	}
-// 	if (data->args[1])
-// 	{
-// 		i = 0;
-// 		while(data->args[1][i++])
-// 		{
-// 			if (!ft_isdigit(data->args[1][i]))
-// 				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), ft_putstr_fd("se requiere un argumento numérico\n", 2), exit(g_stat_code);
-// 		}
-// 		sc_error(ft_atoi(data->args[1]) % 256);
-// 		if (ft_atoi(data->args[1]) % 256)
-// 			ft_putstr_fd("exit\n", 2);
-// 		else
-// 			printf("exit\n");
-// 		exit(g_stat_code);
-// 	}
-// 	printf("exit\n"), sc_error(SC_SUCCESS), exit(g_stat_code);
-// }
-
-void	b_exit(t_data *data)
+void	check_numeric_argument(char *arg)
 {
-	int	i;
-	int j;
+	int	j;
 
 	j = 0;
-	i = 0;
-	while (data->args[i])
-		i++;
-	if (data->args[1])
+	while (arg[j])
 	{
-		j = 0;
-		while(data->args[1][j])
+		if (!ft_isdigit(arg[j]))
 		{
-			if (!ft_isdigit(data->args[1][j]))
-				sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY), printf("exit\n"), ft_putstr_fd("numeric argument required\n", 2), exit(g_stat_code);
-			j++;
+			sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY);
+			printf("exit\n");
+			ft_putstr_fd("numeric argument required\n", 2);
+			exit(g_stat_code);
 		}
+		j++;
 	}
-	if (i > 2)
+}
+
+//TODO si es mayor que 2, too many arguments
+void	b_exit(t_data *data)
+{
+	int	arg_count;
+
+	arg_count = count_args(data->args);
+	if (data->args[1])
+		check_numeric_argument(data->args[1]);
+	if (arg_count > 2)
 	{
-		sc_error(EXIT_FAILURE), printf("exit\n"), ft_putstr_fd("exit: too many arguments\n", 2);
+		sc_error(EXIT_FAILURE);
+		printf("exit\n");
+		ft_putstr_fd("exit: too many arguments\n", 2);
 		return ;
 	}
 	if (data->args[1])
@@ -191,7 +198,9 @@ void	b_exit(t_data *data)
 		printf("exit\n");
 		exit(g_stat_code);
 	}
-	printf("exit\n"), sc_error(SC_SUCCESS), exit(g_stat_code);
+	printf("exit\n");
+	sc_error(SC_SUCCESS);
+	exit(g_stat_code);
 }
 
 void	b_env(t_data *data)
@@ -199,8 +208,12 @@ void	b_env(t_data *data)
 	int	i;
 
 	i = -1;
-	if(data->args[1])
-		ft_putstr_fd("Error, env not accept arguments\n", 2), sc_error(SC_KEY_HAS_EXPIRED), exit(g_stat_code);
+	if (data->args[1])
+	{
+		ft_putstr_fd("Error, env not accept arguments\n", 2);
+		sc_error(SC_KEY_HAS_EXPIRED);
+		exit(g_stat_code);
+	}
 	if (data->env)
 	{
 		while (data->env[++i])
@@ -209,7 +222,8 @@ void	b_env(t_data *data)
 				printf("%s\n", data->env[i]);
 		}
 	}
-	sc_error(SC_SUCCESS), exit(g_stat_code);
+	sc_error(SC_SUCCESS);
+	exit(g_stat_code);
 }
 
 void	switch_builtin(t_data **ddata)
@@ -234,42 +248,6 @@ void	switch_builtin(t_data **ddata)
 	return ;
 }
 
-/*int execute_command(t_data **ddata, char *command_path)
-{
-	pid_t pid = fork();
-    t_data *data;
-
-    data = *ddata;
-	if (pid == -1)
-	{
-		perror("fork");
-        return(0);
-	}
-	else if (pid == 0)
-	{
-        if (data->redir != NULL && data->redir->type == D_MINOR)
-			heredoc(data);
-	    if (data->redir != NULL)
-		    handle_redir(data);
-        if (!ft_strcmp(command_path,"is_builtinOMG"))
-            switch_builtin(ddata);
-		else if (execve(command_path, data->args, NULL) == -1)
-		{
-			perror("execve");
-			return(0);
-		}
-	}
-	else
-	{
-		int	status;
-		if (waitpid(pid, &status, 0) == -1)
-		{
-			perror("waitpid");
-			return(0);
-		}
-	}
-    return (1);
-}*/
 int	is_builtin(char *comand)
 {
 	if (!comand)
@@ -283,78 +261,221 @@ int	is_builtin(char *comand)
 	return (0);
 }
 
-// TODO gestionar los exit con exit status
-void	execute_command(t_data **ddata, char *command_path, int heredoc_processed)
+void	handle_child_process(t_data **ddata, char *command_path, int processed)
 {
-	pid_t	pid;
 	t_data	*data;
 
+	data = *ddata;
+	if (data->redir != NULL)
+		handle_redir(data, processed);
+	if (ft_strcmp(command_path, "is_builtinOMG") == 0)
+	{
+		switch_builtin(ddata);
+		exit(g_stat_code);
+	}
+	else
+	{
+		if (!command_path)
+			exit(SC_KEY_HAS_EXPIRED);
+		if (execve(command_path, data->args, data->env) == -1)
+		{
+			perror("execve");
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+
+void	execute_command(t_data **ddata, char *command_path, int processed)
+{
+	pid_t	pid;
 	int		status;
+
 	wait_signal(0);
 	pid = fork();
-	data = *ddata;
 	if (pid == -1)
 	{
 		perror("fork");
 		return ;
 	}
 	else if (pid == 0)
-	{
-		if (data->redir != NULL)
-			handle_redir(data, heredoc_processed);
-		if (ft_strcmp(command_path, "is_builtinOMG") == 0)
-		{
-			switch_builtin(ddata);
-			exit(g_stat_code);
-		}
-		else
-		{
-			if (!command_path)
-				exit(SC_KEY_HAS_EXPIRED);
-			if (execve(command_path, data->args, data->env) == -1)
-			{
-				perror("execve");
-				exit(EXIT_FAILURE);
-			}
-		}
-	}
+		handle_child_process(ddata, command_path, processed);
 	else
 	{
-		while ((pid = wait(&status)) > 0)
+		pid = wait(&status);
+		while (pid > 0)
 		{
 			if (WIFEXITED(status))
 				g_stat_code = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
 				g_stat_code = WTERMSIG(status);
+			pid = wait(&status);
 		}
 	}
-	
+}
+
+void	initialize_pipe_vars(t_exec_vars *vars)
+{
+	vars->input_fd = STDIN_FILENO;
+	vars->heredoc_fd = -1;
+	vars->heredoc_processed = 0;
+	vars->last_pid = 0;
+}
+
+void	handle_heredoc(t_data *current, t_exec_vars *vars)
+{
+	vars->heredoc_fd = heredoc(current->redir, current);
+	if (vars->heredoc_fd == -1)
+		vars->heredoc_processed = 1;
+	if (dup2(vars->heredoc_fd, STDIN_FILENO) == -1)
+	{
+		perror("dup2");
+		exit(EXIT_FAILURE);
+	}
+	if (g_stat_code == SC_HEREDOC)
+	{
+		sc_error(1);
+		exit(1);
+	}
+	close(vars->heredoc_fd);
+	vars->heredoc_processed = 1;
+}
+
+void	handle_input_redirection(int *input_fd)
+{
+	if (*input_fd != STDIN_FILENO)
+	{
+		if (dup2(*input_fd, STDIN_FILENO) == -1)
+		{
+			perror("dup2");
+			exit(EXIT_FAILURE);
+		}
+		close(*input_fd);
+	}
+}
+
+void	handle_output_redirection(t_data *current, int fd[2])
+{
+	if (current->next != NULL)
+	{
+		if (dup2(fd[1], STDOUT_FILENO) == -1)
+		{
+			perror("dup2");
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+
+void	handle_child_pipes(t_data *current, t_exec_vars *vars, int fd[2])
+{
+	if (current->redir != NULL && current->redir->type == D_MINOR && \
+		!(vars->heredoc_processed))
+		handle_heredoc(current, vars);
+	else
+		handle_input_redirection(&(vars->input_fd));
+	handle_output_redirection(current, fd);
+	close(fd[0]);
+	close(fd[1]);
+	if (current->redir != NULL)
+		handle_redir(current, vars->heredoc_processed);
+	if (!is_valid_command(current, vars->heredoc_processed))
+	{
+		sc_error(SC_KEY_HAS_EXPIRED);
+		exit(g_stat_code);
+	}
+	sc_error(SC_SUCCESS);
+	exit(g_stat_code);
+}
+
+void	update_input_fd(int *input_fd, int fd[2], t_data *current)
+{
+	if (current->next != NULL)
+	{
+		close(fd[1]);
+		*input_fd = fd[0];
+	}
+	else
+	{
+		close(fd[0]);
+		close(fd[1]);
+	}
+}
+
+void	close_heredoc_fd(int *heredoc_fd)
+{
+	if (*heredoc_fd != -1)
+	{
+		close(*heredoc_fd);
+		*heredoc_fd = -1;
+	}
+}
+
+void	update_status(pid_t pid, int *last_pid, int status)
+{
+	if (pid > *last_pid && WIFEXITED(status))
+		g_stat_code = WEXITSTATUS(status);
+	else if (pid > *last_pid && WIFSIGNALED(status))
+		g_stat_code = WTERMSIG(status);
+	*last_pid = pid;
+}
+
+void	wait_for_remaining_processes(int last_pid)
+{
+	int		status;
+	pid_t	pid;
+
+	pid = wait(&status);
+	while (pid > 0)
+	{
+		update_status(pid, &last_pid, status);
+		pid = wait(&status);
+	}
+}
+
+void	update_heredoc_status(t_data **data, pid_t pid, int *processed)
+{
+	int	status;
+
+	if ((*data)->heredoc == 1)
+	{
+		pid = wait(&status);
+		while (pid > 0)
+		{
+			update_status(pid, &pid, status);
+			pid = wait(&status);
+		}
+		*processed = 0;
+	}
+}
+
+void	close_input_fd(int *input_fd)
+{
+	if (*input_fd != STDIN_FILENO)
+		close(*input_fd);
+}
+
+void	handle_parent_process(t_exec_vars *vars, int fd[2], \
+pid_t pid, t_data **data)
+{
+	close_input_fd(&(vars->input_fd));
+	update_input_fd(&(vars->input_fd), fd, *data);
+	close_heredoc_fd(&(vars->heredoc_fd));
+	update_heredoc_status(data, pid, &(vars->heredoc_processed));
 }
 
 void	execute_pipeline(t_data **data)
 {
-	t_data	*current;
-	int		input_fd;
-	int		fd[2];
-	pid_t	pid;
-	int		heredoc_fd;
-	int		heredoc_processed;
-	int		status;
-	int		last_pid;
+	int			fd[2];
+	pid_t		pid;
+	t_exec_vars	vars;
+	t_data		*current;
 
-	pid = 0;
-	heredoc_processed = 0;
-	heredoc_fd = -1;
-	input_fd = STDIN_FILENO;
 	current = *data;
-	last_pid = 0;
+	initialize_pipe_vars(&vars);
+	pid = 0;
 	while (current != NULL)
 	{
 		if (pipe(fd) == -1)
-		{
-			perror("pipe");
-			exit(EXIT_FAILURE);
-		}
+			(perror("pipe"), exit(EXIT_FAILURE));
 		pid = fork();
 		if (pid == -1)
 		{
@@ -362,125 +483,176 @@ void	execute_pipeline(t_data **data)
 			exit(EXIT_FAILURE);
 		}
 		else if (pid == 0)
-		{
-			if (current->redir != NULL && current->redir->type == D_MINOR && !heredoc_processed)
-			{
-				heredoc_fd = heredoc(current->redir, current);
-				if (heredoc_fd == -1)
-					heredoc_processed = 1;
-				if (dup2(heredoc_fd, STDIN_FILENO) == -1)
-				{
-					perror("dup2");
-					exit(EXIT_FAILURE);
-				}
-				if (g_stat_code == SC_HEREDOC)
-					sc_error(1), exit(1);
-				close(heredoc_fd);
-				heredoc_processed = 1;
-			}
-			else if (input_fd != STDIN_FILENO)
-			{
-				if (dup2(input_fd, STDIN_FILENO) == -1)
-				{
-					perror("dup2");
-					exit(EXIT_FAILURE);
-				}
-				close(input_fd);
-			}
-			if (current->next != NULL)
-			{
-				if (dup2(fd[1], STDOUT_FILENO) == -1)
-				{
-					perror("dup2");
-					exit(EXIT_FAILURE);
-				}
-			}
-			close(fd[0]);
-			close(fd[1]);
-			if (current->redir != NULL)
-				handle_redir(current, heredoc_processed);
-			if (!is_valid_command(current, heredoc_processed))
-				sc_error(SC_KEY_HAS_EXPIRED), exit(g_stat_code);
-			sc_error(SC_SUCCESS), exit(g_stat_code);
-		}
+			handle_child_pipes(current, &vars, fd);
 		else
-		{
-			if (input_fd != STDIN_FILENO)
-				close(input_fd);
-			if (current->next != NULL)
-			{
-				close(fd[1]);
-				input_fd = fd[0];
-			}
-			else
-			{
-				close(fd[0]);
-				close(fd[1]);
-			}
-			if (heredoc_fd != -1)
-			{
-				close(heredoc_fd);
-				heredoc_fd = -1;
-			}
-			current = current->next;
-			last_pid = 0;
-			if ((*data)->heredoc == 1)
-			{
-				while ((pid = wait(&status)) > 0)
-				{
-					if (pid > last_pid && WIFEXITED(status))
-						g_stat_code = WEXITSTATUS(status);
-					else if (pid > last_pid && WIFSIGNALED(status))
-						g_stat_code = WTERMSIG(status);
-					last_pid = pid;
-				}
-				heredoc_processed = 0;
-			}
-		}
+			handle_parent_process(&vars, fd, pid, data);
+		current = current->next;
 	}
-	while ((pid = wait(&status)) > 0)
-	{
-		if (pid > last_pid && WIFEXITED(status))
-			g_stat_code = WEXITSTATUS(status);
-		else if (pid > last_pid && WIFSIGNALED(status))
-			g_stat_code = WTERMSIG(status);
-		last_pid = pid;
-	}
+	wait_for_remaining_processes(vars.last_pid);
 }
 
-int	is_valid_command(t_data *data, int heredoc_processed)
+// void	execute_pipeline(t_data **data)
+// {
+// 	int			fd[2];
+// 	pid_t		pid;
+// 	t_exec_vars	vars;
+// 	t_data *current;
+// 	current = *data;
+// 	initialize_pipe_vars(&vars);
+// 	pid = 0;
+// 	while (current != NULL)
+// 	{
+// 		if (pipe(fd) == -1)
+// 		{
+// 			perror("pipe");
+// 			exit(EXIT_FAILURE);
+// 		}
+// 		pid = fork();
+// 		if (pid == -1)
+// 		{
+// 			perror("fork");
+// 			exit(EXIT_FAILURE);
+// 		}
+// 		else if (pid == 0)
+// 			handle_child_pipes(current, &vars, fd);
+// 		//{
+// 		// 	if (current->redir != NULL && current->redir->type ==D_MINOR 
+//	&& !heredoc_processed)
+// 		// 	{
+// 		// 		heredoc_fd = heredoc(current->redir, current);
+// 		// 		if (heredoc_fd == -1)
+// 		// 			heredoc_processed = 1;
+// 		// 		if (dup2(heredoc_fd, STDIN_FILENO) == -1)
+// 		// 		{
+// 		// 			perror("dup2");
+// 		// 			exit(EXIT_FAILURE);
+// 		// 		}
+// 		// 		if (g_stat_code == SC_HEREDOC)
+// 		// 			sc_error(1), exit(1);
+// 		// 		close(heredoc_fd);
+// 		// 		heredoc_processed = 1;
+// 		// 	}
+// 		// 	else if (input_fd != STDIN_FILENO)
+// 		// 	{
+// 		// 		if (dup2(input_fd, STDIN_FILENO) == -1)
+// 		// 		{
+// 		// 			perror("dup2");
+// 		// 			exit(EXIT_FAILURE);
+// 		// 		}
+// 		// 		close(input_fd);
+// 		// 	}
+// 		// 	if (current->next != NULL)
+// 		// 	{
+// 		// 		if (dup2(fd[1], STDOUT_FILENO) == -1)
+// 		// 		{
+// 		// 			perror("dup2");
+// 		// 			exit(EXIT_FAILURE);
+// 		// 		}
+// 		// 	}
+// 		// 	close(fd[0]);
+// 		// 	close(fd[1]);
+// 		// 	if (current->redir != NULL)
+// 		// 		handle_redir(current, heredoc_processed);
+// 		// 	if (!is_valid_command(current, heredoc_processed))
+// 		// 		sc_error(SC_KEY_HAS_EXPIRED), exit(g_stat_code);
+// 		// 	sc_error(SC_SUCCESS), exit(g_stat_code);
+// 		// }
+// 		else
+// 			handle_parent_process(&vars, fd, pid, data);
+//         current = current->next;
+// 		// {
+// 		// 	if (input_fd != STDIN_FILENO)
+// 		// 		close(input_fd);
+// 		// 	if (current->next != NULL)
+// 		// 	{
+// 		// 		close(fd[1]);
+// 		// 		input_fd = fd[0];
+// 		// 	}
+// 		// 	else
+// 		// 	{
+// 		// 		close(fd[0]);
+// 		// 		close(fd[1]);
+// 		// 	}
+// 		// 	if (heredoc_fd != -1)
+// 		// 	{
+// 		// 		close(heredoc_fd);
+// 		// 		heredoc_fd = -1;
+// 		// 	}
+// 		// 	current = current->next;
+// 		// 	last_pid = 0;
+// 		// 	if ((*data)->heredoc == 1)
+// 		// 	{
+// 		// 		while ((pid = wait(&status)) > 0)
+// 		// 		{
+// 		// 			if (pid > last_pid && WIFEXITED(status))
+// 		// 				g_stat_code = WEXITSTATUS(status);
+// 		// 			else if (pid > last_pid && WIFSIGNALED(status))
+// 		// 				g_stat_code = WTERMSIG(status);
+// 		// 			last_pid = pid;
+// 		// 		}
+// 		// 		heredoc_processed = 0;
+// 		// 	}
+// 		// }
+// 	}
+// 	wait_for_remaining_processes(vars.last_pid);
+// 	// while ((pid = wait(&status)) > 0)
+// 	// {
+// 	// 	if (pid > last_pid && WIFEXITED(status))
+// 	// 		g_stat_code = WEXITSTATUS(status);
+// 	// 	else if (pid > last_pid && WIFSIGNALED(status))
+// 	// 		g_stat_code = WTERMSIG(status);
+// 	// 	last_pid = pid;
+// 	// }
+// }
+
+char	*build_command_path(char *dir, char *comand)
 {
-	char	*path;
+	char	*tmp;
+	char	*comand_path;
+
+	tmp = ft_strjoin(dir, "/");
+	if (!tmp)
+		return (NULL);
+	comand_path = ft_strjoin(tmp, comand);
+	free(tmp);
+	return (comand_path);
+}
+
+int	find_command_in_paths(t_data *data, char **token, int heredoc_processed)
+{
 	int		i;
 	char	*comand_path;
-	char	**token;
-	char	*tmp;
 
-	i = 0;
-	path = ft_strdup("PATH");
-	path = key_to_res(&path, data->env);
-	if ((!path || !data->comand) && !is_builtin(data->comand))
+	i = -1;
+	while (token[++i] != NULL)
 	{
-		if (data->redir != NULL && data->redir->type == D_MINOR)
+		comand_path = build_command_path(token[i], data->comand);
+		if (comand_path == NULL)
+			return (0);
+		if (access(comand_path, F_OK) == 0)
 		{
-			execute_command(&data, data->comand, heredoc_processed);
-			return (1);
+			if (access(comand_path, X_OK) == 0)
+			{
+				execute_command(&data, comand_path, heredoc_processed);
+				(free(comand_path), free_args(&token));
+				return (1);
+			}
+			(sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), exit(126));
 		}
-		if (data->redir != NULL)
-		{
-			handle_redir(data, heredoc_processed);
-		}
-		ft_putstr_fd("Comand not found\n", 2);
-		return (0);
+		free(comand_path);
 	}
-	if (is_builtin(data->comand))
-	{
-		execute_command(&data, "is_builtinOMG", heredoc_processed);
-		free(path);
-		return (1);
-	}
+	if (data->redir != NULL)
+		execute_command(&data, data->path, heredoc_processed);
+	(free_args(&token), printf("%s: command not found\n", data->comand));
+	return (sc_error(SC_KEY_HAS_EXPIRED), 0);
+}
+
+int	search_and_execute_command(t_data *data, char *path, int heredoc_processed)
+{
+	char	**token;
+
 	token = ft_split(path, ':');
-	free(path);	
+	free(path);
 	if (access(data->comand, F_OK) == 0)
 	{
 		if (access(data->comand, X_OK) == 0)
@@ -492,29 +664,109 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 		else
 			sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE);
 	}
-
-	while (token[i] != NULL)
-	{
-		tmp = ft_strjoin(token[i], "/");
-		comand_path = ft_strjoin(tmp, data->comand);
-		free(tmp);
-		if(access(comand_path, F_OK) == 0)
-		{
-			if (access(comand_path, X_OK) == 0)
-			{
-				execute_command(&data, comand_path, heredoc_processed);
-				free(comand_path);
-				free_args(&token);
-				return (1);
-			}
-			sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), exit(126);
-		}
-		free(comand_path);
-		i++;
-	}
-	if (data->redir != NULL)
-		execute_command(&data, data->path, heredoc_processed);
-	free_args(&token);
-	printf("%s: command not found\n", data->comand);
-	return (sc_error(SC_KEY_HAS_EXPIRED), 0);
+	return (find_command_in_paths(data, token, heredoc_processed));
 }
+
+void	handle_missing_command(t_data *data, int heredoc_processed)
+{
+	if (data->redir != NULL && data->redir->type == D_MINOR)
+		execute_command(&data, data->comand, heredoc_processed);
+	else if (data->redir != NULL)
+		handle_redir(data, heredoc_processed);
+	ft_putstr_fd("Command not found\n", 2);
+}
+
+int	is_valid_command(t_data *data, int heredoc_processed)
+{
+	char	*path;
+
+	path = ft_strdup("PATH");
+	path = key_to_res(&path, data->env);
+	if (!path || !data->comand)
+	{
+		handle_missing_command(data, heredoc_processed);
+		free(path);
+		return (0);
+	}
+	if (is_builtin(data->comand))
+	{
+		execute_command(&data, "is_builtinOMG", heredoc_processed);
+		free(path);
+		return (1);
+	}
+	return (search_and_execute_command(data, path, heredoc_processed));
+}
+
+// int	is_valid_command(t_data *data, int heredoc_processed)
+// {
+// 	char	*path;
+// 	int		i;
+// 	char	*comand_path;
+// 	char	**token;
+// 	char	*tmp;
+
+// 	i = 0;
+// 	path = ft_strdup("PATH");
+// 	path = key_to_res(&path, data->env);
+// 	if (!path || !data->comand)
+// 	{
+// 		handle_missing_command(data, heredoc_processed);
+//         free(path);
+//         return (0);
+// 		// if (data->redir != NULL && data->redir->type == D_MINOR)
+// 		// {
+// 		// 	execute_command(&data, data->comand, heredoc_processed);
+// 		// 	return (1);
+// 		// }
+// 		// if (data->redir != NULL)
+// 		// 	handle_redir(data, heredoc_processed);
+// 		// ft_putstr_fd("Comand not found\n", 2);
+// 		// return (0);
+// 	}
+// 	if (is_builtin(data->comand))
+// 	{
+// 		execute_command(&data, "is_builtinOMG", heredoc_processed);
+// 		free(path);
+// 		return (1);
+// 	}
+// 	return search_and_execute_command(data, path, heredoc_processed);
+
+// 	// token = ft_split(path, ':');
+// 	// free(path);	
+// 	// if (access(data->comand, F_OK) == 0)
+// 	// {
+// 	// 	if (access(data->comand, X_OK) == 0)
+// 	// 	{
+// 	// 		execute_command(&data, data->comand, heredoc_processed);
+// 	// 		free_args(&token);
+// 	// 		return (1);
+// 	// 	}
+// 	// 	else
+// 	// 		sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE);
+// 	// }
+
+// 	// while (token[i] != NULL)
+// 	// {
+// 	// 	tmp = ft_strjoin(token[i], "/");
+// 	// 	comand_path = ft_strjoin(tmp, data->comand);
+// 	// 	free(tmp);
+// 	// 	if(access(comand_path, F_OK) == 0)
+// 	// 	{
+// 	// 		if (access(comand_path, X_OK) == 0)
+// 	// 		{
+// 	// 			execute_command(&data, comand_path, heredoc_processed);
+// 	// 			free(comand_path);
+// 	// 			free_args(&token);
+// 	// 			return (1);
+// 	// 		}
+// 	// 		sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), exit(126);
+// 	// 	}
+// 	// 	free(comand_path);
+// 	// 	i++;
+// 	// }
+// 	// if (data->redir != NULL)
+// 	// 	execute_command(&data, data->path, heredoc_processed);
+// 	// free_args(&token);
+// 	// printf("%s: command not found\n", data->comand);
+// 	// return (sc_error(SC_KEY_HAS_EXPIRED), 0);
+// }
