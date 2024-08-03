@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/03 16:25:40 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/03 17:42:55 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,7 +220,7 @@ void	switch_builtin(t_data **ddata)
 	if (!ft_strcmp(data->comand, "echo"))
 		b_echo(data);
 	else if (!ft_strcmp(data->comand, "cd"))
-		b_cd(data, getenv("HOME"));
+		b_cd(data, getenv("HOME"), 0);
 	else if (!ft_strcmp(data->comand, "pwd"))
 		b_pwd();
 	else if (!ft_strcmp(data->comand, "export"))

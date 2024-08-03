@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/03 16:27:41 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/03 17:42:11 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ void	b_export(t_data **data);
 int		is_special_string(char *c, char *comp);
 int		ft_strcmp(const char *s1, const char *s2);
 void	b_echo(t_data *data);
-void	b_cd(t_data *data, char *home);
+void	b_cd(t_data *data, char *home, int i);
 void	b_pwd(void);
 
 //split_token
