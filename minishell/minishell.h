@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/31 00:19:02 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/02 22:49:05 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,7 @@ typedef struct s_data
 	char			**env;
 	int				heredoc;
 	int				is_ex;
+	int				exp;
 }	t_data;
 
 // lexer.c
@@ -167,17 +168,16 @@ int		add_last_data(t_data **data, char **str);
 char	*key_to_res(char **key, char **env);
 int		is_special(char c, char *comp);
 void	execute_command(t_data **ddata, char *command_path, int heredoc_processed);
-void	handle_redir(t_data *data);
-int		heredoc(t_data *data);
+void	handle_redir(t_data *data, int heredoc_processed);
+int		heredoc(t_redir	*aux, t_data *data) ;
 char	*charstr(char c);
 char	*new_str(char **str, char c);
 
-//handlers.c
-void	setup_signal_handlers();
-
 //signals.c
 void	handle_sigint_heredoc(int sig);
+void	wait_signal(int i);
 void	setup_signal_handlers(void);
+void	child_handler(int signal);
 
 //env.c
 int		set_env(char *key, char *val, char ***env);

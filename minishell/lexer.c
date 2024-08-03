@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/31 00:26:24 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/02 10:17:13 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,7 +223,7 @@ void	free_args(char ***args)
 void	free_data(t_data **data)
 {
 	t_data	*del;
-	
+
 	if (!*data)
 		return ;
 	while ((*data)->next)
@@ -243,11 +243,12 @@ void	free_data(t_data **data)
 	free(*data);
 	*data = NULL;
 }
+
 void	clean_env(char ***env, int i)
 {
 	if (!*env)
 		return ;
-	if(i == -1)
+	if (i == -1)
 	{
 		while (env[0][++i])
 		{
@@ -255,7 +256,7 @@ void	clean_env(char ***env, int i)
 		}
 		free(*env);
 	}
-	else 
+	else
 	{
 		while (--i >= 0)
 			free(env[0][i]);
@@ -278,7 +279,7 @@ int	create_env(t_data **data, char **env)
 	(*data)->env = (char **)malloc(sizeof(char *) * (i + 1));
 	i = -1;
 	if (!(*data)->env)
-		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY),0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
 	while (env[++i])
 	{
 		(*data)->env[i] = ft_strdup(env[i]);
@@ -289,6 +290,27 @@ int	create_env(t_data **data, char **env)
 	return (1);
 }
 
+int	count_lines(char *file)
+{
+	int		fd;
+	int		i;
+	char	*line;
+
+	fd = open(file, O_RDONLY, 777);
+	if (is_valid_file(file, fd, "R"))
+		return (sc_error(SC_PERMISSION_DENIED), 0);
+	i = 0;
+	line = get_next_line(fd);
+	while (line)
+	{
+		free(line);
+		line = get_next_line(fd);
+		i++;
+	}
+	close(fd);
+	return (i);
+}
+
 char	**get_env_file(int fd)
 {
 	int		i;
@@ -296,19 +318,9 @@ char	**get_env_file(int fd)
 	char	*clean;
 	char	**mat;
 
-	env = get_next_line(fd);
-	i = 0;
-	if (!env)
-		return (NULL);
-	while (env)
-	{
-		free(env);
-		env = get_next_line(fd);
-		i++;
-	}
-	close(fd);
+	i = count_lines("/tmp/env.env");
 	fd = open("/tmp/env.env", O_RDONLY, 777);
-	if (is_valid_file("/tmp/env.env", fd, "R"))
+	if (!i && is_valid_file("/tmp/env.env", fd, "R"))
 		return (sc_error(SC_PERMISSION_DENIED), NULL);
 	mat = (char **)malloc(sizeof(char *) * (i + 1));
 	if (!mat)
@@ -319,16 +331,16 @@ char	**get_env_file(int fd)
 	{
 		clean = ft_strtrim(env, "\n");
 		if (!clean)
-			return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), clean_env(&mat, --i), NULL);
+			return (sc_error(12), clean_env(&mat, --i), NULL);
 		mat[++i] = clean;
 		free(env);
 		env = get_next_line(fd);
 	}
 	mat[++i] = NULL;
-	close(fd);
-	return (mat);
+	return (close(fd), mat);
 }
 
+// TODO extraer la funcion de contar la líneas de un archivo
 int	get_file_env(int fd, t_data **data)
 {
 	int		i;
@@ -338,15 +350,11 @@ int	get_file_env(int fd, t_data **data)
 	i = 0;
 	if (!env || (*data)->env)
 		return (0);
-	while (env)
-	{
-		free(env);
-		env = get_next_line(fd);
-		i++;
-	}
-	close (fd);
+	i = count_lines("/tmp/env.env");
 	fd = open("/tmp/env.env", O_RDONLY, 777);
 	(*data)->env = (char **)malloc(sizeof(char **) * ++i);
+	if (!i && is_valid_file("/tmp/env.env", fd, "R"))
+		return (sc_error(SC_PERMISSION_DENIED), 0);
 	i = -1;
 	if (!(*data)->env)
 		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
@@ -377,6 +385,25 @@ int	init_data(t_data **data, char **env)
 	return (1);
 }
 
+int	manage_token(char *input, t_token **token, int i)
+{
+	if (!*token)
+	{
+		if (!new_token(input[i], typeing(input[i], " |><\'\"") \
+					, token, 0))
+			return (is_error(&(t_error){"Memory error", 1}) \
+					, free_token(token), sc_error(12), 0);
+	}
+	else
+	{
+		if (!add_token(input[i], typeing(input[i], " |><\'\"") \
+					, token))
+			return (is_error(&(t_error){"Memory error", 1}) \
+					, free_token(token), sc_error(12), 0);
+	}
+	return (1);
+}
+
 t_data	*lexer(char *input, t_data **data, char **env)
 {
 	t_token	*token;
@@ -389,30 +416,17 @@ t_data	*lexer(char *input, t_data **data, char **env)
 	error.error = NULL;
 	while (input[++i])
 	{
-		if (!token)
-		{
-			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
-						, &token, 0))
-				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
-		}
-		else
-		{
-			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
-						, &token))
-				return (is_error(& (t_error){"Memory error",1}) \
-						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
-		}
+		if (!manage_token(input, &token, i))
+			return (NULL);
 	}
 	check_closed(token, &error);
 	check_gramathic(token, &error);
 	if (error.is_error)
-		return (is_error(& (t_error){"Syntax error",1}), \
-				free(error.error), free_data(data), free_token(&token), sc_error(EXIT_FAILURE), NULL);
+		return (is_error(&(t_error){"Syntax error", 1}), free(error.error), \
+				free_data(data), free_token(&token), sc_error(1), NULL);
 	else if (!split_token(token, env, data))
-		return (is_error(& (t_error){"Memory error",1}), \
-				free_data(data), free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
-	// print_data(data);
+		return (is_error(&(t_error){"Memory error", 1}), \
+				free_data(data), free_token(&token), sc_error(12), NULL);
 	free_token(&token);
 	return (*data);
 }
