@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/02 22:49:05 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/03 14:14:27 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,7 +176,6 @@ char	*new_str(char **str, char c);
 //signals.c
 void	handle_sigint_heredoc(int sig);
 void	wait_signal(int i);
-void	setup_signal_handlers(void);
 void	child_handler(int signal);
 
 //env.c
