@@ -55,6 +55,25 @@ int token_to_str(t_token **token, char **res, t_data **data)
 		return (1);
 }
 
+int	manage_token(t_token **token, char **input, char *i)
+{
+	if (!(*token))
+	{
+		if (!new_token((*input)[*i], typeing((*input)[*i], " |><\'\"") \
+					, token, 0))
+			return (is_error(& (t_error){"Memory error",1}), free((*input)) \
+					, free_token(token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+	}
+	else
+	{
+		if (!add_token((*input)[*i], typeing((*input)[*i], " |><\'\"") \
+					, token))
+			return (is_error(& (t_error){"Memory error",1}), free((*input)) \
+					, free_token(token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+	}
+	return (1);
+}
+
 
 char	*heredoc_tokenizer(char *str, t_data *data)
 {
@@ -73,20 +92,22 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 	token = NULL;
 	while (input[++i])
 	{
-		if (!token)
-		{
-			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
-						, &token, 0))
-				return (is_error(& (t_error){"Memory error",1}), free(input) \
-						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
-		}
-		else
-		{
-			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
-						, &token))
-				return (is_error(& (t_error){"Memory error",1}), free(input) \
-						, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
-		}
+		if (manage_token(&token, &input, &i))
+			return(NULL);
+		// if (!token)
+		// {
+		// 	if (!new_token(input[i], typeing(input[i], " |><\'\"") \
+		// 				, &token, 0))
+		// 		return (is_error(& (t_error){"Memory error",1}), free(input) \
+		// 				, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		// }
+		// else
+		// {
+		// 	if (!add_token(input[i], typeing(input[i], " |><\'\"") \
+		// 				, &token))
+		// 		return (is_error(& (t_error){"Memory error",1}), free(input) \
+		// 				, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		// }
 	}
 	free(input);
 	while (token)
@@ -94,8 +115,7 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 		if (!token_to_str(&token, &res, &data))
 			return(free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	}
-	free_token(&token);
-	return (res);
+	return (free_token(&token), res);
 }
 
 /*

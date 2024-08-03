@@ -4,6 +4,7 @@ CFLAGS          = -Wall -Wextra -Werror -fPIE
 SOURCES         =	minishell.c \
 					lexer.c \
 					executor.c \
+					executor2.c \
 					special_split.c \
 					split_token.c \
 					signals.c \
