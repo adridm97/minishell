@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/03 18:19:53 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/03 21:04:00 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,6 @@ void	clean_env(char ***env, int i);
 int		save_env(t_data *data);
 int		file_exist(char *file);
 
-
 // split things
 char	**special_split(char const *s);
 int		split_token(t_token *token, char **env, t_data **data);
@@ -171,7 +170,7 @@ void	b_export(t_data **data);
 int		is_special_string(char *c, char *comp);
 int		ft_strcmp(const char *s1, const char *s2);
 void	b_echo(t_data *data);
-void	b_cd(t_data *data, char *home);
+void	b_cd(t_data *data, char *home, int i);
 void	b_pwd(void);
 
 //split_token
@@ -182,9 +181,10 @@ int		add_args(char ***arg, char **str);
 int		add_last_data(t_data **data, char **str);
 char	*key_to_res(char **key, char **env);
 int		is_special(char c, char *comp);
-void	execute_command(t_data **ddata, char *command_path, int heredoc_processed);
+void	execute_command(t_data **ddata, char *command_path, \
+int heredoc_processed);
 void	handle_redir(t_data *data, int heredoc_processed);
-int		heredoc(t_redir	*aux, t_data *data) ;
+int		heredoc(t_redir	*aux, t_data *data);
 char	*charstr(char c);
 char	*new_str(char **str, char c);
 int	count_args(char **args);
