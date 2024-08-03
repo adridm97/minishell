@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/02 00:04:54 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/03 13:58:33 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,12 +68,10 @@ void	wait_signal(int i)
 
 	if (i)
 	{
-
 		sa.sa_handler = &handle_sigint;
 	}
 	else
 	{
-
 		sa.sa_handler = &child_handler;
 	}
 	sa.sa_flags = SA_RESTART;
