@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/03 14:19:44 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/03 15:59:35 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ int	check_pwd(t_data *data)
 	free(key);
 	return (0);
 }
+
 char	*get_input(void)
 {
 	int		fd;
@@ -78,6 +79,7 @@ char	*get_input(void)
 		input = readline(BLUE"Minishell: "BLACK);
 	return (input);
 }
+
 void	handle_env_file(t_data **data)
 {
 	if (*data && !file_exist("/tmp/env.env"))
@@ -86,6 +88,7 @@ void	handle_env_file(t_data **data)
 			perror("Error saving environment\n");
 	}
 }
+
 void	handle_input(char *env[], t_data **data, char ***mat, char *input)
 {
 	if (*mat)
@@ -108,27 +111,22 @@ void	handle_input(char *env[], t_data **data, char ***mat, char *input)
 			sc_error(1);
 	}
 }
+
 int	main(int argc, char *argv[], char *env[])
 {
 	static char	*input;
 	t_data		*data;
 	char		**mat;
 
-	(void)argc;
-	(void)argv;
 	data = NULL;
 	mat = NULL;
 	ft_set_shell(env, &mat);
 	while (1)
 	{
-		wait_signal(1);
-		ft_handle_env_file(&mat);
+		(wait_signal(1), ft_handle_env_file(&mat), (void)argc, (void)argv);
 		input = get_input();
 		if (input == NULL)
-		{
-			printf("\nexit\n");
 			break ;
-		}
 		if (input && *input)
 			add_history(input);
 		handle_input(env, &data, &mat, input);
@@ -137,9 +135,7 @@ int	main(int argc, char *argv[], char *env[])
 			if (g_stat_code != 1)
 				break ;
 		}
-		handle_env_file(&data);
-		ft_free_resources(&data, &input, &mat);
+		(handle_env_file(&data), ft_free_resources(&data, &input, &mat));
 	}
-	ft_free_resources(&data, &input, &mat);
-	return (g_stat_code);
+	return (ft_free_resources(&data, &input, &mat), g_stat_code);
 }
