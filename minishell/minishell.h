@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/03 14:14:27 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/03 16:27:41 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,6 +158,13 @@ void	print_env_env(char **env, char *str);
 int		index_env(t_data *data, char *str);
 void	sc_error(int sce);
 int		is_valid_file(char *filename, int fd, char *check);
+void	print_export(t_data *data, char *str);
+void	b_export(t_data **data);
+int		is_special_string(char *c, char *comp);
+int		ft_strcmp(const char *s1, const char *s2);
+void	b_echo(t_data *data);
+void	b_cd(t_data *data, char *home);
+void	b_pwd(void);
 
 //split_token
 int	is_expandsor(t_token **token, char **str, char **env);

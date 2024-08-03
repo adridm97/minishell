@@ -245,7 +245,6 @@ void	handle_redir(t_data *data, int heredoc_processed)
 	}
 }
 
-// cat << a cat << b cat << c
 void	b_cd(t_data *data, char *home)
 {
 	int		i;
