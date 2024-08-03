@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/07/28 10:48:03 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/03 13:57:59 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,14 +60,59 @@ int	check_pwd(t_data *data)
 	free(key);
 	return (0);
 }
+char	*get_input(void)
+{
+	int		fd;
+	char	*prompt;
+	char	*input;
 
+	if (!access("/tmp/echoafjnaifsnk", F_OK))
+	{
+		fd = open("/tmp/echoafjnaifsnk", O_RDONLY);
+		prompt = get_next_line(fd);
+		close(fd);
+		unlink("/tmp/echoafjnaifsnk");
+		input = readline(prompt);
+	}
+	else
+		input = readline(BLUE"Minishell: "BLACK);
+	return (input);
+}
+void	handle_env_file(t_data **data)
+{
+	if (*data && !file_exist("/tmp/env.env"))
+	{
+		if (save_env(*data))
+			perror("Error saving environment\n");
+	}
+}
+void	handle_input(char *env[], t_data **data, char ***mat, char *input)
+{
+	if (*mat)
+		*data = lexer(input, data, *mat);
+	else
+		*data = lexer(input, data, env);
+	if (*data)
+		check_pwd(*data);
+	if (*data && (*data)->next)
+	{
+		execute_pipeline(data);
+		if (g_stat_code == SC_HEREDOC)
+			sc_error(1);
+	}
+	else if (*data)
+	{
+		print_data(*data);
+		is_valid_command(*data, 0);
+		if (g_stat_code == SC_HEREDOC)
+			sc_error(1);
+	}
+}
 int	main(int argc, char *argv[], char *env[])
 {
 	static char	*input;
 	t_data		*data;
 	char		**mat;
-	int			fd;
-	char		*prompt;
 
 	(void)argc;
 	(void)argv;
@@ -78,16 +123,7 @@ int	main(int argc, char *argv[], char *env[])
 	while (1)
 	{
 		ft_handle_env_file(&mat);
-		if (!access("/tmp/echoafjnaifsnk", F_OK))
-		{
-			fd = open("/tmp/echoafjnaifsnk", O_RDONLY);
-			prompt = get_next_line(fd);
-			close(fd);
-			unlink("/tmp/echoafjnaifsnk");
-			input = readline(prompt);
-		}
-		else
-			input = readline(BLUE"Minishell: "BLACK);
+		input = get_input();
 		if (input == NULL)
 		{
 			printf("\nexit\n");
@@ -95,41 +131,14 @@ int	main(int argc, char *argv[], char *env[])
 		}
 		if (input && *input)
 			add_history(input);
-		if (mat)
-			data = lexer(input, &data, mat);
-		else
-			data = lexer(input, &data, env);
-		if (data)
-			check_pwd(data);
-		if (data && data->next)
-		{
-			execute_pipeline(&data);
-			if (g_stat_code == SC_HEREDOC)
-				sc_error(1);
-		}
-		else if (data)
-		{
-			is_valid_command(data, 0);
-			if (g_stat_code == SC_HEREDOC)
-				sc_error(1);
-		}
+		handle_input(env, &data, &mat, input);
 		if (data && data->comand && !strcmp(data->comand, "exit"))
 		{
 			if (g_stat_code != 1)
 				break ;
 		}
-		if (data && !file_exist("/tmp/env.env"))
-		{
-			if (save_env(data))
-				perror("Error saving envoirment\n");
-			ft_free_resources(&data, &input, &mat);
-		}
+		handle_env_file(&data);
 		ft_free_resources(&data, &input, &mat);
-		if (mat)
-			clean_env(&mat, -1);
-		if (data)
-			free_data(&data);
-		data = NULL;
 	}
 	ft_free_resources(&data, &input, &mat);
 	return (g_stat_code);
