@@ -12,7 +12,6 @@
 
 #include "minishell.h"
 
-
 int	ft_strcmp(const char *s1, const char *s2)
 {
 	size_t			i;
@@ -37,6 +36,25 @@ void sc_error(int sce)
 {
 	g_stat_code = sce;
 }
+
+int token_to_str(t_token **token, char **res, t_data **data)
+{
+	if (is_special((*token)->value, "$") && (!is_special((*token)->next->value, "\"'")))
+		{
+			if (!is_expandsor(token, res, (*data)->env))
+				return(free_token(token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+		}
+		else
+		{
+			if ((*token))
+			{
+				*res = new_str(res, (*token)->value);
+				(*token) = (*token)->next;
+			}
+		}
+		return (1);
+}
+
 
 char	*heredoc_tokenizer(char *str, t_data *data)
 {
@@ -73,19 +91,8 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 	free(input);
 	while (token)
 	{
-		if (is_special(token->value, "$") && (!is_special(token->next->value, "\"'")))
-		{
-			if (!is_expandsor(&token, &res, data->env))
-				return(free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
-		}
-		else
-		{
-			if (token)
-			{
-				res = new_str(&res, token->value);
-				token = token->next;
-			}
-		}	
+		if (!token_to_str(&token, &res, &data))
+			return(free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	}
 	free_token(&token);
 	return (res);
@@ -157,6 +164,7 @@ int	heredoc(t_redir	*aux, t_data *data)
 	return open(filename, O_RDONLY);
 }
 
+
 void	handle_redir(t_data *data, int heredoc_processed)
 {
 	int 	fd;
@@ -216,6 +224,7 @@ void	handle_redir(t_data *data, int heredoc_processed)
 		redir = redir->next;
 	}
 }
+
 // cat << a cat << b cat << c
 void	b_cd(t_data *data, char *home)
 {
