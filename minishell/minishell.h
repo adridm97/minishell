@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/03 17:42:11 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/03 20:44:07 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,6 @@ void	clean_env(char ***env, int i);
 int		save_env(t_data *data);
 int		file_exist(char *file);
 
-
 // split things
 char	**special_split(char const *s);
 int		split_token(t_token *token, char **env, t_data **data);
@@ -167,16 +166,17 @@ void	b_cd(t_data *data, char *home, int i);
 void	b_pwd(void);
 
 //split_token
-int	is_expandsor(t_token **token, char **str, char **env);
+int		is_expandsor(t_token **token, char **str, char **env);
 void	is_expandsor_str_simple(t_token **token, char **str, char **env);
 int		switch_case(t_token **token, char **env, t_data **data, char **str);
 int		add_args(char ***arg, char **str);
 int		add_last_data(t_data **data, char **str);
 char	*key_to_res(char **key, char **env);
 int		is_special(char c, char *comp);
-void	execute_command(t_data **ddata, char *command_path, int heredoc_processed);
+void	execute_command(t_data **ddata, char *command_path, \
+int heredoc_processed);
 void	handle_redir(t_data *data, int heredoc_processed);
-int		heredoc(t_redir	*aux, t_data *data) ;
+int		heredoc(t_redir	*aux, t_data *data);
 char	*charstr(char c);
 char	*new_str(char **str, char c);
 

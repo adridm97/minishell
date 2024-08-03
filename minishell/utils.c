@@ -3,15 +3,12 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:33:06 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/03 12:43:15 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/03 20:43:05 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
-
 
 #include "minishell.h"
 
@@ -34,6 +31,7 @@ void	ft_free_resources(t_data **data, char **input, char ***mat)
 void	ft_handle_env_file(char ***mat)
 {
 	int	fd;
+
 	fd = open("/tmp/env.env", O_RDONLY);
 	if (is_valid_file("/tmp/env.env", fd, "R"))
 		sc_error(SC_PERMISSION_DENIED);

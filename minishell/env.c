@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:35:01 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/03 12:35:47 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/03 20:41:37 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,13 @@ char	**create_env_first(char **cenv)
 		i++;
 	env = (char **)malloc(sizeof(char *) * (i + 1));
 	if (!env)
-		return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	i = -1;
 	while (cenv[++i])
 	{
 		env[i] = ft_strdup(cenv[i]);
 		if (!(env)[i])
-			return (clean_env(&env, --i), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+			return (clean_env(&env, --i), sc_error(12), NULL);
 	}
 	env[i] = NULL;
 	return (env);
@@ -110,6 +110,7 @@ void	ft_set_shell(char *env[], char ***mat)
 {
 	char	*key;
 	int		fd;
+
 	*mat = create_env_first(env);
 	if (!*mat)
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
