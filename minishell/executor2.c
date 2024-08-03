@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/03 16:17:46 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/03 16:25:40 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ void	b_export(t_data **data)
 		if (index_env(cdata, key) >= 0)
 		{
 			i = index_env(cdata, key);
-			// printf("la i es %i\n", i);
 			if(need && need[0] == '=')
 				(cdata)->env[i] = (cdata)->args[j];
 		}
