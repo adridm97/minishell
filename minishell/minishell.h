@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/01 23:56:53 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/02 22:49:05 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,7 @@ typedef struct s_data
 	char			**env;
 	int				heredoc;
 	int				is_ex;
+	int				exp;
 }	t_data;
 
 // lexer.c

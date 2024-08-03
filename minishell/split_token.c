@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/02 00:34:28 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/03 13:55:34 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,6 @@ void	is_double_string(t_token **token, char **env, char **str)
 	if (*str)
 		res = ft_strdup(*str);
 	*token = (*token)->next;
-
 	while (*token && (*token)->value != '"')
 	{
 		if ((*token)->value == '$')
@@ -122,109 +121,165 @@ void	switch_case_redir(t_token **token, char **str, char **env)
 		is_expandsor(token, str, env);
 }
 
-/*TODO Hay que hacerla más corta*/
-void	init_redir(t_token **token, t_data **data, char **env, int type)
+int	set_redir(int type, t_redir **redir)
+{
+	(*redir) = (t_redir *)malloc(sizeof(t_redir));
+	if (!(*redir))
+	{
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		return (0);
+	}
+	(*redir)->next = NULL;
+	(*redir)->type = type;
+	(*redir)->path = NULL;
+	return (1);
+}
+
+void	manage_redirs(t_data **data, t_redir **credir, char *str)
+{
+	t_data	*c_data;
+	t_redir	*l_redir;
+	t_redir	*redir;
+
+	redir = *credir;
+	c_data = *data;
+	if (!c_data->redir)
+	{
+		c_data->redir = redir;
+		redir->path = str;
+		return ;
+	}
+	l_redir = c_data->redir;
+	while (l_redir->next)
+		l_redir = l_redir->next;
+	l_redir->next = redir;
+	redir->path = str;
+}
+// {
+// 	while (c_data->next)
+// 				c_data = c_data->next;
+// 			redir->path = str;
+// 			if (!c_data->redir)
+// 			{
+// 				c_data->redir = redir;
+// 				return ;
+// 			}
+// 			l_redir = c_data->redir;
+// 			while (l_redir->next)
+// 				l_redir = l_redir->next;
+// 			l_redir->next = redir;
+// }
+
+int	exp_var(int *exp, int type)
+{
+	if (type == D_MINOR)
+		*exp = 0;
+	else
+		*exp = 1;
+	return (1);
+}
+
+// TODO esta fallando con segfault al usar pipe
+void	redirs(t_data **c_data, char **str, t_redir **redir, t_redir **l_redir)
+{
+	while ((*c_data)->next)
+	{
+		(*c_data) = (*c_data)->next;
+	}
+	(*redir)->path = *str;
+	(*l_redir) = (*c_data)->redir;
+	if (!(*l_redir))
+	{
+		(*c_data)->redir = (*redir);
+		return ;
+	}
+	while ((*l_redir)->next)
+	{
+		(*l_redir) = (*l_redir)->next;
+	}
+	(*l_redir)->next = (*redir);
+}
+
+int	init_redir(t_token **token, t_data **data, char **env, int type)
 {
 	char	*str;
 	t_redir	*redir;
 	t_redir	*l_redir;
 	t_data	*c_data;
-	int		exp;
 
-	exp = 1;
-	if (type == D_MINOR)
-		exp = 0;
+	if (exp_var(&(*data)->exp, type) && !set_redir(type, &redir))
+		return (0);
 	c_data = *data;
-	redir = (t_redir *)malloc(sizeof(t_redir));
-	redir->next = NULL;
-	redir->type = type;
-	redir->path = NULL;
 	str = NULL;
 	while ((*token))
 	{
-		if (is_special((*token)->value, "'\"$" ) && exp)
+		if (is_special((*token)->value, "'\"$" ) && (*data)->exp)
 			switch_case_redir(token, &str, env);
 		else if (is_special((*token)->value, "| <>") && str)
-		{
-			while (c_data->next)
-				c_data = c_data->next;
-			redir->path = str;
-			if (!c_data->redir)
-			{
-				c_data->redir = redir;
-				return ;
-			}
-			l_redir = c_data->redir;
-			while (l_redir->next)
-				l_redir = l_redir->next;
-			l_redir->next = redir;
-			return ;
-		}
+			return (manage_redirs(&c_data, &redir, str), 1);
 		else if ((*token)->value == ' ')
-		{
 			*token = (*token)->next;
-		}
 		else
 		{
 			str = new_str(&str, (*token)->value);
 			*token = (*token)->next;
 		}
 	}
-	while (c_data->next)
-		c_data = c_data->next;
-	redir->path = str;
-	l_redir = c_data->redir;
-	if (!l_redir)
-	{
-		c_data->redir = redir;
-		return ;
-	}
-	while (l_redir->next)
-		l_redir = l_redir->next;
-	l_redir->next = redir;
+	redirs(&c_data, &str, &redir, &l_redir);
+	return (1);
 }
 
 // split the redirection and put in data
-void	is_redir_input(t_token **token, t_data **data, char **str, char **env)
+int	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 {
 	if (*token)
 		*token = (*token)->next;
 	if ((*token)->value == '<')
 	{
 		*token = (*token)->next;
-		init_redir(token, data, env, D_MINOR);
+		if (!init_redir(token, data, env, D_MINOR))
+			return (0);
 		(*data)->heredoc = 1;
 	}
 	else if ((*token)->value == '>')
 	{
 		*token = (*token)->next;
-		init_redir(token, data, env, SPACES);
+		if (!init_redir(token, data, env, SPACES))
+			return (0);
 	}
 	else
 	{
-		init_redir(token, data, env, MINOR);
+		if (!init_redir(token, data, env, MINOR))
+			return (0);
 	}
 	(void)str;
+	return (1);
 }
 
 // split the redirection and put in data
-void	is_redir_output(t_token **token, t_data **data, char **str, char **env)
+int	is_redir_output(t_token **token, t_data **data, char **str, char **env)
 {
 	if (*token)
 		*token = (*token)->next;
 	if ((*token)->value == '>')
 	{
 		*token = (*token)->next;
-		init_redir(token, data, env, D_MAJOR);
+		if (!init_redir(token, data, env, D_MAJOR))
+			return (0);
 	}
 	else if ((*token)->value == '<')
 	{
 		*token = (*token)->next;
-		init_redir(token, data, env, SPACES);
+		if (!init_redir(token, data, env, SPACES))
+			return (0);
 	}
 	else
-		init_redir(token, data, env, MAJOR);
+	{
+		if (!init_redir(token, data, env, MAJOR))
+			return (0);
+	}
 	(void)str;
+	return (1);
 }
 
 // split the pipe and put in data
@@ -250,7 +305,7 @@ int	is_pipe(t_token **token, t_data **data, char **str)
 
 int	take_key(t_token **token, char **key, char *str)
 {
-	t_token *ctoken;
+	t_token	*ctoken;
 
 	ctoken = *token;
 	while (ctoken && !is_special(ctoken->value, str))
@@ -287,62 +342,123 @@ char	*key_to_res(char **key, char **env)
 }
 
 // Expand the $ with env
-int	is_expandsor(t_token **token, char **str, char **env)
+// int	is_expandsor(t_token **token, char **str, char **env)
+// {
+// 	char	*key;
+// 	char	*res;
+// 	char	*status_code;
+
+// 	key = NULL;
+// 	*token = (*token)->next;
+// 	if (!*token || is_special((*token)->value, "<> |\0"))
+// 		*str = new_str(str, '$');
+// 	else if ((*token)->value == '"')
+// 		is_double_string(token, env, str);
+// 	else if ((*token)->value == '\'')
+// 		is_simple_string(token, env, str);
+// 	else
+// 	{
+// 		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€$"))
+// 		{
+// 			key = key_to_res(&key, env);
+// 			if (key)
+// 			{
+// 				if (!*str)
+// 					res = ft_strjoin("", key);
+// 				else
+// 					res = ft_strjoin(*str, key);
+// 				(free(*str), free(key));
+// 				*str = res;
+// 			}
+// 			else
+// 				return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+// 		}
+// 		else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€$"))
+// 		{
+// 			status_code = ft_itoa(g_stat_code);
+// 			if (!*str)
+// 				res = ft_strjoin("", status_code);
+// 			else
+// 				res = ft_strjoin(*str, status_code);
+// 			(free(*str), free(key));
+// 			*str = res;
+// 		}
+// 		else
+// 		{
+// 			*str = new_str(str, '$');
+// 			return (1);
+// 		}
+// 	}
+// 	return (1);
+// }
+
+int	handle_key(char **str, char **env, char *key)
 {
-	char	*key;
+	char	*res;
+
+	key = key_to_res(&key, env);
+	if (key)
+	{
+		if (!*str)
+			res = ft_strjoin("", key);
+		else
+			res = ft_strjoin(*str, key);
+		(free(*str), free(key));
+		*str = res;
+	}
+	else
+	{
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		return (0);
+	}
+	return (1);
+}
+
+int	handle_status_code(char **str, char *key)
+{
 	char	*res;
 	char	*status_code;
 
+	status_code = ft_itoa(g_stat_code);
+	if (!*str)
+		res = ft_strjoin("", status_code);
+	else
+		res = ft_strjoin(*str, status_code);
+	(free(*str), free(key));
+	*str = res;
+	return (1);
+}
 
-	status_code = NULL;
+int	handle_string(char **str)
+{
+	*str = new_str(str, '$');
+	return (1);
+}
+
+int	process_token(t_token **token, char **str, char **env)
+{
+	char	*key;
+
 	key = NULL;
-	// printf("inicio de is_expand\n");
+	if (take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€$"))
+		return (handle_key(str, env, key));
+	else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€$"))
+		return (handle_status_code(str, key));
+	else
+		return (handle_string(str));
+}
+
+int	is_expandsor(t_token **token, char **str, char **env)
+{
 	*token = (*token)->next;
 	if (!*token || is_special((*token)->value, "<> |\0"))
 		*str = new_str(str, '$');
 	else if ((*token)->value == '"')
-	{
 		is_double_string(token, env, str);
-	}
 	else if ((*token)->value == '\'')
-	{
 		is_simple_string(token, env, str);
-	}
 	else
-	{
-		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€$"))
-		{
-			key = key_to_res(&key, env);
-			if (key)
-			{
-				if (!*str)
-					res = ft_strjoin("", key);
-				else
-					res = ft_strjoin(*str, key);
-				free(*str);
-				free(key);
-				*str = res;
-			}
-			else
-				return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
-		}
-		else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€$"))
-		{
-			status_code = ft_itoa(g_stat_code);
-			if (!*str)
-					res = ft_strjoin("", status_code);
-			else
-				res = ft_strjoin(*str, status_code);
-			free(*str);
-			free(key);
-			*str = res;
-		}
-		else
-		{
-			*str = new_str(str, '$');
-			return(1);
-		}
-	}
+		return (process_token(token, str, env));
 	return (1);
 }
 
@@ -418,9 +534,9 @@ int	switch_case(t_token **token, char **env, t_data **data, char **str)
 	else if ((*token)->value == '"')
 		is_double_string(token, env, str);
 	else if ((*token)->value == '<')
-		is_redir_input(token, data, str, env);
+		return (is_redir_input(token, data, str, env));
 	else if ((*token)->value == '>')
-		is_redir_output(token, data, str, env);
+		return (is_redir_output(token, data, str, env));
 	else if ((*token)->value == '|')
 		return (is_pipe(token, data, str));
 	else if ((*token)->value == '$')
@@ -443,12 +559,12 @@ int	add_last_data(t_data **data, char **str)
 	n_data = *data;
 	while (n_data->next)
 		n_data = n_data->next;
-	if((*data)->is_ex)
+	if ((*data)->is_ex)
 	{
 		mat = ft_split(*str, ' ');
 		if (!mat)
-			return(sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
-		while(mat[i])
+			return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+		while (mat[i])
 		{
 			if (!add_args(&n_data->args, &mat[i]))
 				return (free_args(&mat), 0);
@@ -485,9 +601,7 @@ int	split_token(t_token *token, char **env, t_data **data)
 	while (token)
 	{
 		if (is_special(token->value, " |\"'<>$"))
-		{
 			switch_case(&token, (*data)->env, data, &str);
-		}
 		else
 		{
 			str = new_str(&str, token->value);
