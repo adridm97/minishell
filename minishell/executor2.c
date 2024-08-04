@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/03 21:04:01 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/04 16:58:36 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,11 +158,33 @@ void	b_unset(t_data *data)
 	exit(g_stat_code);
 }
 
+void try_max_num(char *arg)
+{
+	if (ft_strlen(arg) > ft_strlen("9223372036854775807"))
+	{
+		sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY);
+		printf("exit\n");
+		ft_putstr_fd("numeric argument required\n", 2);
+		exit(g_stat_code);
+	}
+	if (ft_strcmp(arg, "9223372036854775807") > 0)
+	{
+		sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY);
+		printf("exit\n");
+		ft_putstr_fd("numeric argument required\n", 2);
+		exit(g_stat_code);
+	}
+}
+
 void	check_numeric_argument(char *arg)
 {
 	int	j;
 
 	j = 0;
+	if (ft_strlen(arg) >= ft_strlen("9223372036854775807"))
+	{
+		try_max_num(arg);
+	}
 	while (arg[j])
 	{
 		if (!ft_isdigit(arg[j]))
@@ -193,8 +215,8 @@ void	b_exit(t_data *data)
 	}
 	if (data->args[1])
 	{
-		sc_error(ft_atoi(data->args[1]) % 256);
-		g_stat_code = ft_atoi(data->args[1]) % 256;
+		sc_error(ft_atoi(data->args[1]));
+		g_stat_code = ft_atoi(data->args[1]);
 		printf("exit\n");
 		exit(g_stat_code);
 	}
