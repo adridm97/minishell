@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:35:01 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/03 20:41:37 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/04 23:42:01 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ char	**create_env_first(char **cenv)
 	char	**env;
 
 	i = 0;
+	//TODO Debe crear un mini env con: PWD(lo extrae con cwd()), SHLVL=1 y _???
 	if (!cenv || !cenv[0])
 		return (NULL);
 	while (cenv[i])
@@ -106,12 +107,15 @@ int	save_env(t_data *data)
 	return (0);
 }
 
-void	ft_set_shell(char *env[], char ***mat)
+void	ft_set_shell(char *env[], char ***mat, t_data **data)
 {
 	char	*key;
 	int		fd;
 
+	*data = NULL;
 	*mat = create_env_first(env);
+			printf("ENTRO\n");
+
 	if (!*mat)
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
 	key = ft_strdup("SHLVL");

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/02 10:17:13 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/04 20:56:50 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,14 @@ int	check_closed(t_token *token, t_error *error)
 	int		quote;
 	char	open;
 
+	quote = 0;
 	open = 0;
+	if (!token)
+	{
+		if (!error->error)
+			error->is_error = 1;
+		return (!open);
+	}
 	while (token)
 	{
 		if ((token->type == QUOTE || token->type == D_QUOTE) && !open)
@@ -380,6 +387,7 @@ int	init_data(t_data **data, char **env)
 	(*data)->env = NULL;
 	(*data)->heredoc = 0;
 	(*data)->is_ex = 0;
+	(*data)->pipe = 0;
 	if (!create_env(data, env))
 		return (0);
 	return (1);

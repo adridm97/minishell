@@ -198,7 +198,8 @@ int	heredoc(t_redir	*aux, t_data *data)
 void	handle_dups(int fd, t_redir *redir, t_data *data, int heredoc_processed)
 {
 	if (fd == -1)
-		(perror("open"), exit(EXIT_FAILURE));
+		return (ft_putstr_fd(data->redir->path, 2), \
+		ft_putstr_fd("No such file or directory\n", 2));
 	if ((redir->type == MAJOR || redir->type == D_MAJOR) \
 	&& data->comand != NULL)
 	{
@@ -226,7 +227,7 @@ void	handle_redir(t_data *data, int heredoc_processed)
 	redir = data->redir;
 	while (redir != NULL)
 	{
-		if (data && (data->redir != NULL && data->redir->type == D_MINOR) \
+		if (data && (data->redir != NULL && redir->type == D_MINOR) \
 				&& heredoc_processed == 0)
 			fd = heredoc(redir, data);
 		else if (redir->type == MAJOR)
@@ -248,6 +249,8 @@ void	handle_redir(t_data *data, int heredoc_processed)
 
 void	find_home(char **res, char **pwd, t_data *data)
 {
+	if(*pwd)
+		free(*pwd);
 	*res = ft_strdup("HOME");
 	if (!*res)
 		(sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code));
@@ -261,6 +264,7 @@ void	find_home(char **res, char **pwd, t_data *data)
 
 void	find_oldpwd(char **res, char **pwd, t_data *data)
 {
+	free(*pwd);
 	*res = ft_strdup("OLDPWD");
 	if (!*res)
 		(sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code));
@@ -270,67 +274,91 @@ void	find_oldpwd(char **res, char **pwd, t_data *data)
 		perror("OLDPWD no está definido"), exit(g_stat_code));
 	*pwd = ft_strdup(*res);
 	free(*res);
+	*res = NULL;
 }
 
-void	find_pwd(char **res, t_data *data)
+void	find_pwd(char **res, t_data **data)
 {
+	if(res)
+		free(res);
 	*res = ft_strjoin("PWD=", "PWD");
 	if (!*res)
 		(sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code));
-	(data)->env = ft_matadd(&(data)->env, *res);
-	if (!(data)->env)
+	(*data)->env = ft_matadd(&(*data)->env, *res);
+	if (!(*data)->env)
 		(free(*res), exit(g_stat_code));
 	free(*res);
+	*res = NULL;
 }
 
-void	managing_env(char **res, int i, char **last_pwd, t_data *data)
+void	managing_env(char **res, int i, char **last_pwd, t_data **data)
 {
 	if (i == -2)
 		(sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE), exit(g_stat_code));
 	*res = ft_strjoin("OLDPWD=", *last_pwd);
 	if (!*res)
 		(sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code));
-	(data)->env = ft_matadd(&(data)->env, *res);
-	if (!(data)->env)
+	(*data)->env = ft_matadd(&(*data)->env, *res);
+	if (!(*data)->env)
 		exit(g_stat_code);
 	free(*res);
+	*res = NULL;
 }
 
-void	ft_oldpwd(t_data *data, char **last_pwd, char **res)
+void	ft_oldpwd(t_data **data, char **last_pwd, char **res)
 {
 	int	i;
 
-	i = index_env(data, "OLDPWD");
+	i = index_env(*data, "OLDPWD");
 	if (i >= 0)
-		data->env[i] = ft_strjoin("OLDPWD=",*last_pwd);
+	{
+		free((*data)->env[i]);
+		(*data)->env[i] = ft_strjoin("OLDPWD=",*last_pwd);
+	}
 	else
 		managing_env(res, i, last_pwd, data);
-	if (!data->env[i])
-		(free(data->env[index_env(data, "PWD")]), \
+	if (!(*data)->env[i])
+		(free((*data)->env[index_env((*data), "PWD")]), \
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code));
 	unlink("/tmp/env.env");
-	if (save_env(data))
-		(free(data->env[index_env(data, "PWD")]), \
-		free(data->env[index_env(data, "OLDPWD")]), free(*last_pwd), \
-		exit(g_stat_code));
+	if (save_env(*data))
+		(clean_env(&(*data)->env, -1), free(*last_pwd), \
+		free(*res), exit(g_stat_code));
 }
+/*
+// (free((*data)->env[index_env((*data), "PWD")]), \
+// free((*data)->env[index_env((*data), "OLDPWD")]), free(*last_pwd), \
+// free(*res), exit(g_stat_code));
+*/
 
-void	ft_pwd(char **pwd, char **res, t_data *data)
+void	ft_pwd(char **pwd, char **res, t_data **data)
 {
 	int	i;
 	int	size;
 
 	free(*pwd);
 	*pwd = NULL;
-	i = index_env(data, "PWD");
+	i = index_env((*data), "PWD");
 	if (i < 0)
 		find_pwd(res, data);
 	size = 1;
-	while (!*pwd)
+	while (size < 10000 && !*pwd)
 		*pwd = getcwd(*pwd, size++);
-	i = index_env(data, "PWD");
-	data->env[i] = ft_strjoin("PWD=", *pwd);
-	if (!data->env[i])
+	if (size == 10000)
+	{
+		if (size == 10000)
+		{
+			*pwd = ft_strdup("PWD");
+			*pwd = key_to_res(pwd, (*data)->env);
+		}
+		if (!*pwd)
+			(sc_error(EXIT_FAILURE), exit(g_stat_code));
+	}
+	i = index_env((*data), "PWD");
+	free((*data)->env[i]);
+	(*data)->env[i] = ft_strjoin("PWD=", *pwd);
+	free(*pwd);
+	if (!(*data)->env[i])
 		(sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code));
 }
 
@@ -341,27 +369,35 @@ void	init_cd(char **last_pwd, char **pwd, int size, t_data *data)
 	size = 1;
 	if (data->args[1])
 		*pwd = ft_strdup(data->args[1]);
-	while (!*last_pwd)
+	while (size < 10000 && !*last_pwd)
 		*last_pwd = getcwd(*last_pwd, size++);
+	if (size == 10000)
+	{
+		if (size == 10000)
+		{
+			*last_pwd = ft_strdup("PWD");
+			*last_pwd = key_to_res(last_pwd, data->env);
+		}
+		if (!*last_pwd)
+			(sc_error(EXIT_FAILURE), free(*pwd), exit(g_stat_code));
+	}
 }
 
-void	b_cd(t_data *data, char *home, int i)
+void	b_cd(t_data **data, char *home)
 {
 	char	*last_pwd;
 	char	*pwd;
 	char	*res;
 
-	init_cd(&last_pwd, &pwd, 1, data);
+	init_cd(&last_pwd, &pwd, 1, *data);
 	if (!pwd)
-		find_home(&res, &pwd, data);
-	else
-	{
-		if (!ft_strcmp(pwd, "-"))
-			find_oldpwd(&res, &pwd, data);
-	}
+		find_home(&res, &pwd, *data);
+	else if (!ft_strcmp(pwd, "-"))
+		find_oldpwd(&res, &pwd, *data);
 	if (ft_strrchr(pwd, '~'))
 	{
 		res = ft_substr(pwd, 1, ft_strlen(pwd) - 1);
+		free(pwd);
 		pwd = ft_strjoin(home, res);
 	}
 	if (!chdir(pwd))
@@ -369,7 +405,7 @@ void	b_cd(t_data *data, char *home, int i)
 	else
 		(free(pwd), printf("La ruta especificada no existe\n"), \
 		sc_error(EXIT_FAILURE), exit(g_stat_code));
-	(free(data->env[i]), sc_error(SC_SUCCESS));
+	(free_args(&(*data)->env), sc_error(SC_SUCCESS));
 	exit(g_stat_code);
 }
 
@@ -423,15 +459,24 @@ void	b_echo(t_data *data)
 	(sc_error(SC_SUCCESS), free_args(&data->args), exit(g_stat_code));
 }
 
-void	b_pwd(void)
+void	b_pwd(t_data *data)
 {
 	size_t	size;
 	char	*buff;
 
 	size = 1;
 	buff = NULL;
-	while (!buff)
+	while (size < 10000 && !buff)
+	{
 		buff = getcwd(buff, size++);
+	}
+	if (size == 10000)
+	{
+		buff = ft_strdup("PWD");
+		buff = key_to_res(&buff, data->env);
+		if (!buff)
+			(sc_error(EXIT_FAILURE), exit(g_stat_code));
+	}
 	printf("%s\n", buff);
 	free(buff);
 	sc_error(SC_SUCCESS);

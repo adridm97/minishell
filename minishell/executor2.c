@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/04 16:58:36 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/04 23:29:12 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,7 +198,6 @@ void	check_numeric_argument(char *arg)
 	}
 }
 
-//TODO si es mayor que 2, too many arguments
 void	b_exit(t_data *data)
 {
 	int	arg_count;
@@ -208,19 +207,22 @@ void	b_exit(t_data *data)
 		check_numeric_argument(data->args[1]);
 	if (arg_count > 2)
 	{
-		sc_error(EXIT_FAILURE);
-		printf("exit\n");
+		sc_error(235);
+		if (!data->pipe)
+			ft_putstr_fd("exit\n", 2);
 		ft_putstr_fd("exit: too many arguments\n", 2);
-		return ;
+		exit(g_stat_code);
 	}
 	if (data->args[1])
 	{
 		sc_error(ft_atoi(data->args[1]));
 		g_stat_code = ft_atoi(data->args[1]);
-		printf("exit\n");
+		if (!data->pipe)
+			printf("exit\n");
 		exit(g_stat_code);
 	}
-	printf("exit\n");
+	if (!data->pipe)
+		printf("exit\n");
 	sc_error(SC_SUCCESS);
 	exit(g_stat_code);
 }
@@ -256,9 +258,9 @@ void	switch_builtin(t_data **ddata)
 	if (!ft_strcmp(data->comand, "echo"))
 		b_echo(data);
 	else if (!ft_strcmp(data->comand, "cd"))
-		b_cd(data, getenv("HOME"), 0);
+		(b_cd(ddata, getenv("HOME")));
 	else if (!ft_strcmp(data->comand, "pwd"))
-		b_pwd();
+		b_pwd(*ddata);
 	else if (!ft_strcmp(data->comand, "export"))
 		b_export(ddata);
 	else if (!ft_strcmp(data->comand, "unset"))
@@ -286,7 +288,7 @@ int	is_builtin(char *comand)
 void	handle_child_process(t_data **ddata, char *command_path, int processed)
 {
 	t_data	*data;
-
+	
 	data = *ddata;
 	if (data->redir != NULL)
 		handle_redir(data, processed);
@@ -496,6 +498,7 @@ void	execute_pipeline(t_data **data)
 	pid = 0;
 	while (current != NULL)
 	{
+		current->pipe = 1;
 		if (pipe(fd) == -1)
 			(perror("pipe"), exit(EXIT_FAILURE));
 		pid = fork();

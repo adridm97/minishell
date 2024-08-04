@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/03 15:59:35 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/04 23:38:46 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ char	*get_input(void)
 		close(fd);
 		unlink("/tmp/echoafjnaifsnk");
 		input = readline(prompt);
+		printf("input: |%s|", input);
 	}
 	else
 		input = readline(BLUE"Minishell: "BLACK);
@@ -91,8 +92,12 @@ void	handle_env_file(t_data **data)
 
 void	handle_input(char *env[], t_data **data, char ***mat, char *input)
 {
+	if (!*input)
+		return ;
 	if (*mat)
+	{
 		*data = lexer(input, data, *mat);
+	}
 	else
 		*data = lexer(input, data, env);
 	if (*data)
@@ -118,9 +123,9 @@ int	main(int argc, char *argv[], char *env[])
 	t_data		*data;
 	char		**mat;
 
-	data = NULL;
+
 	mat = NULL;
-	ft_set_shell(env, &mat);
+	ft_set_shell(env, &mat, &data);
 	while (1)
 	{
 		(wait_signal(1), ft_handle_env_file(&mat), (void)argc, (void)argv);
@@ -130,10 +135,12 @@ int	main(int argc, char *argv[], char *env[])
 		if (input && *input)
 			add_history(input);
 		handle_input(env, &data, &mat, input);
-		if (data && data->comand && !strcmp(data->comand, "exit"))
+		if (data && data->comand && !strcmp(data->comand, "exit") && !data->pipe)
 		{
-			if (g_stat_code != 1)
+			if (g_stat_code != 235)
 				break ;
+			else
+				(ft_putstr_fd("exit\n", 2), sc_error(1));
 		}
 		(handle_env_file(&data), ft_free_resources(&data, &input, &mat));
 	}

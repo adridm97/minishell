@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/03 14:14:10 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/04 19:53:03 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <bits/sigaction.h>
 
 void	handle_sigint(int sig)
 {
@@ -52,6 +53,7 @@ void	wait_signal(int i)
 {
 	struct sigaction	sa;
 
+	ft_memset(&sa, 0, sizeof(sa));
 	if (i)
 	{
 		sa.sa_handler = &handle_sigint;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/04 16:47:53 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/04 22:53:35 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MINISHELL_H
 
 # include <stdio.h>
+# include <limits.h>
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
@@ -43,7 +44,7 @@
 # define NO_QUOTE	6 // string sin comillas
 # define D_MAJOR	7 // >>
 # define D_MINOR	8 // <<
-
+# define SA_RESTART   0x10000000
 # define ERROR		0
 
 /*	char			*path;
@@ -130,6 +131,7 @@ typedef struct s_data
 	int				heredoc;
 	int				is_ex;
 	int				exp;
+	int				pipe;
 }	t_data;
 
 // lexer.c
@@ -170,8 +172,8 @@ void	b_export(t_data **data);
 int		is_special_string(char *c, char *comp);
 int		ft_strcmp(const char *s1, const char *s2);
 void	b_echo(t_data *data);
-void	b_cd(t_data *data, char *home, int i);
-void	b_pwd(void);
+void	b_cd(t_data **data, char *home);
+void	b_pwd(t_data *data);
 
 //split_token
 int		is_expandsor(t_token **token, char **str, char **env);
@@ -199,7 +201,7 @@ int		set_env(char *key, char *val, char ***env);
 char	**create_env_first(char **cenv);
 int		index_env_env(char **env, char *str);
 int		save_env(t_data *data);
-void	ft_set_shell(char *env[], char ***mat);
+void	ft_set_shell(char *env[], char ***mat, t_data **data);
 
 //utils.c
 void	ft_free_resources(t_data **data, char **input, char ***mat);
