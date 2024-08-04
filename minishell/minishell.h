@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/03 21:04:00 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/04 16:47:53 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,7 +187,7 @@ void	handle_redir(t_data *data, int heredoc_processed);
 int		heredoc(t_redir	*aux, t_data *data);
 char	*charstr(char c);
 char	*new_str(char **str, char c);
-int	count_args(char **args);
+int		count_args(char **args);
 
 //signals.c
 void	handle_sigint_heredoc(int sig);
