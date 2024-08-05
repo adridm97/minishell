@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/06/25 19:18:51 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/05 22:29:41 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,10 @@ static int	count_words(char const *s)
 	int	count;
 	int	in_word;
 
-	i = -1;
+	i = 0;
 	count = 0;
 	in_word = 0;
-	while (s[++i])
+	while (s[i])
 	{
 		if (s[i] == '<' || s[i] == '>')
 			in_word = 0;
@@ -33,7 +33,9 @@ static int	count_words(char const *s)
 				in_word = 1;
 			}
 		}
+		i++;
 	}
+	printf("count_words: %d\n", count);
 	return (count);
 }
 
@@ -90,6 +92,7 @@ char	**special_split(char const *s)
 	int		n_words;
 	char	**mat;
 
+	printf("ENTRO EN SPECIAL\n");
 	if (!s)
 		return (NULL);
 	n_words = count_words(s) + 1;

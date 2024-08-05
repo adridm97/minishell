@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/03 13:55:34 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/06 00:15:14 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ char	*new_str(char **str, char c)
 	{
 		letter = charstr(c);
 		if (!letter)
-			return (NULL);
+			return (free(*str), NULL);
 		res = ft_strjoin(*str, letter);
 		if (letter)
 			free(letter);
@@ -101,7 +101,7 @@ void	is_double_string(t_token **token, char **env, char **str)
 		{
 			is_expandsor(token, &res, env);
 		}
-		res = new_str(&res, (*token)->value);
+			res = new_str(&res, (*token)->value);
 		if (*token)
 			*token = (*token)->next;
 	}
@@ -392,18 +392,18 @@ char	*key_to_res(char **key, char **env)
 // 	return (1);
 // }
 
-int	handle_key(char **str, char **env, char *key)
+int	handle_key(char **str, char **env, char **key)
 {
 	char	*res;
-
-	key = key_to_res(&key, env);
-	if (key)
+	
+	*key = key_to_res(key, env);
+	if (*key)
 	{
 		if (!*str)
-			res = ft_strjoin("", key);
+			res = ft_strjoin("", *key);
 		else
-			res = ft_strjoin(*str, key);
-		(free(*str), free(key));
+			res = ft_strjoin(*str, *key);
+		(free(*str), free(*key));
 		*str = res;
 	}
 	else
@@ -414,7 +414,7 @@ int	handle_key(char **str, char **env, char *key)
 	return (1);
 }
 
-int	handle_status_code(char **str, char *key)
+int	handle_status_code(char **str, char **key)
 {
 	char	*res;
 	char	*status_code;
@@ -424,7 +424,7 @@ int	handle_status_code(char **str, char *key)
 		res = ft_strjoin("", status_code);
 	else
 		res = ft_strjoin(*str, status_code);
-	(free(*str), free(key));
+	(free(*str), free(*key), free(status_code));
 	*str = res;
 	return (1);
 }
@@ -441,9 +441,9 @@ int	process_token(t_token **token, char **str, char **env)
 
 	key = NULL;
 	if (take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€$"))
-		return (handle_key(str, env, key));
+		return (handle_key(str, env, &key));
 	else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€$"))
-		return (handle_status_code(str, key));
+		return (handle_status_code(str, &key));
 	else
 		return (handle_string(str));
 }
@@ -452,7 +452,9 @@ int	is_expandsor(t_token **token, char **str, char **env)
 {
 	*token = (*token)->next;
 	if (!*token || is_special((*token)->value, "<> |\0"))
+	{
 		*str = new_str(str, '$');
+	}
 	else if ((*token)->value == '"')
 		is_double_string(token, env, str);
 	else if ((*token)->value == '\'')
@@ -559,7 +561,7 @@ int	add_last_data(t_data **data, char **str)
 	n_data = *data;
 	while (n_data->next)
 		n_data = n_data->next;
-	if ((*data)->is_ex)
+	if ((*data)->is_ex && ft_strchr(*str, ' '))
 	{
 		mat = ft_split(*str, ' ');
 		if (!mat)
@@ -567,10 +569,10 @@ int	add_last_data(t_data **data, char **str)
 		while (mat[i])
 		{
 			if (!add_args(&n_data->args, &mat[i]))
-				return (free_args(&mat), 0);
+				return (free_args(&mat), i);
 			i++;
 		}
-		free(mat);
+		(free(mat), free(*str));
 		str = NULL;
 	}
 	else if (!add_args(&n_data->args, str))
@@ -601,7 +603,9 @@ int	split_token(t_token *token, char **env, t_data **data)
 	while (token)
 	{
 		if (is_special(token->value, " |\"'<>$"))
+		{
 			switch_case(&token, (*data)->env, data, &str);
+		}
 		else
 		{
 			str = new_str(&str, token->value);
