@@ -267,11 +267,15 @@ void	find_oldpwd(char **res, char **pwd, t_data *data)
 	free(*pwd);
 	*res = ft_strdup("OLDPWD");
 	if (!*res)
+	{
 		(sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code));
+	}
 	*res = key_to_res(res, data->env);
-	if (!res)
+	if (!*res || *res == NULL)
+	{
 		(sc_error(EXIT_FAILURE), \
-		perror("OLDPWD no está definido"), exit(g_stat_code));
+		ft_putstr_fd("OLDPWD no está definido\n", 2), exit(g_stat_code));
+	}
 	*pwd = ft_strdup(*res);
 	free(*res);
 	*res = NULL;

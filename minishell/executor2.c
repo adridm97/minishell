@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/04 23:29:12 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/05 12:44:49 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -707,7 +707,7 @@ int	is_valid_command(t_data *data, int heredoc_processed)
 
 	path = ft_strdup("PATH");
 	path = key_to_res(&path, data->env);
-	if (!path || !data->comand)
+	if ((!path || !data->comand) && !is_builtin(data->comand))
 	{
 		handle_missing_command(data, heredoc_processed);
 		free(path);

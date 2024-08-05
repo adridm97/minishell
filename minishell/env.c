@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:35:01 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/04 23:42:01 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/05 20:16:31 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,15 +41,44 @@ int	set_env(char *key, char *val, char ***env)
 	return (free(str), 1);
 }
 
+void	set_env_i(char ***env)
+{
+    char 	*cwd;
+	char	*pwd;
+
+	cwd = getcwd(NULL, 0);
+	if (!*env)
+	{
+		*env = (char **)malloc(sizeof(char *) * 1);
+		if (!*env)
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		(*env)[0] = NULL;
+	}
+	*env = ft_matadd(env, "SHLVL=0");
+	*env = ft_matadd(env, "_=/usr/bin/env");
+	pwd = (char *)malloc(ft_strlen("PWD=") + ft_strlen(cwd) + 1);
+	if (!pwd)
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+	ft_strcpy(pwd, "PWD=");
+	ft_strcat(pwd, cwd);
+	*env = ft_matadd(env, pwd);
+	free(pwd);
+	free(cwd);
+}
+
 char	**create_env_first(char **cenv)
 {
 	int		i;
 	char	**env;
 
 	i = 0;
+	env = NULL;
 	//TODO Debe crear un mini env con: PWD(lo extrae con cwd()), SHLVL=1 y _???
 	if (!cenv || !cenv[0])
-		return (NULL);
+	{
+		set_env_i(&env);
+		return (env);
+	}
 	while (cenv[i])
 		i++;
 	env = (char **)malloc(sizeof(char *) * (i + 1));
@@ -114,10 +143,11 @@ void	ft_set_shell(char *env[], char ***mat, t_data **data)
 
 	*data = NULL;
 	*mat = create_env_first(env);
-			printf("ENTRO\n");
-
 	if (!*mat)
+	{
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		return ;
+	}
 	key = ft_strdup("SHLVL");
 	if (!key)
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
@@ -131,5 +161,5 @@ void	ft_set_shell(char *env[], char ***mat, t_data **data)
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
 	if (!set_env("SHLVL", key, mat))
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	free (key);
+	free (key);	
 }

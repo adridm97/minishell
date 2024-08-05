@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/04 23:38:46 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/05 17:05:47 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ void	handle_env_file(t_data **data)
 {
 	if (*data && !file_exist("/tmp/env.env"))
 	{
+		printf("llega\n");
 		if (save_env(*data))
 			perror("Error saving environment\n");
 	}

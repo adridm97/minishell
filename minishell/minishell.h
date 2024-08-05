@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/04 22:53:35 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/05 09:37:09 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include <signal.h>
+//#include <bits/sigaction.h>
 
 // Signals
 # define CTRL_C SIGINT
@@ -44,7 +45,7 @@
 # define NO_QUOTE	6 // string sin comillas
 # define D_MAJOR	7 // >>
 # define D_MINOR	8 // <<
-# define SA_RESTART   0x10000000
+//# define SA_RESTART   0x10000000
 # define ERROR		0
 
 /*	char			*path;
