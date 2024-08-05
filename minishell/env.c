@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:35:01 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/05 20:16:31 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/05 20:41:15 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,29 +41,32 @@ int	set_env(char *key, char *val, char ***env)
 	return (free(str), 1);
 }
 
-void	set_env_i(char ***env)
+char	**set_env_i(char ***env)
 {
     char 	*cwd;
 	char	*pwd;
+	int		size;
 
-	cwd = getcwd(NULL, 0);
+	size = 1;
+	cwd = NULL;
+	pwd = NULL;
+	while (size < 10000 && !cwd)
+		cwd = getcwd(cwd, size++);
+	if (size == 10000)
+		return (sc_error(EXIT_FAILURE), NULL);
+	*env = (char **)malloc(sizeof(char *) * 1);
 	if (!*env)
-	{
-		*env = (char **)malloc(sizeof(char *) * 1);
-		if (!*env)
-			sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-		(*env)[0] = NULL;
-	}
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+	(*env)[0] = NULL;
 	*env = ft_matadd(env, "SHLVL=0");
 	*env = ft_matadd(env, "_=/usr/bin/env");
-	pwd = (char *)malloc(ft_strlen("PWD=") + ft_strlen(cwd) + 1);
+	pwd = ft_strjoin("PWD=", cwd);
 	if (!pwd)
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	ft_strcpy(pwd, "PWD=");
-	ft_strcat(pwd, cwd);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	*env = ft_matadd(env, pwd);
 	free(pwd);
 	free(cwd);
+	return (*env);
 }
 
 char	**create_env_first(char **cenv)
@@ -75,10 +78,7 @@ char	**create_env_first(char **cenv)
 	env = NULL;
 	//TODO Debe crear un mini env con: PWD(lo extrae con cwd()), SHLVL=1 y _???
 	if (!cenv || !cenv[0])
-	{
-		set_env_i(&env);
-		return (env);
-	}
+		return (set_env_i(&env));
 	while (cenv[i])
 		i++;
 	env = (char **)malloc(sizeof(char *) * (i + 1));
