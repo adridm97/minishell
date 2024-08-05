@@ -321,7 +321,7 @@ void	ft_oldpwd(t_data **data, char **last_pwd, char **res)
 	}
 	else
 		managing_env(res, i, last_pwd, data);
-	if (!(*data)->env[i])
+	if (!(*data)->env)
 		(free((*data)->env[index_env((*data), "PWD")]), \
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code));
 	unlink("/tmp/env.env");
@@ -405,7 +405,10 @@ void	b_cd(t_data **data, char *home)
 		pwd = ft_strjoin(home, res);
 	}
 	if (!chdir(pwd))
+	{
+		printf("pwd: %s\n", pwd);
 		(ft_pwd(&pwd, &res, data), ft_oldpwd(data, &last_pwd, &res));
+	}
 	else
 		(free(pwd), printf("La ruta especificada no existe\n"), \
 		sc_error(EXIT_FAILURE), exit(g_stat_code));

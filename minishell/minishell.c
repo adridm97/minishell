@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/05 17:05:47 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/05 20:58:23 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,6 @@ int	main(int argc, char *argv[], char *env[])
 	static char	*input;
 	t_data		*data;
 	char		**mat;
-
 
 	mat = NULL;
 	ft_set_shell(env, &mat, &data);
