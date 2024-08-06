@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/06 14:44:11 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/06 23:06:32 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ char	*get_input(void)
 		close(fd);
 		unlink("/tmp/echoafjnaifsnk");
 		input = readline(prompt);
-		printf("input: |%s|", input);
 	}
 	else
 		input = readline(BLUE"Minishell: "BLACK);
@@ -146,7 +145,7 @@ int	main(int argc, char *argv[], char *env[])
 		if (input && *input)
 			(add_history(input), create_history(input));
 		handle_input(env, &d, &mat, input);
-		print_data(d);
+		// print_data(d);
 		if (d && d->comand && !strcmp(d->comand, "exit") && !d->pipe)
 		{
 			if (g_stat_code != 235)

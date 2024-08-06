@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:35:01 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/06 09:34:34 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/06 21:28:37 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,32 +133,4 @@ int	save_env(t_data *data)
 	}
 	close(fd);
 	return (0);
-}
-
-void	ft_set_shell(char *env[], char ***mat, t_data **data)
-{
-	char	*key;
-	int		fd;
-
-	*data = NULL;
-	*mat = create_env_first(env);
-	if (!*mat)
-	{
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-		return ;
-	}
-	key = ft_strdup("SHLVL");
-	if (!key)
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	key = key_to_res(&key, *mat);
-	if (!key)
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	fd = ft_atoi(key) + 1;
-	free(key);
-	key = ft_itoa(fd);
-	if (!key)
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	if (!set_env("SHLVL", key, mat))
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	free (key);
 }

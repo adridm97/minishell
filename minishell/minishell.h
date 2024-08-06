@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/06 12:49:52 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/06 21:59:19 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,6 @@
 # define SA_RESTART   0x10000000
 # define ERROR		0
 
-/*	char			*path;
-	struct s_error	*errors;
-	struct s_token	*token;*/
 typedef struct s_mini
 {
 	char			*path;
@@ -58,17 +55,12 @@ typedef struct s_mini
 	struct s_token	*token;
 }	t_mini;
 
-/*	char	*error;
-	int		is_error;*/
 typedef struct s_error
 {
 	char	*error;
 	int		is_error;
 }	t_error;
 
-/*	int				type;
-	char			*path;
-	struct s_redir	*next;*/
 typedef struct s_redir
 {
 	int				type;
@@ -84,26 +76,6 @@ typedef struct s_exec_vars
 	int		last_pid;
 }	t_exec_vars;
 
-/*
-typedef struct s_heredoc
-{
-	int					type;
-	char				*file;
-	struct s_heredoc	*next;
-}	t_heredoc;
-*/
-
-/*
-Structure:
-	int				*key;
-	char			*value;
-	struct s_token	*next;
-	struct s_data	*data;
--cuando encontramos un caracter especial la key sera special y el value 
-	la macro del caracter
--cuando sea un comando en key pondremos el comando y en value la continuacion 
-	hasta el caracter especial
-*/
 typedef struct s_token
 {
 	int				index;
@@ -112,14 +84,6 @@ typedef struct s_token
 	struct s_token	*next;
 }	t_token;
 
-// Structure:
-	// char			*comand;
-	// char			**args;
-	// struct s_data	*next;
-	// struct s_redir	*redir;
-	// struct s_error	error;
-// args ha de uncluir NULL su ultima posicion, 
-//	esta struct es la utilizada por Adrian
 typedef struct s_data
 {
 	char			*comand;
@@ -152,7 +116,6 @@ void	clean_env(char ***env, int i);
 void	print_redir(t_redir *redir);
 
 // minishell.c
-int		save_env(t_data *data);
 int		file_exist(char *file);
 
 // split things
@@ -165,13 +128,11 @@ void	execute_pipeline(t_data **data);
 int		is_valid_command(t_data *data, int heredoc_processed);
 int		ft_matsize(char **mat);
 void	print_env(t_data *data, char *str);
-void	print_env_env(char **env, char *str);
 int		index_env(t_data *data, char *str);
 void	sc_error(int sce);
 int		is_valid_file(char *filename, int fd, char *check);
 void	print_export(t_data *data, char *str);
 void	b_export(t_data **data);
-int		is_special_string(char *c, char *comp);
 int		ft_strcmp(const char *s1, const char *s2);
 void	b_echo(t_data *data);
 void	b_cd(t_data **data, char *home);
@@ -186,7 +147,7 @@ int		add_last_data(t_data **data, char **str);
 char	*key_to_res(char **key, char **env);
 int		is_special(char c, char *comp);
 void	execute_command(t_data **ddata, char *command_path, \
-int heredoc_processed);
+int		heredoc_processed);
 void	handle_redir(t_data *data, int heredoc_processed);
 int		heredoc(t_redir	*aux, t_data *data);
 char	*charstr(char c);
@@ -203,11 +164,15 @@ int		set_env(char *key, char *val, char ***env);
 char	**create_env_first(char **cenv);
 int		index_env_env(char **env, char *str);
 int		save_env(t_data *data);
+
+//env2.c
 void	ft_set_shell(char *env[], char ***mat, t_data **data);
+void	print_env_env(char **env, char *str);
+void	ft_handle_env_file(char ***mat);
+int		is_special_string(char *c, char *comp);
 
 //utils.c
 void	ft_free_resources(t_data **data, char **input, char ***mat);
-void	ft_handle_env_file(char ***mat);
 
 // Regular Colors
 # define BLACK "\x1b[0m"

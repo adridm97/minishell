@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/06 12:54:21 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/06 22:30:25 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,27 +42,31 @@ void	child_handler(int signal)
 		g_stat_code = 130;
 	else if (signal == SIGQUIT)
 	{
-		printf("Quit: 3\n");
+		printf("Quit: (Core dumped)\n");
 		g_stat_code = 131;
 	}
-	return ;
 }
 
 void	wait_signal(int i)
 {
-	struct sigaction	sa;
+	struct sigaction	sa_int;
+	struct sigaction	sa_quit;
 
-	ft_memset(&sa, 0, sizeof(sa));
+	ft_memset(&sa_int, 0, sizeof(sa_int));
+	ft_memset(&sa_quit, 0, sizeof(sa_quit));
 	if (i)
 	{
-		sa.sa_handler = &handle_sigint;
+		sa_int.sa_handler = &handle_sigint;
+		sa_quit.sa_handler = &handle_sigquit;
 	}
 	else
 	{
-		sa.sa_handler = &child_handler;
+		sa_int.sa_handler = &child_handler;
+		sa_quit.sa_handler = &child_handler;
 	}
-	sa.sa_flags = SA_RESTART;
-	sigaction(SIGINT, &sa, NULL);
-	sigaction(SIGQUIT, &sa, NULL);
-	sigaction(SIGTERM, &sa, NULL);
+	sa_int.sa_flags = SA_RESTART;
+	sa_quit.sa_flags = SA_RESTART;
+	sigaction(SIGINT, &sa_int, NULL);
+	sigaction(SIGQUIT, &sa_quit, NULL);
+	sigaction(SIGTERM, &sa_int, NULL);
 }

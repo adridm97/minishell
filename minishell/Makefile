@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: adrian <adrian@student.42.fr>              +#+  +:+       +#+         #
+#    By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/04 16:50:24 by adrian            #+#    #+#              #
-#    Updated: 2024/08/04 16:50:28 by adrian           ###   ########.fr        #
+#    Updated: 2024/08/06 21:29:39 by aduenas-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,6 +21,7 @@ SOURCES         =	minishell.c \
 					split_token.c \
 					signals.c \
 					env.c \
+					env2.c \
 					utils.c
 OBJS_PATH       = ./build
 HEADER          = minishell.h

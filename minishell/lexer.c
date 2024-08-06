@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/06 12:34:57 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/07 00:58:06 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,17 +29,21 @@ void	free_token(t_token **token)
 	}
 }
 
-int	check_error(t_token *token, char type)
+int	check_error(t_token *token, char type, int flag)
 {
+	if(flag == -1)
+		return (1);
 	if (token->next && (type == token->next->type || (MINOR == type && \
 			MAJOR == token->next->type)) && type != PIPE)
 		token = token->next;
 	while (token->next)
 	{
+
 		token = token->next;
 		if (token->type != SPACES)
 		{
-			if (token->type >= PIPE && token->type <= MINOR)
+			if (token->type >= PIPE && token->type <= MINOR && (type == PIPE 
+				&& !(token->type > PIPE && token->type <= MINOR)))
 				return (1);
 			else
 				return (0);
@@ -48,30 +52,29 @@ int	check_error(t_token *token, char type)
 	return (1);
 }
 
-int	check_gramathic(t_token *token, t_error *error)
+int	check_gramathic(t_token *token, t_error *error, char flag, char type)
 {
-	char	flag;
-	char	type;
-
-	flag = 0;
 	while (token)
 	{
-		if (token->type >= PIPE && token->type <= MINOR && !flag)
+		if (token->type >= PIPE && token->type <= MINOR)
 		{
-			flag = 1;
+			if (flag != -1 || token->type != PIPE)
+				flag = 1;
 			type = token->type;
 		}
-		if (flag)
+		if (flag && token->type >= PIPE && token->type <= MINOR)
 		{
-			if (check_error(token, type))
+			if (check_error(token, type, flag))
 			{
 				if (!error->error)
 					error->error = ft_strdup("Syntax error");
-				error->is_error = 0;
+				error->is_error = 1;
 				return (ERROR);
 			}
 			flag = 0;
 		}
+		if(flag == -1 && !(token->type >= PIPE && token->type <= MINOR) && token->type != SPACES)
+			flag = 0;
 		token = token->next;
 	}
 	return (1);
@@ -428,7 +431,7 @@ t_data	*lexer(char *input, t_data **data, char **env)
 			return (NULL);
 	}
 	check_closed(token, &error);
-	check_gramathic(token, &error);
+	check_gramathic(token, &error, -1, 0);
 	if (error.is_error)
 		return (is_error(&(t_error){"Syntax error", 1}), free(error.error), \
 				free_data(data), free_token(&token), sc_error(1), NULL);

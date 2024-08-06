@@ -6,34 +6,11 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/06 15:26:17 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/06 23:40:10 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-// void	update_env(t_data *cdata, char *key, char *arg)
-// {
-// 	int	i;
-// 	char	*res;
-
-// 	res = NULL;
-// 	i = index_env(cdata, key);
-// 	if (i >= 0)
-// 	{
-// 		res = ft_strdup(cdata->env[i]);
-// 		free(cdata->env[i]);
-// 		cdata->env[i] = NULL;
-// 		if (ft_strnstr(arg, "=", ft_strlen(arg)))
-// 			cdata->env[i] = arg;
-// 	}
-// 	else
-// 	{
-// 		cdata->env = ft_matadd(&(cdata)->env, arg);
-// 		if (!cdata->env)
-// 			exit(g_stat_code);
-// 	}
-// }
 
 void	update_env(t_data *cdata, char *key, char *arg)
 {
@@ -122,6 +99,11 @@ void	b_export(t_data **data)
 	int	j;
 
 	j = 0;
+	if((*data)->pipe)
+	{
+		sc_error(SC_SUCCESS);
+		exit(g_stat_code);
+	}
 	if (!(*data)->args[1])
 		return (print_export(*data, "declare -x "));
 	while ((*data)->args[++j])
@@ -180,6 +162,8 @@ void	b_unset(t_data *data)
 	int	i;
 	int	j;
 
+	if (data->pipe)
+		(sc_error(0), exit(g_stat_code));
 	j = 0;
 	while (data->args[++j])
 	{
@@ -733,7 +717,11 @@ void	handle_missing_command(t_data *data, int heredoc_processed)
 		execute_command(&data, data->comand, heredoc_processed);
 	else if (data->redir != NULL)
 		handle_redir(data, heredoc_processed);
-	//ft_putstr_fd("Command not found\n", 2);
+	else
+	{
+		ft_putstr_fd(data->comand, 2);
+		ft_putstr_fd(": No such file or directory\n", 2);
+	}
 }
 
 int	is_valid_command(t_data *data, int heredoc_processed)

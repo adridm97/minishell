@@ -76,22 +76,6 @@ int	manage_token_heredoc(t_token **token, char **input, int *i)
 	}
 	return (1);
 }
-/*
-		if (!token)
-		{
-			if (!new_token(input[i], typeing(input[i], " |><\'\"") \
-						, &token, 0))
-				return (is_error(& (t_error){"Memory error",1}), free(input) \
-				, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
-		}
-		else
-		{
-			if (!add_token(input[i], typeing(input[i], " |><\'\"") \
-						, &token))
-				return (is_error(& (t_error){"Memory error",1}), free(input) \
-				, free_token(&token), sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
-		}
-*/
 
 char	*heredoc_tokenizer(char *str, t_data *data)
 {
@@ -199,7 +183,7 @@ void	handle_dups(int fd, t_redir *redir, t_data *data, int heredoc_processed)
 {
 	if (fd == -1)
 		return (ft_putstr_fd(data->redir->path, 2), \
-		ft_putstr_fd("No such file or directory\n", 2));
+		ft_putstr_fd(" No such file or directory\n", 2));
 	if ((redir->type == MAJOR || redir->type == D_MAJOR) \
 	&& data->comand != NULL)
 	{
@@ -368,7 +352,10 @@ void	init_cd(char **last_pwd, char **pwd, int size, t_data *data)
 {
 	*last_pwd = NULL;
 	*pwd = NULL;
+
 	size = 1;
+	if (data->pipe)
+		(sc_error(0), exit(g_stat_code));
 	if (data->args[1])
 		*pwd = ft_strdup(data->args[1]);
 	while (size < 10000 && !*last_pwd)
@@ -414,19 +401,31 @@ void	b_cd(t_data **data, char *home)
 	exit(g_stat_code);
 }
 
-int	ft_is_n(char *str)
+int	ft_is_n(char **str, int *j)
 {
 	int	i;
+	int res;
 
 	i = 0;
-	if (str[i] != '-')
-		return (1);
-	while (str[++i])
+	res = -1;
+	while (str[*j])
 	{
-		if (str[i] != 'n')
+		if (res == -1 && str[*j][i] != '-')
 			return (1);
+		else if (res == 0 && str[*j][i] != '-')
+			return (res);
+		while (str[*j][++i])
+		{
+			if (res == -1 && str[*j][i] != 'n')
+				return (1);
+			else if (res == 0 && str[*j][i] != 'n')
+				return (res);
+			res = 0;
+		}
+		*j = *j + 1;
+		i = 0;
 	}
-	return (0);
+	return (res);
 }
 
 void	print_args_echo(t_data *data, int *i, int fd)
@@ -445,9 +444,8 @@ void	b_echo(t_data *data)
 	int	fd;
 
 	i = 1;
-	if (data->args[i] && !ft_is_n(data->args[i]))
+	if (data->args[i] && !ft_is_n(data->args, &i))
 	{
-		i++;
 		fd = open("/tmp/echoafjnaifsnk", O_WRONLY | O_CREAT | O_APPEND, 0777);
 		if (is_valid_file("/tmp/echoafjnaifsnk", fd, "FW"))
 			(close(fd), unlink("/tmp/echoafjnaifsnk"), exit(g_stat_code));
@@ -506,7 +504,7 @@ void	print_export(t_data *data, char *str)
 	char	*key;
 
 	i = -1;
-	if (data->env)
+	if (!data->pipe && data->env)
 	{
 		while (data->env[++i])
 		{
@@ -529,17 +527,7 @@ void	print_export(t_data *data, char *str)
 	}
 }
 
-void	print_env_env(char **env, char *str)
-{
-	int	i;
 
-	i = -1;
-	if (env)
-	{
-		while (env[++i])
-			printf("%s%s\n", str, env[i]);
-	}
-}
 
 int	ft_matsize(char **mat)
 {
@@ -578,18 +566,4 @@ char	**ft_matadd(char ***mat, char *str)
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
 	new_mat[++i] = NULL;
 	return (free_args(mat), new_mat);
-}
-
-int	is_special_string(char *c, char *comp)
-{
-	char	*str;
-
-	while (*c)
-	{
-		str = ft_strchr(comp, *c);
-		if (str)
-			return (1);
-		c++;
-	}
-	return (0);
 }

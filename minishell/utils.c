@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:33:06 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/03 20:43:05 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/06 21:37:54 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,17 +28,16 @@ void	ft_free_resources(t_data **data, char **input, char ***mat)
 		clean_env(mat, -1);
 }
 
-void	ft_handle_env_file(char ***mat)
+int	is_special_string(char *c, char *comp)
 {
-	int	fd;
+	char	*str;
 
-	fd = open("/tmp/env.env", O_RDONLY);
-	if (is_valid_file("/tmp/env.env", fd, "R"))
-		sc_error(SC_PERMISSION_DENIED);
-	if (mat && fd >= 0)
+	while (*c)
 	{
-		*mat = get_env_file(fd);
-		close(fd);
-		unlink("/tmp/env.env");
+		str = ft_strchr(comp, *c);
+		if (str)
+			return (1);
+		c++;
 	}
+	return (0);
 }
