@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/06 11:07:25 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/06 14:44:11 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,16 @@ void	handle_input(char *env[], t_data **data, char ***mat, char *input)
 	}
 }
 
+void	create_history(char *input)
+{
+	int	fd;
+
+	fd = open("/tmp/.minishell_history", O_WRONLY | O_CREAT | O_APPEND, 0777);
+	ft_putstr_fd(input, fd);
+	ft_putstr_fd("\n", fd);
+	close(fd);
+}
+
 int	main(int argc, char *argv[], char *env[])
 {
 	static char	*input;
@@ -129,10 +139,14 @@ int	main(int argc, char *argv[], char *env[])
 		(wait_signal(1), ft_handle_env_file(&mat), (void)argc, (void)argv);
 		input = get_input();
 		if (input == NULL)
+		{
+			printf("\nexit\n");
 			break ;
+		}
 		if (input && *input)
-			add_history(input);
+			(add_history(input), create_history(input));
 		handle_input(env, &d, &mat, input);
+		print_data(d);
 		if (d && d->comand && !strcmp(d->comand, "exit") && !d->pipe)
 		{
 			if (g_stat_code != 235)

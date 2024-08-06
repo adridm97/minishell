@@ -6,22 +6,56 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/06 12:35:59 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/06 15:26:17 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+// void	update_env(t_data *cdata, char *key, char *arg)
+// {
+// 	int	i;
+// 	char	*res;
+
+// 	res = NULL;
+// 	i = index_env(cdata, key);
+// 	if (i >= 0)
+// 	{
+// 		res = ft_strdup(cdata->env[i]);
+// 		free(cdata->env[i]);
+// 		cdata->env[i] = NULL;
+// 		if (ft_strnstr(arg, "=", ft_strlen(arg)))
+// 			cdata->env[i] = arg;
+// 	}
+// 	else
+// 	{
+// 		cdata->env = ft_matadd(&(cdata)->env, arg);
+// 		if (!cdata->env)
+// 			exit(g_stat_code);
+// 	}
+// }
+
 void	update_env(t_data *cdata, char *key, char *arg)
 {
 	int	i;
+	char	*new_entry;
 
 	i = index_env(cdata, key);
 	if (i >= 0)
 	{
+		new_entry = ft_strdup(cdata->env[i]);
+		if (!new_entry)
+			exit(g_stat_code);
 		free(cdata->env[i]);
 		if (ft_strnstr(arg, "=", ft_strlen(arg)))
-			cdata->env[i] = arg;
+		{
+			cdata->env[i] = ft_strdup(arg);
+			if (!cdata->env[i])
+				exit(g_stat_code);
+			free(new_entry);
+		}
+		else
+			cdata->env[i] = new_entry;
 	}
 	else
 	{
