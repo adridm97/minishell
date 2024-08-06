@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/05 22:41:55 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/06 12:34:57 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	check_gramathic(t_token *token, t_error *error)
 			{
 				if (!error->error)
 					error->error = ft_strdup("Syntax error");
-				error->is_error = 1;
+				error->is_error = 0;
 				return (ERROR);
 			}
 			flag = 0;

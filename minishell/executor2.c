@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/06 09:38:17 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/06 12:35:59 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void	update_env(t_data *cdata, char *key, char *arg)
 	i = index_env(cdata, key);
 	if (i >= 0)
 	{
+		free(cdata->env[i]);
 		if (ft_strnstr(arg, "=", ft_strlen(arg)))
 			cdata->env[i] = arg;
 	}
@@ -125,16 +126,17 @@ int	index_env(t_data *data, char *str)
 	int		i;
 	char	**env;
 
-	i = -1;
+	i = 0;
 	env = data->env;
 	if (!env)
 		return (-2);
-	while (env[++i])
+	while (env[i])
 	{
 		if (ft_strnstr(env[i], str, ft_strlen(str)) && \
 				(env[i][ft_strlen(str)] \
 				== '=' || env[i][ft_strlen(str)] == '\0'))
 			return (i);
+		i++;
 	}
 	return (-1);
 }
@@ -697,7 +699,7 @@ void	handle_missing_command(t_data *data, int heredoc_processed)
 		execute_command(&data, data->comand, heredoc_processed);
 	else if (data->redir != NULL)
 		handle_redir(data, heredoc_processed);
-	ft_putstr_fd("Command not found\n", 2);
+	//ft_putstr_fd("Command not found\n", 2);
 }
 
 int	is_valid_command(t_data *data, int heredoc_processed)

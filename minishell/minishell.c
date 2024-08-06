@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/06 09:40:09 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/06 11:07:25 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,6 @@ void	handle_env_file(t_data **data)
 {
 	if (*data && !file_exist("/tmp/env.env"))
 	{
-		printf("llega\n");
 		if (save_env(*data))
 			perror("Error saving environment\n");
 	}
@@ -111,7 +110,6 @@ void	handle_input(char *env[], t_data **data, char ***mat, char *input)
 	}
 	else if (*data)
 	{
-		print_data(*data);
 		is_valid_command(*data, 0);
 		if (g_stat_code == SC_HEREDOC)
 			sc_error(1);
