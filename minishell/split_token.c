@@ -76,11 +76,12 @@ void	is_simple_string(t_token **token, char **env, char **str)
 	while (*token && (*token)->value != '\'')
 	{
 		(void)env;
-		if ((*token)->value != '\'')
-			res = new_str(&res, (*token)->value);
+		res = new_str(&res, (*token)->value);
 		if (*token)
 			*token = (*token)->next;
 	}
+	if (*token)
+		*token = (*token)->next;
 	free(*str);
 	*str = res;
 }
@@ -99,12 +100,14 @@ void	is_double_string(t_token **token, char **env, char **str)
 		if ((*token)->value == '$')
 		{
 			is_expandsor(token, &res, env);
+			break ;
 		}
-		if ((*token)->value != '"')
-			res = new_str(&res, (*token)->value);
+		res = new_str(&res, (*token)->value);
 		if (*token)
 			*token = (*token)->next;
 	}
+	if (*token)
+		*token = (*token)->next;
 	free(*str);
 	*str = res;
 }
@@ -141,6 +144,8 @@ void	manage_redirs(t_data **data, t_redir **credir, char *str)
 
 	redir = *credir;
 	c_data = *data;
+	while (c_data->next)
+		c_data = c_data->next;
 	if (!c_data->redir)
 	{
 		c_data->redir = redir;

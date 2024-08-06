@@ -149,6 +149,7 @@ void	free_token(t_token **token);
 char	**get_env_file(int fd);
 void	print_data(t_data *data);
 void	clean_env(char ***env, int i);
+void	print_redir(t_redir *redir);
 
 // minishell.c
 int		save_env(t_data *data);
