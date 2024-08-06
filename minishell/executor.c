@@ -249,7 +249,7 @@ void	handle_redir(t_data *data, int heredoc_processed)
 
 void	find_home(char **res, char **pwd, t_data *data)
 {
-	if(*pwd)
+	if (*pwd)
 		free(*pwd);
 	*res = ft_strdup("HOME");
 	if (!*res)
@@ -283,7 +283,7 @@ void	find_oldpwd(char **res, char **pwd, t_data *data)
 
 void	find_pwd(char **res, t_data **data)
 {
-	if(res)
+	if (res)
 		free(res);
 	*res = ft_strjoin("PWD=", "PWD");
 	if (!*res)
@@ -335,17 +335,15 @@ void	ft_oldpwd(t_data **data, char **last_pwd, char **res)
 // free(*res), exit(g_stat_code));
 */
 
-void	ft_pwd(char **pwd, char **res, t_data **data)
+void	ft_pwd(char **pwd, char **res, t_data **data, int size)
 {
 	int	i;
-	int	size;
 
 	free(*pwd);
 	*pwd = NULL;
 	i = index_env((*data), "PWD");
 	if (i < 0)
 		find_pwd(res, data);
-	size = 1;
 	while (size < 10000 && !*pwd)
 		*pwd = getcwd(*pwd, size++);
 	if (size == 10000)
@@ -407,7 +405,7 @@ void	b_cd(t_data **data, char *home)
 	if (!chdir(pwd))
 	{
 		printf("pwd: %s\n", pwd);
-		(ft_pwd(&pwd, &res, data), ft_oldpwd(data, &last_pwd, &res));
+		(ft_pwd(&pwd, &res, data, 0), ft_oldpwd(data, &last_pwd, &res));
 	}
 	else
 		(free(pwd), printf("La ruta especificada no existe\n"), \

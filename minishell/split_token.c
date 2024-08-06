@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/06 00:15:14 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/06 09:32:40 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,12 +76,11 @@ void	is_simple_string(t_token **token, char **env, char **str)
 	while (*token && (*token)->value != '\'')
 	{
 		(void)env;
-		res = new_str(&res, (*token)->value);
+		if ((*token)->value != '\'')
+			res = new_str(&res, (*token)->value);
 		if (*token)
 			*token = (*token)->next;
 	}
-	if (*token)
-		*token = (*token)->next;
 	free(*str);
 	*str = res;
 }
@@ -101,12 +100,11 @@ void	is_double_string(t_token **token, char **env, char **str)
 		{
 			is_expandsor(token, &res, env);
 		}
+		if ((*token)->value != '"')
 			res = new_str(&res, (*token)->value);
 		if (*token)
 			*token = (*token)->next;
 	}
-	if (*token)
-		*token = (*token)->next;
 	free(*str);
 	*str = res;
 }
@@ -155,20 +153,6 @@ void	manage_redirs(t_data **data, t_redir **credir, char *str)
 	l_redir->next = redir;
 	redir->path = str;
 }
-// {
-// 	while (c_data->next)
-// 				c_data = c_data->next;
-// 			redir->path = str;
-// 			if (!c_data->redir)
-// 			{
-// 				c_data->redir = redir;
-// 				return ;
-// 			}
-// 			l_redir = c_data->redir;
-// 			while (l_redir->next)
-// 				l_redir = l_redir->next;
-// 			l_redir->next = redir;
-// }
 
 int	exp_var(int *exp, int type)
 {
@@ -341,61 +325,10 @@ char	*key_to_res(char **key, char **env)
 	return (NULL);
 }
 
-// Expand the $ with env
-// int	is_expandsor(t_token **token, char **str, char **env)
-// {
-// 	char	*key;
-// 	char	*res;
-// 	char	*status_code;
-
-// 	key = NULL;
-// 	*token = (*token)->next;
-// 	if (!*token || is_special((*token)->value, "<> |\0"))
-// 		*str = new_str(str, '$');
-// 	else if ((*token)->value == '"')
-// 		is_double_string(token, env, str);
-// 	else if ((*token)->value == '\'')
-// 		is_simple_string(token, env, str);
-// 	else
-// 	{
-// 		if (*token && take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€$"))
-// 		{
-// 			key = key_to_res(&key, env);
-// 			if (key)
-// 			{
-// 				if (!*str)
-// 					res = ft_strjoin("", key);
-// 				else
-// 					res = ft_strjoin(*str, key);
-// 				(free(*str), free(key));
-// 				*str = res;
-// 			}
-// 			else
-// 				return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
-// 		}
-// 		else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€$"))
-// 		{
-// 			status_code = ft_itoa(g_stat_code);
-// 			if (!*str)
-// 				res = ft_strjoin("", status_code);
-// 			else
-// 				res = ft_strjoin(*str, status_code);
-// 			(free(*str), free(key));
-// 			*str = res;
-// 		}
-// 		else
-// 		{
-// 			*str = new_str(str, '$');
-// 			return (1);
-// 		}
-// 	}
-// 	return (1);
-// }
-
 int	handle_key(char **str, char **env, char **key)
 {
 	char	*res;
-	
+
 	*key = key_to_res(key, env);
 	if (*key)
 	{

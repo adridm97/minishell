@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/05 12:44:49 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/06 09:38:17 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,7 +158,7 @@ void	b_unset(t_data *data)
 	exit(g_stat_code);
 }
 
-void try_max_num(char *arg)
+void	try_max_num(char *arg)
 {
 	if (ft_strlen(arg) > ft_strlen("9223372036854775807"))
 	{
@@ -288,7 +288,7 @@ int	is_builtin(char *comand)
 void	handle_child_process(t_data **ddata, char *command_path, int processed)
 {
 	t_data	*data;
-	
+
 	data = *ddata;
 	if (data->redir != NULL)
 		handle_redir(data, processed);
@@ -504,8 +504,7 @@ void	execute_pipeline(t_data **data)
 		pid = fork();
 		if (pid == -1)
 		{
-			perror("fork");
-			exit(EXIT_FAILURE);
+			(perror("fork"), exit(EXIT_FAILURE));
 		}
 		else if (pid == 0)
 			handle_child_pipes(current, &vars, fd);

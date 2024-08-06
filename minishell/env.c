@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:35:01 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/05 20:41:15 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/06 09:34:34 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	set_env(char *key, char *val, char ***env)
 
 char	**set_env_i(char ***env)
 {
-    char 	*cwd;
+	char	*cwd;
 	char	*pwd;
 	int		size;
 
@@ -76,7 +76,6 @@ char	**create_env_first(char **cenv)
 
 	i = 0;
 	env = NULL;
-	//TODO Debe crear un mini env con: PWD(lo extrae con cwd()), SHLVL=1 y _???
 	if (!cenv || !cenv[0])
 		return (set_env_i(&env));
 	while (cenv[i])
@@ -161,5 +160,5 @@ void	ft_set_shell(char *env[], char ***mat, t_data **data)
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
 	if (!set_env("SHLVL", key, mat))
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	free (key);	
+	free (key);
 }

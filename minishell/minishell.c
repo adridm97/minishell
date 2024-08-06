@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/05 20:58:23 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/06 09:40:09 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,11 +121,11 @@ void	handle_input(char *env[], t_data **data, char ***mat, char *input)
 int	main(int argc, char *argv[], char *env[])
 {
 	static char	*input;
-	t_data		*data;
+	t_data		*d;
 	char		**mat;
 
 	mat = NULL;
-	ft_set_shell(env, &mat, &data);
+	ft_set_shell(env, &mat, &d);
 	while (1)
 	{
 		(wait_signal(1), ft_handle_env_file(&mat), (void)argc, (void)argv);
@@ -134,15 +134,15 @@ int	main(int argc, char *argv[], char *env[])
 			break ;
 		if (input && *input)
 			add_history(input);
-		handle_input(env, &data, &mat, input);
-		if (data && data->comand && !strcmp(data->comand, "exit") && !data->pipe)
+		handle_input(env, &d, &mat, input);
+		if (d && d->comand && !strcmp(d->comand, "exit") && !d->pipe)
 		{
 			if (g_stat_code != 235)
 				break ;
 			else
 				(ft_putstr_fd("exit\n", 2), sc_error(1));
 		}
-		(handle_env_file(&data), ft_free_resources(&data, &input, &mat));
+		(handle_env_file(&d), ft_free_resources(&d, &input, &mat));
 	}
-	return (ft_free_resources(&data, &input, &mat), g_stat_code);
+	return (ft_free_resources(&d, &input, &mat), g_stat_code);
 }
