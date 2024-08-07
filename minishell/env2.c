@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env2.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 21:27:52 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/07 15:58:22 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/07 21:33:55 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ void	check_shlvl(int *n)
 	else if (*n >= 1000)
 	{
 		*n = 1;
-		printf("warning: shell level (1000) too high, resetting to 1\n");
+		ft_putstr_fd("warning: shell level"
+			" (1000) too high, resetting to 1\n", 2);
 	}
 }
 

@@ -3,14 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   pwd2.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:08:03 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 11:51:36 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/07 21:39:40 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	ft_free_char(char **f)
+{
+	if (*f)
+		free(*f);
+	*f = NULL;
+}
 
 void	managing_env(char **res, int i, char **last_pwd, t_data **data)
 {
@@ -22,7 +29,7 @@ void	managing_env(char **res, int i, char **last_pwd, t_data **data)
 	(*data)->env = ft_matadd(&(*data)->env, *res);
 	if (!(*data)->env)
 		exit(g_stat_code);
-	free(*res);
+	ft_free_char(res);
 	*res = NULL;
 }
 
@@ -33,37 +40,31 @@ void	ft_oldpwd(t_data **data, char **last_pwd, char **res)
 	i = index_env(*data, "OLDPWD");
 	if (i >= 0)
 	{
-		free((*data)->env[i]);
+		ft_free_char(&(*data)->env[i]);
 		(*data)->env[i] = ft_strjoin("OLDPWD=",*last_pwd);
 	}
 	else
 		managing_env(res, i, last_pwd, data);
 	if (!(*data)->env)
-		(free((*data)->env[index_env((*data), "PWD")]), \
+		(ft_free_char(&(*data)->env[index_env((*data), "PWD")]), \
 		sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code));
 	unlink("/tmp/env.env");
 	if (save_env(*data))
-		(clean_env(&(*data)->env, -1), free(*last_pwd), \
-		free(*res), exit(g_stat_code));
+		(clean_env(&(*data)->env, -1), ft_free_char(last_pwd), \
+		ft_free_char(res), exit(g_stat_code));
 }
-/*
-// (free((*data)->env[index_env((*data), "PWD")]), \
-// free((*data)->env[index_env((*data), "OLDPWD")]), free(*last_pwd), \
-// free(*res), exit(g_stat_code));
-*/
 
 void	ft_pwd(char **pwd, char **res, t_data **data, int size)
 {
 	int	i;
 
-	free(*pwd);
-	*pwd = NULL;
+	ft_free_char(pwd);
 	i = index_env((*data), "PWD");
 	if (i < 0)
 		find_pwd(res, data);
 	while (size < 10000 && !*pwd)
 		*pwd = getcwd(*pwd, size++);
-	if (size == 10000)
+	if (size == 10000 || !*pwd)
 	{
 		if (size == 10000)
 		{
@@ -74,9 +75,9 @@ void	ft_pwd(char **pwd, char **res, t_data **data, int size)
 			(sc_error(EXIT_FAILURE), exit(g_stat_code));
 	}
 	i = index_env((*data), "PWD");
-	free((*data)->env[i]);
+	ft_free_char(&(*data)->env[i]);
 	(*data)->env[i] = ft_strjoin("PWD=", *pwd);
-	free(*pwd);
+	ft_free_char(pwd);
 	if (!(*data)->env[i])
 		(sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code));
 }
@@ -100,7 +101,7 @@ void	b_pwd(t_data *data)
 			(sc_error(EXIT_FAILURE), exit(g_stat_code));
 	}
 	printf("%s\n", buff);
-	free(buff);
+	ft_free_char(&buff);
 	sc_error(SC_SUCCESS);
 	exit(g_stat_code);
 }

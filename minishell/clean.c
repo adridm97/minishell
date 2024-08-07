@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clean.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 17:32:30 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 17:34:50 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/07 21:10:21 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,10 @@ void	free_args(char ***args)
 		while ((*args)[++i])
 		{
 			if ((*args)[i])
+			{
 				free((*args)[i]);
+				(*args)[i] = NULL;
+			}
 		}
 		free(*args);
 	}

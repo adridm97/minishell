@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/07 20:00:35 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/07 21:37:00 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -305,6 +305,8 @@ void	b_pwd(t_data *data);
 void	managing_env(char **res, int i, char **last_pwd, t_data **data);
 void	ft_oldpwd(t_data **data, char **last_pwd, char **res);
 void	ft_pwd(char **pwd, char **res, t_data **data, int size);
+
+void	ft_free_char(char **f);
 
 // Regular Colors
 # define BLACK "\x1b[0m"
