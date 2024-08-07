@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/07 17:47:40 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/07 20:00:35 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,6 @@ void	free_data(t_data **data);
 void	clean_env(char ***env, int i);
 void	free_token(t_token **token);
 
-
 // minishell.c
 int		file_exist(char *file);
 
@@ -194,7 +193,7 @@ char	*extract_key(char *arg);
 //pipes.c
 void	execute_pipeline(t_data **data);
 void	initialize_pipe_vars(t_exec_vars *vars);
-int	is_pipe(t_token **token, t_data **data, char **str);
+int		is_pipe(t_token **token, t_data **data, char **str);
 
 //cd.c
 void	b_cd(t_data **data, char *home);
