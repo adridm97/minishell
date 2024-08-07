@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+         #
+#    By: adrian <adrian@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/04 16:50:24 by adrian            #+#    #+#              #
-#    Updated: 2024/08/06 21:29:39 by aduenas-         ###   ########.fr        #
+#    Updated: 2024/08/07 17:39:39 by adrian           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,33 @@ SOURCES         =	minishell.c \
 					signals.c \
 					env.c \
 					env2.c \
-					utils.c
+					env3.c \
+					pwd.c \
+					pwd2.c \
+					status.c \
+					heredoc.c \
+					print.c \
+					echo.c \
+					cd.c \
+					mat.c \
+					handle.c \
+					handle2.c \
+					handle_fd.c \
+					pipes.c \
+					exit.c \
+					builtins.c \
+					unset.c \
+					export.c \
+					redirs.c \
+					redirs2.c \
+					args.c \
+					key.c \
+					clean.c \
+					token.c \
+					checkers.c \
+					utils.c \
+					utils2.c
+
 OBJS_PATH       = ./build
 HEADER          = minishell.h
 LIBFT_PATH      = ./libft

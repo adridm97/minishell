@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env2.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 21:27:52 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/06 22:55:45 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:58:22 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,18 +52,6 @@ void	ft_set_shell(char *env[], char ***mat, t_data **data)
 	free (key);
 }
 
-void	print_env_env(char **env, char *str)
-{
-	int	i;
-
-	i = -1;
-	if (env)
-	{
-		while (env[++i])
-			printf("%s%s\n", str, env[i]);
-	}
-}
-
 void	ft_handle_env_file(char ***mat)
 {
 	int	fd;
@@ -77,4 +65,39 @@ void	ft_handle_env_file(char ***mat)
 		close(fd);
 		unlink("/tmp/env.env");
 	}
+}
+
+void	handle_env_file(t_data **data)
+{
+	if (*data && !file_exist("/tmp/env.env"))
+	{
+		if (save_env(*data))
+			perror("Error saving environment\n");
+	}
+}
+
+int	get_file_env(int fd, t_data **data)
+{
+	int		i;
+	char	*env;
+
+	env = get_next_line(fd);
+	i = 0;
+	if (!env || (*data)->env)
+		return (0);
+	i = count_lines("/tmp/env.env");
+	fd = open("/tmp/env.env", O_RDONLY, 777);
+	(*data)->env = (char **)malloc(sizeof(char **) * ++i);
+	if (!i && is_valid_file("/tmp/env.env", fd, "R"))
+		return (sc_error(SC_PERMISSION_DENIED), 0);
+	i = -1;
+	if (!(*data)->env)
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+	env = get_next_line(fd);
+	while (env)
+	{
+		(*data)->env[++i] = env;
+		env = get_next_line(fd);
+	}
+	return (1);
 }
