@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 12:44:46 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/08 13:21:05 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,11 @@ void	handle_missing_command(t_data *data, int heredoc_processed)
 		handle_redir(data, heredoc_processed);
 	else
 	{
-		ft_putstr_fd(data->comand, 2);
-		ft_putstr_fd(": No such file or directory\n", 2);
+		if (data->comand)
+		{
+			ft_putstr_fd(data->comand, 2);
+			ft_putstr_fd(": No such file or directory\n", 2);
+		}
 	}
 }
 
