@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   split_token.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/07 17:27:41 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/10 15:43:46 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ int	add_last_data(t_data **data, char **str)
 			i++;
 		}
 		free(mat);
-		str = NULL;
+		*str = NULL;
 	}
 	else if (!add_args(&n_data->args, str))
 		return (0);

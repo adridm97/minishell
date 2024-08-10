@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   key.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 17:21:05 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 17:29:05 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/10 15:40:52 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,18 +50,18 @@ char	*key_to_res(char **key, char **env)
 	return (NULL);
 }
 
-int	handle_key(char **str, char **env, char *key)
+int	handle_key(char **str, char **env, char **key)
 {
 	char	*res;
 
-	key = key_to_res(&key, env);
-	if (key)
+	*key = key_to_res(key, env);
+	if (*key)
 	{
 		if (!*str)
-			res = ft_strjoin("", key);
+			res = ft_strjoin("", *key);
 		else
-			res = ft_strjoin(*str, key);
-		(free(*str), free(key));
+			res = ft_strjoin(*str, *key);
+		(free(*str), free(*key));
 		*str = res;
 	}
 	else
@@ -84,7 +84,7 @@ int	process_token(t_token **token, char **str, char **env)
 
 	key = NULL;
 	if (take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€$"))
-		return (handle_key(str, env, key));
+		return (handle_key(str, env, &key));
 	else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€$"))
 		return (handle_status_code(str, key));
 	else

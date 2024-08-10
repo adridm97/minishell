@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/08 13:27:07 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/10 15:02:36 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -291,7 +291,7 @@ void	is_double_string(t_token **token, char **env, char **str);
 //key.c
 int		take_key(t_token **token, char **key, char *str);
 char	*key_to_res(char **key, char **env);
-int		handle_key(char **str, char **env, char *key);
+int		handle_key(char **str, char **env, char **key);
 int		handle_string(char **str);
 int		process_token(t_token **token, char **str, char **env);
 

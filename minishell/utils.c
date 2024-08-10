@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:33:06 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/07 17:17:44 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/10 15:39:36 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,5 +99,6 @@ int	handle_status_code(char **str, char *key)
 		res = ft_strjoin(*str, status_code);
 	(free(*str), free(key));
 	*str = res;
+	printf("str: %s\n", *str);
 	return (1);
 }

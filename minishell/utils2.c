@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:27:50 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 16:47:56 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/10 15:18:31 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,12 +96,16 @@ void	is_double_string(t_token **token, char **env, char **str)
 		if ((*token)->value == '$')
 		{
 			is_expandsor(token, &res, env);
+			// printf("res: %c\n", (*token)->next->value);
+			if(*token && (*token)->next && (*token)->value == '"')
+				(*token) = (*token)->next;
 		}
-		res = new_str(&res, (*token)->value);
+		if (*token)
+			res = new_str(&res, (*token)->value);
 		if (*token)
 			*token = (*token)->next;
 	}
-	if (*token)
+	if (*token && (*token)->type == D_QUOTE)
 		*token = (*token)->next;
 	free(*str);
 	*str = res;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/07 20:00:15 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/10 14:57:18 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ int	main(int argc, char *argv[], char *env[])
 		if (input && *input)
 			add_history(input);
 		handle_input(env, &d, &mat, input);
+		print_data(d);
 		if (ft_is_exit(d) == 1)
 			break ;
 		(handle_env_file(&d), ft_free_resources(&d, &input, &mat));
