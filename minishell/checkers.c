@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   checkers.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 17:39:20 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 17:45:55 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/11 20:59:15 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,15 @@ int	check_error(t_token *token, char type, int flag)
 	if (token->next && (type == token->next->type || (MINOR == type && \
 			MAJOR == token->next->type)) && type != PIPE)
 		token = token->next;
-	while (token->next)
+	while (token)
 	{
+		// printf("check err = %c\n", token->value);
 		token = token->next;
-		if (token->type != SPACES)
+		if (token && token->type != SPACES)
 		{
-			if (token->type >= PIPE && token->type <= MINOR && (type == PIPE \
-			&& !(token->type > PIPE && token->type <= MINOR)))
+			/*TODO, antes era esta, si falla el lexer es por este if if (token->type >= PIPE && token->type <= MINOR && (type == PIPE \
+			&& !(token->type > PIPE && token->type <= MINOR)))*/
+			if (token->type >= PIPE && token->type <= MINOR)
 				return (1);
 			else
 				return (0);

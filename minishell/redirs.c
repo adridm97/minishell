@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirs.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:08:03 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 16:23:46 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/11 20:52:24 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ int	init_redir(t_token **token, t_data **data, char **env, int type)
 	while ((*token))
 	{
 		if (is_special((*token)->value, "'\"$" ) && (*data)->exp)
-			switch_case_redir(token, &str, env);
+			(switch_case_redir(token, &str, env));
 		else if (is_special((*token)->value, "| <>") && str)
 			return (manage_redirs(&c_data, &redir, str), 1);
 		else if ((*token)->value == ' ')

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirs2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:24:04 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 16:26:21 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/11 18:55:11 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ void	manage_redirs(t_data **data, t_redir **credir, char *str)
 
 	redir = *credir;
 	c_data = *data;
+	while (c_data->next)
+		c_data = c_data->next;
 	if (!c_data->redir)
 	{
 		c_data->redir = redir;

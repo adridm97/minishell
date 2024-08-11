@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/10 15:43:46 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/11 20:51:58 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ int	is_expandsor(t_token **token, char **str, char **env)
 
 int	switch_case(t_token **token, char **env, t_data **data, char **str)
 {
+	// printf("switch case = %c\n", (*token)->value);
 	if ((*token)->value == '\'')
 		is_simple_string(token, env, str);
 	else if ((*token)->value == '"')
