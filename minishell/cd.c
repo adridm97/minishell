@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:21:28 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 21:38:47 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/11 23:12:07 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,11 @@ void	find_home(char **res, char **pwd, t_data *data)
 		ft_free_char(pwd);
 	*res = ft_strdup("HOME");
 	if (!*res)
-		(sc_error(SC_CANNOT_ALLOCATE_MEMORY), exit(g_stat_code));
+		(sc_error(SC_CANNOT_ALLOCATE_MEMORY, &data), exit(*data->stat_code));
 	*res = key_to_res(res, data->env);
 	if (!*res)
-		(sc_error(EXIT_FAILURE), perror("HOME no está definido"), \
-		exit(g_stat_code));
+		(sc_error(EXIT_FAILURE, &data), perror("HOME no está definido"), \
+		exit(*data->stat_code));
 	*pwd = ft_strdup(*res);
 	ft_free_char(res);
 }
@@ -33,7 +33,7 @@ void	init_cd(char **last_pwd, char **pwd, int size, t_data *data)
 	*pwd = NULL;
 	size = 1;
 	if (data->pipe)
-		(sc_error(0), exit(g_stat_code));
+		(sc_error(0, &data), exit(*data->stat_code));
 	if (data->args[1])
 		*pwd = ft_strdup(data->args[1]);
 	while (size < 10000 && !*last_pwd)
@@ -49,7 +49,7 @@ void	init_cd(char **last_pwd, char **pwd, int size, t_data *data)
 		}
 		if (!*last_pwd)
 		{
-			(ft_free_char(pwd), sc_error(SC_KEY_HAS_BEEN_REVOKED));
+			(ft_free_char(pwd), sc_error(SC_KEY_HAS_BEEN_REVOKED, &data));
 			*pwd = ft_strdup("/");
 			*last_pwd = ft_strdup("/");
 		}
@@ -79,7 +79,7 @@ void	b_cd(t_data **data, char *home)
 		(ft_pwd(&pwd, &res, data, 0), ft_oldpwd(data, &last_pwd, &res));
 	else
 		(ft_putstr_fd("La ruta especificada no existe\n", 2), \
-		ft_free_char(&pwd), sc_error(EXIT_FAILURE), exit(g_stat_code));
-	(free_args(&(*data)->env), sc_error(SC_SUCCESS));
-	exit(g_stat_code);
+		ft_free_char(&pwd), sc_error(EXIT_FAILURE, data), exit(*(*data)->stat_code));
+	(free_args(&(*data)->env), sc_error(SC_SUCCESS, data));
+	exit(*(*data)->stat_code);
 }

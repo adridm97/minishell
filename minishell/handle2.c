@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 13:19:37 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/11 23:12:46 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 	if (ft_strcmp(command_path, "is_builtinOMG") == 0)
 	{
 		switch_builtin(ddata);
-		exit(g_stat_code);
+		exit(*data->stat_code);
 	}
 	else
 	{
@@ -46,9 +46,9 @@ void	handle_heredoc(t_data *current, t_exec_vars *vars)
 		perror("dup2");
 		exit(EXIT_FAILURE);
 	}
-	if (g_stat_code == SC_HEREDOC)
+	if (*current->stat_code == SC_HEREDOC)
 	{
-		sc_error(1);
+		sc_error(1, &current);
 		exit(1);
 	}
 	close(vars->heredoc_fd);

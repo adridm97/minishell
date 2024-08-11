@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env2.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/06 21:27:52 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/07 21:33:55 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/11 22:35:51 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,39 +30,39 @@ void	ft_set_shell(char *env[], char ***mat, t_data **data)
 	int		fd;
 
 	*data = NULL;
-	*mat = create_env_first(env);
+	*mat = create_env_first(env, data);
 	if (!*mat)
 	{
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY, data);
 		return ;
 	}
 	key = ft_strdup("SHLVL");
 	if (!key)
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY, data);
 	key = key_to_res(&key, *mat);
 	if (!key)
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY, data);
 	fd = ft_atoi(key) + 1;
 	free(key);
 	check_shlvl(&fd);
 	key = ft_itoa(fd);
 	if (!key)
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
-	if (!set_env("SHLVL", key, mat))
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY, data);
+	if (!set_env("SHLVL", key, mat, data))
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY, data);
 	free (key);
 }
 
-void	ft_handle_env_file(char ***mat)
+void	ft_handle_env_file(char ***mat, t_data **data)
 {
 	int	fd;
 
 	fd = open("/tmp/env.env", O_RDONLY);
-	if (is_valid_file("/tmp/env.env", fd, "R"))
-		sc_error(SC_PERMISSION_DENIED);
+	if (is_valid_file("/tmp/env.env", fd, "R", data))
+		sc_error(SC_PERMISSION_DENIED, data);
 	if (mat && fd >= 0)
 	{
-		*mat = get_env_file(fd);
+		*mat = get_env_file(fd, data);
 		close(fd);
 		unlink("/tmp/env.env");
 	}
@@ -86,14 +86,14 @@ int	get_file_env(int fd, t_data **data)
 	i = 0;
 	if (!env || (*data)->env)
 		return (0);
-	i = count_lines("/tmp/env.env");
+	i = count_lines("/tmp/env.env", data);
 	fd = open("/tmp/env.env", O_RDONLY, 777);
 	(*data)->env = (char **)malloc(sizeof(char **) * ++i);
-	if (!i && is_valid_file("/tmp/env.env", fd, "R"))
-		return (sc_error(SC_PERMISSION_DENIED), 0);
+	if (!i && is_valid_file("/tmp/env.env", fd, "R", data))
+		return (sc_error(SC_PERMISSION_DENIED, data), 0);
 	i = -1;
 	if (!(*data)->env)
-		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY, data), 0);
 	env = get_next_line(fd);
 	while (env)
 	{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:27:48 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 16:34:51 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/11 23:06:41 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,15 +46,15 @@ void	execute_pipeline(t_data **data)
 			handle_parent_process(&vars, fd, pid, data);
 		current = current->next;
 	}
-	wait_for_remaining_processes(vars.last_pid);
+	wait_for_remaining_processes(vars.last_pid, data);
 }
 
-int	is_pipe(t_token **token, t_data **data, char **str)
+int	is_pipe(t_token **token, t_data **data, char **str, int *sce)
 {
 	t_data	*n_data;
 	t_data	*last_data;
 
-	if (!init_data(&n_data, (*data)->env))
+	if (!init_data(&n_data, (*data)->env, sce))
 		return (free(*str), 0);
 	last_data = (*data);
 	while (last_data->next)

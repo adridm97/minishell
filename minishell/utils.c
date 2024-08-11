@@ -6,16 +6,17 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:33:06 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/10 15:39:36 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/11 23:28:28 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_free_resources(t_data **data, char **input, char ***mat)
+void	ft_free_resources(t_data **data, char **input, char ***mat,  int *sce)
 {
 	if (*data)
 	{
+		*sce = (*data)->stat_code;
 		free_data(data);
 		*data = NULL;
 	}
@@ -61,29 +62,26 @@ char	*get_input(void)
 	return (input);
 }
 
-void	handle_input(char *env[], t_data **data, char ***mat, char *input)
+void	handle_input(t_data **data, char ***mat, char *input, int *sce)
 {
 	if (!*input)
 		return ;
 	if (*mat)
-	{
-		*data = lexer(input, data, *mat);
-	}
-	else
-		*data = lexer(input, data, env);
+		*data = lexer(input, data, *mat, sce);
+		
 	if (*data)
 		check_pwd(*data);
 	if (*data && (*data)->next)
 	{
 		execute_pipeline(data);
-		if (g_stat_code == SC_HEREDOC)
-			sc_error(1);
+		if (*(*data)->stat_code == SC_HEREDOC)
+			sc_error(1, data);
 	}
 	else if (*data)
 	{
 		is_valid_command(*data, 0);
-		if (g_stat_code == SC_HEREDOC)
-			sc_error(1);
+		if (*(*data)->stat_code == SC_HEREDOC)
+			sc_error(1, data);
 	}
 }
 

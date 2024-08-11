@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:55:56 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 17:27:39 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/11 23:14:31 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	b_unset(t_data *data)
 	int	j;
 
 	if (data->pipe)
-		(sc_error(0), exit(g_stat_code));
+		(sc_error(0, &data), exit(*data->stat_code));
 	j = 0;
 	while (data->args[++j])
 	{
@@ -28,9 +28,9 @@ void	b_unset(t_data *data)
 	}
 	unlink("/tmp/env.env");
 	if (save_env(data))
-		exit(g_stat_code);
-	sc_error(SC_SUCCESS);
-	exit(g_stat_code);
+		exit(*data->stat_code);
+	sc_error(SC_SUCCESS, &data);
+	exit(*data->stat_code);
 }
 
 char	**ft_mat_rem_index(char ***mat, int index)

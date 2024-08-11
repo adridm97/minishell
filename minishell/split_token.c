@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/11 20:51:58 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/11 23:16:24 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ int	is_expandsor(t_token **token, char **str, char **env)
 	return (1);
 }
 
+// TODO hay que meter el sce
 int	switch_case(t_token **token, char **env, t_data **data, char **str)
 {
 	// printf("switch case = %c\n", (*token)->value);
@@ -63,7 +64,7 @@ int	add_last_data(t_data **data, char **str)
 	{
 		mat = ft_split(*str, ' ');
 		if (!mat)
-			return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+			return (sc_error(SC_CANNOT_ALLOCATE_MEMORY, data), 0);
 		while (mat[i])
 		{
 			if (!add_args(&n_data->args, &mat[i]))
@@ -91,11 +92,11 @@ void	include_comand(t_data **data)
 	}
 }
 
-int	split_token(t_token *token, char **env, t_data **data)
+int	split_token(t_token *token, char **env, t_data **data, int *sce)
 {
 	char	*str;
 
-	if (!init_data(data, env))
+	if (!init_data(data, env, sce))
 		return (free_data(data), 0);
 	str = NULL;
 	while (token)

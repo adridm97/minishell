@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/08 13:25:05 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/11 22:33:02 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+//TODO hemos roto las señales
 
 void	handle_sigint(int sig)
 {
@@ -24,7 +26,7 @@ void	handle_sigint(int sig)
 void	handle_sigint_heredoc(int sig)
 {
 	(void)sig;
-	g_stat_code = SC_HEREDOC;
+	// g_stat_code = SC_HEREDOC;
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
@@ -38,12 +40,11 @@ void	handle_sigquit(int sig)
 
 void	child_handler(int signal)
 {
-	if (signal == SIGINT)
-		g_stat_code = 130;
-	else if (signal == SIGQUIT)
+	// if (signal == SIGINT)
+	// 	g_stat_code = 130;
+	if (signal == SIGQUIT)
 	{
 		printf("Quit: (Core dumped)\n");
-		g_stat_code = 131;
 	}
 }
 

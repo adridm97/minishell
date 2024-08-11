@@ -91,9 +91,6 @@ int main() {
         "echo 'Hello'",
         "echo \"Hello'",
         "echo 'Hello\"",
-        "cat << EOF\nSome content\nEOF\n,",  // cat <<EOF expects content and an EOF marker
-        "cat >> file\nSome content\n,",       // Append content to a file
-        "cat <<EOF\nSome content\nEOF\n,",    // Same as above with <<EOF
         "cat \"file",
         "cat 'file'",
         "echo \"Hello > file",
@@ -131,14 +128,14 @@ int main() {
         run_custom_shell("./minishell", command, minishell_result, sizeof(minishell_result));
 
         // Ejecutar el comando en Bash
-        // run_command("/bin/bash", command, bash_result, sizeof(bash_result));
+        run_command("/bin/bash", command, bash_result, sizeof(bash_result));
 
         // Imprimir los resultados para cada comando
         printf("----------------%s----------------\n", command);
         printf("\x1b[32m""++++Minishell++++\n""\x1b[0m");
-        printf("%s", strchr(minishell_result, ' ') + 1);
-        // printf("\x1b[35m""++++Bash++++\n""\x1b[0m");
-        // printf("%s", bash_result);
+        printf("%s", minishell_result);
+        printf("\x1b[35m""++++Bash++++\n""\x1b[0m");
+        printf("%s", bash_result);
     }
 
     return 0;

@@ -3,36 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   env3.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:36:08 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 21:24:04 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/11 23:12:05 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	**get_env_file(int fd)
+char	**get_env_file(int fd, t_data **data)
 {
 	int		i;
 	char	*env;
 	char	*clean;
 	char	**mat;
 
-	i = count_lines("/tmp/env.env");
+	i = count_lines("/tmp/env.env", data);
 	fd = open("/tmp/env.env", O_RDONLY, 777);
-	if (!i && is_valid_file("/tmp/env.env", fd, "R"))
-		return (sc_error(SC_PERMISSION_DENIED), NULL);
+	if (!i && is_valid_file("/tmp/env.env", fd, "R", data))
+		return (sc_error(SC_PERMISSION_DENIED, data), NULL);
 	mat = (char **)malloc(sizeof(char *) * (i + 1));
 	if (!mat)
-		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), NULL);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY, data), NULL);
 	i = -1;
 	env = get_next_line(fd);
 	while (env)
 	{
 		clean = ft_strtrim(env, "\n");
 		if (!clean)
-			return (sc_error(12), clean_env(&mat, --i), NULL);
+			return (sc_error(12, data), clean_env(&mat, --i), NULL);
 		mat[++i] = clean;
 		free(env);
 		env = get_next_line(fd);
@@ -50,13 +50,13 @@ void	update_env(t_data *cdata, char *key, char *arg, int i)
 	{
 		new_entry = ft_strdup(cdata->env[i]);
 		if (!new_entry)
-			exit(g_stat_code);
+			exit(*cdata->stat_code);
 		free(cdata->env[i]);
 		if (ft_strnstr(arg, "=", ft_strlen(arg)))
 		{
 			cdata->env[i] = ft_strdup(arg);
 			if (!cdata->env[i])
-				exit(g_stat_code);
+				exit(*cdata->stat_code);
 			free(new_entry);
 		}
 		else
@@ -64,9 +64,10 @@ void	update_env(t_data *cdata, char *key, char *arg, int i)
 	}
 	else
 	{
-		cdata->env = ft_matadd(&(cdata)->env, arg);
+		cdata->env = ft_matadd(&(cdata)->env, arg, &cdata);
 		if (!cdata->env)
-			exit(g_stat_code);
+			exit(*cdata->stat_code);
+
 	}
 }
 
@@ -98,8 +99,8 @@ void	b_env(t_data *data)
 	if (data->args[1])
 	{
 		ft_putstr_fd("Error, env not accept arguments\n", 2);
-		sc_error(SC_KEY_HAS_EXPIRED);
-		exit(g_stat_code);
+		sc_error(SC_KEY_HAS_EXPIRED, &data);
+		exit(*data->stat_code);
 	}
 	if (data->env)
 	{
@@ -109,8 +110,8 @@ void	b_env(t_data *data)
 				printf("%s\n", data->env[i]);
 		}
 	}
-	sc_error(SC_SUCCESS);
-	exit(g_stat_code);
+	sc_error(SC_SUCCESS, &data);
+	exit(*data->stat_code);
 }
 
 int	create_env(t_data **data, char **env)
@@ -127,7 +128,7 @@ int	create_env(t_data **data, char **env)
 	(*data)->env = (char **)malloc(sizeof(char *) * (i + 1));
 	i = -1;
 	if (!(*data)->env)
-		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY), 0);
+		return (sc_error(SC_CANNOT_ALLOCATE_MEMORY, data), 0);
 	while (env[++i])
 	{
 		(*data)->env[i] = ft_strdup(env[i]);

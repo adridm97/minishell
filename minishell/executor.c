@@ -42,22 +42,22 @@ int	is_valid_command(t_data *data, int heredoc_processed)
  X = se puede ejecutar? retorna 4 cuando no.
  si fd es -1 retorna 5.
 */
-int	is_valid_file(char *filename, int fd, char *check)
+int	is_valid_file(char *filename, int fd, char *check, t_data **data)
 {
 	if (fd < 0)
-		return (sc_error(EXIT_FAILURE), 5);
+		return (sc_error(EXIT_FAILURE, data), 5);
 	if (ft_strchr(check, 'F') && access(filename, F_OK))
 		return (close(fd), perror("El archivo no existe"), \
-		sc_error(SC_KEY_HAS_EXPIRED), 1);
+		sc_error(SC_KEY_HAS_EXPIRED, data), 1);
 	if (ft_strchr(check, 'R') && access(filename, R_OK))
 		return (close(fd), perror("El archivo no tiene permisos de lectura"), \
-		sc_error(EXIT_FAILURE), 2);
+		sc_error(EXIT_FAILURE, data), 2);
 	if (ft_strchr(check, 'W') && access(filename, W_OK))
 		return (close(fd), perror("El archivo no tiene permisos de escritura"), \
-		sc_error(EXIT_FAILURE), 3);
+		sc_error(EXIT_FAILURE, data), 3);
 	if (ft_strchr(check, 'X') && access(filename, X_OK))
 		return (close(fd), perror("El archivo no tiene permisos de ejecución"), \
-		sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE), 4);
+		sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE, data), 4);
 	return (0);
 }
 
@@ -81,9 +81,9 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 		while (pid > 0)
 		{
 			if (WIFEXITED(status))
-				g_stat_code = WEXITSTATUS(status);
+				*(*ddata)->stat_code = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
-				g_stat_code = WTERMSIG(status);
+				*(*ddata)->stat_code = WTERMSIG(status);
 			pid = wait(&status);
 		}
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:52:55 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 15:53:26 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/11 23:12:06 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ void	b_echo(t_data *data)
 	if (data->args[i] && !ft_is_n(data->args, &i))
 	{
 		fd = open("/tmp/echoafjnaifsnk", O_WRONLY | O_CREAT | O_APPEND, 0777);
-		if (is_valid_file("/tmp/echoafjnaifsnk", fd, "FW"))
-			(close(fd), unlink("/tmp/echoafjnaifsnk"), exit(g_stat_code));
+		if (is_valid_file("/tmp/echoafjnaifsnk", fd, "FW", &data))
+			(close(fd), unlink("/tmp/echoafjnaifsnk"), exit(*data->stat_code));
 		print_args_echo(data, &i, fd);
 		(ft_putstr_fd(BLUE"Minishell: "BLACK, fd), close(fd));
 	}
@@ -33,7 +33,7 @@ void	b_echo(t_data *data)
 	}
 	else
 		printf("\n");
-	(sc_error(SC_SUCCESS), free_args(&data->args), exit(g_stat_code));
+	(sc_error(SC_SUCCESS, &data), free_args(&data->args), exit(*data->stat_code));
 }
 
 int	ft_is_n(char **str, int *j)

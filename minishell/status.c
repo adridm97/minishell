@@ -3,18 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   status.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:23:30 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 14:46:23 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/11 23:10:08 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	sc_error(int sce)
+void	sc_error(int sce, t_data **data)
 {
-	g_stat_code = sce;
+	if (data && *data)
+	{
+		*(*data)->stat_code = sce;
+	}
 }
 
 void	update_heredoc_status(t_data **data, pid_t pid, int *processed)
@@ -26,23 +29,23 @@ void	update_heredoc_status(t_data **data, pid_t pid, int *processed)
 		pid = wait(&status);
 		while (pid > 0)
 		{
-			update_status(pid, &pid, status);
+			update_status(pid, &pid, status, data);
 			pid = wait(&status);
 		}
 		*processed = 0;
 	}
 }
 
-void	update_status(pid_t pid, int *last_pid, int status)
+void	update_status(pid_t pid, int *last_pid, int status, t_data **data)
 {
 	if (pid > *last_pid && WIFEXITED(status))
-		g_stat_code = WEXITSTATUS(status);
+		*(*data)->stat_code = WEXITSTATUS(status);
 	else if (pid > *last_pid && WIFSIGNALED(status))
-		g_stat_code = WTERMSIG(status);
+		*(*data)->stat_code = WTERMSIG(status);
 	*last_pid = pid;
 }
 
-void	wait_for_remaining_processes(int last_pid)
+void	wait_for_remaining_processes(int last_pid, t_data **data)
 {
 	int		status;
 	pid_t	pid;
@@ -50,7 +53,7 @@ void	wait_for_remaining_processes(int last_pid)
 	pid = wait(&status);
 	while (pid > 0)
 	{
-		update_status(pid, &last_pid, status);
+		update_status(pid, &last_pid, status, data);
 		pid = wait(&status);
 	}
 }

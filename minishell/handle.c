@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/08 13:21:05 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/11 23:12:47 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,9 +103,9 @@ void	handle_child_pipes(t_data *current, t_exec_vars *vars, int fd[2])
 		handle_redir(current, vars->heredoc_processed);
 	if (!is_valid_command(current, vars->heredoc_processed))
 	{
-		sc_error(SC_KEY_HAS_EXPIRED);
-		exit(g_stat_code);
+		sc_error(SC_KEY_HAS_EXPIRED, &current);
+		exit(*current->stat_code);
 	}
-	sc_error(SC_SUCCESS);
-	exit(g_stat_code);
+	sc_error(SC_SUCCESS, &current);
+	exit(*current->stat_code);
 }

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/10 15:02:36 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/11 23:27:02 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,7 @@ typedef struct s_data
 	int				is_ex;
 	int				exp;
 	int				pipe;
+	int				*stat_code;
 }	t_data;
 
 //checkers.c
@@ -111,9 +112,9 @@ int		new_token(char c, int type, t_token **token, int index);
 int		add_token(char c, int type, t_token **token);
 
 // lexer.c
-t_data	*lexer(char *input, t_data **data, char **env);
-int		init_data(t_data **data, char **env);
-int		count_lines(char *file);
+t_data	*lexer(char *input, t_data **data, char **env, int *sce);
+int		init_data(t_data **data, char **env, int *sce);
+int		count_lines(char *file, t_data **data);
 
 //clean.c
 void	free_redir(t_redir **redir);
@@ -129,10 +130,10 @@ int		file_exist(char *file);
 char	**special_split(char const *s);
 
 //status.c
-void	wait_for_remaining_processes(int last_pid);
-void	sc_error(int sce);
+void	wait_for_remaining_processes(int last_pid, t_data **data);
+void	sc_error(int sce, t_data **data);
 void	update_heredoc_status(t_data **data, pid_t pid, int *processed);
-void	update_status(pid_t pid, int *last_pid, int status);
+void	update_status(pid_t pid, int *last_pid, int status, t_data **data);
 
 //print.c
 void	print_redir(t_redir *redir);
@@ -142,7 +143,7 @@ void	print_env(t_data *data, char *str);
 void	print_env_env(char **env, char *str);
 
 //mat.c
-char	**ft_matadd(char ***mat, char *str);
+char	**ft_matadd(char ***mat, char *str, t_data **data);
 int		ft_matsize(char **mat);
 char	**ft_matcpy(char **mat);
 
@@ -175,7 +176,7 @@ char	*build_command_path(char *dir, char *comand);
 
 //executor.c
 int		is_valid_command(t_data *data, int heredoc_processed);
-int		is_valid_file(char *filename, int fd, char *check);
+int		is_valid_file(char *filename, int fd, char *check, t_data **data);
 void	execute_command(t_data **ddata, char *command_path, \
 int heredoc_processed);
 
@@ -188,12 +189,12 @@ void	b_export(t_data **data);
 void	process_argument(t_data *cdata, char *arg);
 void	finalize_export(t_data *cdata);
 int		is_valid_key(char *key);
-char	*extract_key(char *arg);
+char	*extract_key(char *arg, t_data **data);
 
 //pipes.c
 void	execute_pipeline(t_data **data);
 void	initialize_pipe_vars(t_exec_vars *vars);
-int		is_pipe(t_token **token, t_data **data, char **str);
+int		is_pipe(t_token **token, t_data **data, char **str, int *sce);
 
 //cd.c
 void	b_cd(t_data **data, char *home);
@@ -211,7 +212,7 @@ int		is_expandsor(t_token **token, char **str, char **env);
 void	is_expandsor_str_simple(t_token **token, char **str, char **env);
 int		switch_case(t_token **token, char **env, t_data **data, char **str);
 int		add_last_data(t_data **data, char **str);
-int		split_token(t_token *token, char **env, t_data **data);
+int		split_token(t_token *token, char **env, t_data **data, int *sce);
 
 //redirs.c
 void	redirs(t_data **c_data, char **str, t_redir **redir, t_redir **l_redir);
@@ -228,7 +229,7 @@ void	manage_redirs(t_data **data, t_redir **credir, char *str);
 int		heredoc(t_redir	*aux, t_data *data);
 int		expand_line(char **expanded_line, char **line, int fd, t_data *data);
 char	*heredoc_tokenizer(char *str, t_data *data);
-int		manage_token_heredoc(t_token **token, char **input, int *i);
+int		manage_token_heredoc(t_token **token, char **input, int *i, t_data **data);
 int		token_to_str(t_token **token, char **res, t_data **data);
 
 //signals.c
@@ -239,21 +240,21 @@ void	handle_sigint(int sig);
 void	handle_sigquit(int sig);
 
 //env.c
-int		set_env(char *key, char *val, char ***env);
-char	**create_env_first(char **cenv);
+int		set_env(char *key, char *val, char ***env, t_data **data);
+char	**create_env_first(char **cenv, t_data **data);
 int		index_env_env(char **env, char *str);
 int		save_env(t_data *data);
-char	**set_env_i(char ***env);
+char	**set_env_i(char ***env, t_data **data);
 
 //env2.c
 void	check_shlvl(int *n);
 void	ft_set_shell(char *env[], char ***mat, t_data **data);
-void	ft_handle_env_file(char ***mat);
+void	ft_handle_env_file(char ***mat, t_data **data);
 void	handle_env_file(t_data **data);
 int		get_file_env(int fd, t_data **data);
 
 //env3.c
-char	**get_env_file(int fd);
+char	**get_env_file(int fd, t_data **data);
 void	update_env(t_data *cdata, char *key, char *arg, int i);
 int		index_env(t_data *data, char *str);
 void	b_env(t_data *data);
@@ -266,8 +267,8 @@ int		ft_is_n(char **str, int *j);
 
 //exit.c
 void	b_exit(t_data *data);
-void	check_numeric_argument(char *arg);
-void	try_max_num(char *arg);
+void	check_numeric_argument(char *arg, t_data **data);
+void	try_max_num(char *arg, t_data **data);
 
 //unset.c
 void	b_unset(t_data *data);
@@ -275,8 +276,8 @@ char	**ft_mat_rem_index(char ***mat, int index);
 void	is_space(t_token **token, t_data **data, char **str);
 
 //utils.c
-void	ft_free_resources(t_data **data, char **input, char ***mat);
-void	handle_input(char *env[], t_data **data, char ***mat, char *input);
+void	ft_free_resources(t_data **data, char **input, char ***mat, int *sce);
+void	handle_input(t_data **data, char ***mat, char *input, int *sce);
 char	*get_input(void);
 int		is_special_string(char *c, char *comp);
 int		handle_status_code(char **str, char *key);
@@ -317,8 +318,6 @@ void	ft_free_char(char **f);
 # define MAGENTA "\x1b[35m"
 # define CYAN "\x1b[36m"
 # define WHITE "\x1b[37m"
-
-extern int	g_stat_code;
 
 # define SC_SUCCESS												0
 # define SC_OPERATION_NOT_PERMITTED								1

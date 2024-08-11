@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 14:12:39 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 21:25:00 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/11 23:12:47 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ void	b_export(t_data **data)
 	j = 0;
 	if ((*data)->pipe)
 	{
-		sc_error(SC_SUCCESS);
-		exit(g_stat_code);
+		sc_error(SC_SUCCESS, data);
+		exit(*(*data)->stat_code);
 	}
 	if (!(*data)->args[1])
 		return (print_export(*data, "declare -x "));
@@ -35,13 +35,13 @@ void	process_argument(t_data *cdata, char *arg)
 {
 	char	*key;
 
-	key = extract_key(arg);
+	key = extract_key(arg, &cdata);
 	if (!is_valid_key(key))
 	{
 		free(key);
-		return (sc_error(SC_INVALID_ARGUMENT), \
+		return (sc_error(SC_INVALID_ARGUMENT, &cdata), \
 		printf("export: `%s': not a valid identifier\n", arg), \
-		exit(g_stat_code));
+		exit(*cdata->stat_code));
 	}
 	update_env(cdata, key, arg, 0);
 	free(key);
@@ -51,12 +51,12 @@ void	finalize_export(t_data *cdata)
 {
 	unlink("/tmp/env.env");
 	if (save_env(cdata))
-		exit(g_stat_code);
-	sc_error(SC_SUCCESS);
-	exit(g_stat_code);
+		exit(*cdata->stat_code);
+	sc_error(SC_SUCCESS, &cdata);
+	exit(*cdata->stat_code);
 }
 
-char	*extract_key(char *arg)
+char	*extract_key(char *arg, t_data **data)
 {
 	char	*need;
 	char	*key;
@@ -66,14 +66,14 @@ char	*extract_key(char *arg)
 	{
 		key = (char *)malloc((need - arg) + 1);
 		if (!key)
-			exit(g_stat_code);
+			exit(*(*data)->stat_code);
 		ft_strlcpy(key, arg, (need - arg) + 1);
 	}
 	else
 	{
 		key = ft_strdup(arg);
 		if (!key)
-			exit(g_stat_code);
+			exit(*(*data)->stat_code);
 	}
 	return (key);
 }
