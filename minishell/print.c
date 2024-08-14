@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   print.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:46:17 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 11:49:59 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/13 08:05:14 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,8 @@ void	print_data(t_data *data)
 	j = -1;
 	while (data)
 	{
+		printf("-----------------------------------------------------------\n");
+		printf("exit status: %i|\n", *data->stat_code);
 		printf("data %i\nComand: %s|\n", i, data->comand);
 		while (data->args && data->args[++j])
 			printf("arg[%i]: %s|\nnext = %p\n", j, data->args[j], data->next);

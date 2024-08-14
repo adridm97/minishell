@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:27:50 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/10 15:18:31 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 00:11:08 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void	is_simple_string(t_token **token, char **env, char **str)
 	*str = res;
 }
 
-void	is_double_string(t_token **token, char **env, char **str)
+void	is_double_string(t_token **token, char **env, char **str, t_data **data)
 {
 	char	*res;
 
@@ -95,8 +95,7 @@ void	is_double_string(t_token **token, char **env, char **str)
 	{
 		if ((*token)->value == '$')
 		{
-			is_expandsor(token, &res, env);
-			// printf("res: %c\n", (*token)->next->value);
+			is_expandsor(token, &res, env, data);
 			if(*token && (*token)->next && (*token)->value == '"')
 				(*token) = (*token)->next;
 		}

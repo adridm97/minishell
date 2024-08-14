@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:26:22 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/11 23:14:32 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 00:08:13 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ int	token_to_str(t_token **token, char **res, t_data **data)
 	if (is_special((*token)->value, "$") && \
 	(!is_special((*token)->next->value, "\"'")))
 	{
-		if (!is_expandsor(token, res, (*data)->env))
+		if (!is_expandsor(token, res, (*data)->env, data))
 			return (free_token(token), sc_error(SC_CANNOT_ALLOCATE_MEMORY, data), 0);
 	}
 	else

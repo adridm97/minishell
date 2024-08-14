@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:33:06 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/11 23:28:28 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 00:10:11 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	ft_free_resources(t_data **data, char **input, char ***mat,  int *sce)
 {
 	if (*data)
 	{
-		*sce = (*data)->stat_code;
+		*sce = *(*data)->stat_code;
 		free_data(data);
 		*data = NULL;
 	}
@@ -68,7 +68,6 @@ void	handle_input(t_data **data, char ***mat, char *input, int *sce)
 		return ;
 	if (*mat)
 		*data = lexer(input, data, *mat, sce);
-		
 	if (*data)
 		check_pwd(*data);
 	if (*data && (*data)->next)
@@ -79,24 +78,23 @@ void	handle_input(t_data **data, char ***mat, char *input, int *sce)
 	}
 	else if (*data)
 	{
-		is_valid_command(*data, 0);
+		is_valid_command(data, 0);
 		if (*(*data)->stat_code == SC_HEREDOC)
 			sc_error(1, data);
 	}
 }
 
-int	handle_status_code(char **str, char *key)
+int	handle_status_code(char **str, char *key, t_data **data)
 {
 	char	*res;
 	char	*status_code;
 
-	status_code = ft_itoa(g_stat_code);
+	status_code = ft_itoa(*(*data)->stat_code);
 	if (!*str)
 		res = ft_strjoin("", status_code);
 	else
 		res = ft_strjoin(*str, status_code);
 	(free(*str), free(key));
 	*str = res;
-	printf("str: %s\n", *str);
 	return (1);
 }

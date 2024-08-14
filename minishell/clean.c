@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clean.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 17:32:30 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 21:10:21 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/15 00:00:04 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,4 +108,5 @@ void	free_token(t_token **token)
 				c_token = (*token)->next;
 		}
 	}
+	*token = NULL;
 }

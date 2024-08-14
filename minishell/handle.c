@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/11 23:12:47 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/14 23:03:37 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,23 +89,23 @@ pid_t pid, t_data **data)
 	update_heredoc_status(data, pid, &(vars->heredoc_processed));
 }
 
-void	handle_child_pipes(t_data *current, t_exec_vars *vars, int fd[2])
+void	handle_child_pipes(t_data **current, t_exec_vars *vars, int fd[2])
 {
-	if (current->redir != NULL && current->redir->type == D_MINOR && \
+	if ((*current)->redir != NULL && (*current)->redir->type == D_MINOR && \
 		!(vars->heredoc_processed))
-		handle_heredoc(current, vars);
+		handle_heredoc((*current), vars);
 	else
 		handle_input_redirection(&(vars->input_fd));
-	handle_output_redirection(current, fd);
+	handle_output_redirection((*current), fd);
 	close(fd[0]);
 	close(fd[1]);
-	if (current->redir != NULL)
-		handle_redir(current, vars->heredoc_processed);
+	if ((*current)->redir != NULL)
+		handle_redir((*current), vars->heredoc_processed);
 	if (!is_valid_command(current, vars->heredoc_processed))
 	{
-		sc_error(SC_KEY_HAS_EXPIRED, &current);
-		exit(*current->stat_code);
+		sc_error(SC_KEY_HAS_EXPIRED, current);
+		exit(*(*current)->stat_code);
 	}
-	sc_error(SC_SUCCESS, &current);
-	exit(*current->stat_code);
+	sc_error(SC_SUCCESS, current);
+	exit(*(*current)->stat_code);
 }

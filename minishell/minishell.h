@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/11 23:27:02 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/14 23:46:34 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,7 @@ int heredoc_processed);
 void	handle_redir(t_data *data, int heredoc_processed);
 void	handle_parent_process(t_exec_vars *vars, int fd[2], \
 pid_t pid, t_data **data);
-void	handle_child_pipes(t_data *current, t_exec_vars *vars, int fd[2]);
+void	handle_child_pipes(t_data **current, t_exec_vars *vars, int fd[2]);
 
 //handle2.c
 void	handle_child_process(t_data **ddata, char *command_path, int processed);
@@ -168,14 +168,14 @@ void	close_heredoc_fd(int *heredoc_fd);
 void	close_input_fd(int *input_fd);
 
 //executor2.c
-int		search_and_execute_command(t_data *data, char *path, \
+int		search_and_execute_command(t_data **data, char *path, \
 int heredoc_processed);
-int		find_command_in_paths(t_data *data, char **token, \
+int		find_command_in_paths(t_data **data, char **token, \
 int heredoc_processed);
 char	*build_command_path(char *dir, char *comand);
 
 //executor.c
-int		is_valid_command(t_data *data, int heredoc_processed);
+int		is_valid_command(t_data **data, int heredoc_processed);
 int		is_valid_file(char *filename, int fd, char *check, t_data **data);
 void	execute_command(t_data **ddata, char *command_path, \
 int heredoc_processed);
@@ -208,7 +208,7 @@ int		add_args(char ***arg, char **str);
 int		exp_var(int *exp, int type);
 
 //split_token
-int		is_expandsor(t_token **token, char **str, char **env);
+int		is_expandsor(t_token **token, char **str, char **env, t_data **data);
 void	is_expandsor_str_simple(t_token **token, char **str, char **env);
 int		switch_case(t_token **token, char **env, t_data **data, char **str);
 int		add_last_data(t_data **data, char **str);
@@ -219,10 +219,10 @@ void	redirs(t_data **c_data, char **str, t_redir **redir, t_redir **l_redir);
 int		init_redir(t_token **token, t_data **data, char **env, int type);
 int		is_redir_input(t_token **token, t_data **data, char **str, char **env);
 int		is_redir_output(t_token **token, t_data **data, char **str, char **env);
-void	switch_case_redir(t_token **token, char **str, char **env);
+void	switch_case_redir(t_token **token, char **str, char **env, t_data **data);
 
 //redirs2.c
-int		set_redir(int type, t_redir **redir);
+int		set_redir(int type, t_redir **redir, t_data **data);
 void	manage_redirs(t_data **data, t_redir **credir, char *str);
 
 //heredoc.c
@@ -280,21 +280,21 @@ void	ft_free_resources(t_data **data, char **input, char ***mat, int *sce);
 void	handle_input(t_data **data, char ***mat, char *input, int *sce);
 char	*get_input(void);
 int		is_special_string(char *c, char *comp);
-int		handle_status_code(char **str, char *key);
+int		handle_status_code(char **str, char *key, t_data **data);
 
 //utils2.c
 char	*charstr(char c);
 char	*new_str(char **str, char c);
 int		is_special(char c, char *comp);
 void	is_simple_string(t_token **token, char **env, char **str);
-void	is_double_string(t_token **token, char **env, char **str);
+void	is_double_string(t_token **token, char **env, char **str, t_data **data);
 
 //key.c
 int		take_key(t_token **token, char **key, char *str);
 char	*key_to_res(char **key, char **env);
-int		handle_key(char **str, char **env, char **key);
+int		handle_key(char **str, char **env, char **key, t_data **data);
 int		handle_string(char **str);
-int		process_token(t_token **token, char **str, char **env);
+int		process_token(t_token **token, char **str, char **env, t_data **data);
 
 //pwd.c
 int		check_pwd(t_data *data);
@@ -308,6 +308,8 @@ void	ft_oldpwd(t_data **data, char **last_pwd, char **res);
 void	ft_pwd(char **pwd, char **res, t_data **data, int size);
 
 void	ft_free_char(char **f);
+void	sc_error_int(int err, int *sce);
+int	save_env_mat(char **env, int *stat_code);
 
 // Regular Colors
 # define BLACK "\x1b[0m"

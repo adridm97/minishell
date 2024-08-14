@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/11 23:26:46 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 00:06:36 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,23 +53,29 @@ int	init_data(t_data **data, char **env, int *sce)
 	return (1);
 }
 
-static int	manage_token(char *input, t_token **token, int i, t_data **data)
+static t_token	*manage_token(char *input, t_token **token, int i, int *sce)
 {
 	if (!*token)
 	{
 		if (!new_token(input[i], typeing(input[i], " |><\'\"") \
 					, token, 0))
+		{
+			*sce = 12;
 			return (is_error(&(t_error){"Memory error", 1}) \
-					, free_token(token), sc_error(12, data), 0);
+					, free_token(token), NULL);
+		}
 	}
 	else
 	{
 		if (!add_token(input[i], typeing(input[i], " |><\'\"") \
 					, token))
+		{
+			*sce = 12;
 			return (is_error(&(t_error){"Memory error", 1}) \
-					, free_token(token), sc_error(12, data), 0);
+					, free_token(token), NULL);
+		}
 	}
-	return (1);
+	return (*token);
 }
 
 t_data	*lexer(char *input, t_data **data, char **env, int  *sce)
@@ -84,18 +90,17 @@ t_data	*lexer(char *input, t_data **data, char **env, int  *sce)
 	error.error = NULL;
 	while (input[++i])
 	{
-		*sce = manage_token(input, &token, i, data);
-		if (!*sce)
+		if (!manage_token(input, &token, i, sce))
 			return (NULL);
 	}
 	check_closed(token, &error);
 	check_gramathic(token, &error, -1, 0);
 	if (error.is_error)
 		return (is_error(&(t_error){"Syntax error", 1}), free(error.error), \
-				free_data(data), free_token(&token), sc_error(1, data), NULL);
+				save_env_mat(env, sce), free_data(data), free_token(&token), sc_error_int(12, sce), NULL);
 	else if (!split_token(token, env, data, sce))
 		return (is_error(&(t_error){"Memory error", 1}), \
-				free_data(data), free_token(&token), sc_error(12, data), NULL);
+				save_env_mat(env, sce), free_data(data), free_token(&token), sc_error_int(12, sce), NULL);
 	free_token(&token);
 	return (*data);
 }

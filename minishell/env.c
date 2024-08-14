@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:35:01 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/11 23:12:06 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/14 23:46:08 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,34 @@ int	save_env(t_data *data)
 	if (fd < 0)
 		return (sc_error(SC_FILE_DESCRIPTOR_IN_BAD_STATE, &data), *data->stat_code);
 	env = data->env;
+	while (env[i])
+	{
+		ft_putstr_fd(env[i], fd);
+		ft_putstr_fd("\n", fd);
+		i++;
+	}
+	close(fd);
+	return (0);
+}
+
+int	save_env_mat(char **env, int *stat_code)
+{
+	int		fd;
+	int		i;
+
+	i = 0;
+	if (!env || !env[0])
+	{
+		*stat_code = EXIT_FAILURE;
+		return (*stat_code);
+	}
+	unlink("/tmp/env.env");
+	fd = open("/tmp/env.env", O_WRONLY | O_CREAT | O_TRUNC, 777);
+	if (fd < 0)
+	{
+		*stat_code = SC_FILE_DESCRIPTOR_IN_BAD_STATE;
+		return (*stat_code);
+	}
 	while (env[i])
 	{
 		ft_putstr_fd(env[i], fd);

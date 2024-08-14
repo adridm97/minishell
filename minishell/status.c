@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:23:30 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/11 23:10:08 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 00:26:29 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,14 @@ void	sc_error(int sce, t_data **data)
 	if (data && *data)
 	{
 		*(*data)->stat_code = sce;
+	}
+}
+
+void	sc_error_int(int err, int *sce)
+{
+	if (sce)
+	{
+		*sce= err;
 	}
 }
 
@@ -39,9 +47,15 @@ void	update_heredoc_status(t_data **data, pid_t pid, int *processed)
 void	update_status(pid_t pid, int *last_pid, int status, t_data **data)
 {
 	if (pid > *last_pid && WIFEXITED(status))
+	{
 		*(*data)->stat_code = WEXITSTATUS(status);
+		printf("1Terminado por señal %d\n", *(*data)->stat_code);
+	}
 	else if (pid > *last_pid && WIFSIGNALED(status))
-		*(*data)->stat_code = WTERMSIG(status);
+	{
+		*(*data)->stat_code = WTERMSIG(status) + 128;
+		printf("2Terminado por señal %d\n", *(*data)->stat_code);
+	}
 	*last_pid = pid;
 }
 

@@ -12,21 +12,21 @@
 
 #include "minishell.h"
 
-int	is_valid_command(t_data *data, int heredoc_processed)
+int	is_valid_command(t_data **data, int heredoc_processed)
 {
 	char	*path;
 
 	path = ft_strdup("PATH");
-	path = key_to_res(&path, data->env);
-	if ((!path || !data->comand) && !is_builtin(data->comand))
+	path = key_to_res(&path, (*data)->env);
+	if ((!path || !(*data)->comand) && !is_builtin((*data)->comand))
 	{
-		handle_missing_command(data, heredoc_processed);
+		handle_missing_command(*data, heredoc_processed);
 		free(path);
 		return (0);
 	}
-	if (is_builtin(data->comand))
+	if (is_builtin((*data)->comand))
 	{
-		execute_command(&data, "is_builtinOMG", heredoc_processed);
+		execute_command(data, "is_builtinOMG", heredoc_processed);
 		free(path);
 		return (1);
 	}
@@ -81,9 +81,15 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 		while (pid > 0)
 		{
 			if (WIFEXITED(status))
+			{
 				*(*ddata)->stat_code = WEXITSTATUS(status);
+				printf("3Terminado por señal %d\n", *(*ddata)->stat_code);
+			}
 			else if (WIFSIGNALED(status))
-				*(*ddata)->stat_code = WTERMSIG(status);
+			{
+				*(*ddata)->stat_code = WTERMSIG(status) + 128;
+				printf("4Terminado por señal %d\n", *(*ddata)->stat_code);
+			}
 			pid = wait(&status);
 		}
 	}

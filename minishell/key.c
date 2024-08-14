@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 17:21:05 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/10 15:40:52 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 00:11:21 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ char	*key_to_res(char **key, char **env)
 	return (NULL);
 }
 
-int	handle_key(char **str, char **env, char **key)
+int	handle_key(char **str, char **env, char **key, t_data **data)
 {
 	char	*res;
 
@@ -66,7 +66,7 @@ int	handle_key(char **str, char **env, char **key)
 	}
 	else
 	{
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY, data);
 		return (0);
 	}
 	return (1);
@@ -78,15 +78,15 @@ int	handle_string(char **str)
 	return (1);
 }
 
-int	process_token(t_token **token, char **str, char **env)
+int	process_token(t_token **token, char **str, char **env, t_data **data)
 {
 	char	*key;
 
 	key = NULL;
 	if (take_key(token, &key, " <>|'\".,-+*!¡?¿%%=·@#ªº¬€$"))
-		return (handle_key(str, env, &key));
+		return (handle_key(str, env, &key, data));
 	else if (take_key(token, &key, " <>|'\".,-+*!¡¿%%=·@#ªº¬€$"))
-		return (handle_status_code(str, key));
+		return (handle_status_code(str, key, data));
 	else
 		return (handle_string(str));
 }

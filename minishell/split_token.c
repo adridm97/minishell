@@ -6,23 +6,23 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/11 23:16:24 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 00:10:55 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	is_expandsor(t_token **token, char **str, char **env)
+int	is_expandsor(t_token **token, char **str, char **env, t_data **data)
 {
 	*token = (*token)->next;
 	if (!*token || is_special((*token)->value, "<> |\0"))
 		*str = new_str(str, '$');
 	else if ((*token)->value == '"')
-		is_double_string(token, env, str);
+		is_double_string(token, env, str, data);
 	else if ((*token)->value == '\'')
 		is_simple_string(token, env, str);
 	else
-		return (process_token(token, str, env));
+		return (process_token(token, str, env, data));
 	return (1);
 }
 
@@ -33,16 +33,16 @@ int	switch_case(t_token **token, char **env, t_data **data, char **str)
 	if ((*token)->value == '\'')
 		is_simple_string(token, env, str);
 	else if ((*token)->value == '"')
-		is_double_string(token, env, str);
+		is_double_string(token, env, str, data);
 	else if ((*token)->value == '<')
 		return (is_redir_input(token, data, str, env));
 	else if ((*token)->value == '>')
 		return (is_redir_output(token, data, str, env));
 	else if ((*token)->value == '|')
-		return (is_pipe(token, data, str));
+		return (is_pipe(token, data, str, (*data)->stat_code));
 	else if ((*token)->value == '$')
 	{
-		is_expandsor(token, str, env);
+		is_expandsor(token, str, env, data);
 		(*data)->is_ex = 1;
 	}
 	else if ((*token)->value == ' ')

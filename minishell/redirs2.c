@@ -6,18 +6,18 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:24:04 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/11 23:08:49 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/13 07:25:51 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	set_redir(int type, t_redir **redir)
+int	set_redir(int type, t_redir **redir, t_data **data)
 {
 	(*redir) = (t_redir *)malloc(sizeof(t_redir));
 	if (!(*redir))
 	{
-		sc_error(SC_CANNOT_ALLOCATE_MEMORY);
+		sc_error(SC_CANNOT_ALLOCATE_MEMORY, data);
 		return (0);
 	}
 	(*redir)->next = NULL;

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:08:03 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/11 20:52:24 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 00:11:14 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,14 @@ int	init_redir(t_token **token, t_data **data, char **env, int type)
 	t_redir	*l_redir;
 	t_data	*c_data;
 
-	if (exp_var(&(*data)->exp, type) && !set_redir(type, &redir))
+	if (exp_var(&(*data)->exp, type) && !set_redir(type, &redir, data))
 		return (0);
 	c_data = *data;
 	str = NULL;
 	while ((*token))
 	{
 		if (is_special((*token)->value, "'\"$" ) && (*data)->exp)
-			(switch_case_redir(token, &str, env));
+			(switch_case_redir(token, &str, env, data));
 		else if (is_special((*token)->value, "| <>") && str)
 			return (manage_redirs(&c_data, &redir, str), 1);
 		else if ((*token)->value == ' ')
@@ -112,12 +112,12 @@ int	is_redir_output(t_token **token, t_data **data, char **str, char **env)
 	return (1);
 }
 
-void	switch_case_redir(t_token **token, char **str, char **env)
+void	switch_case_redir(t_token **token, char **str, char **env,t_data **data)
 {
 	if ((*token)->value == '\'')
 		is_simple_string(token, env, str);
 	else if ((*token)->value == '"')
-		is_double_string(token, env, str);
+		is_double_string(token, env, str, data);
 	else if ((*token)->value == '$')
-		is_expandsor(token, str, env);
+		is_expandsor(token, str, env, data);
 }

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:27:48 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/11 23:06:41 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/14 23:00:32 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	execute_pipeline(t_data **data)
 			(perror("fork"), exit(EXIT_FAILURE));
 		}
 		else if (pid == 0)
-			handle_child_pipes(current, &vars, fd);
+			handle_child_pipes(&current, &vars, fd);
 		else
 			handle_parent_process(&vars, fd, pid, data);
 		current = current->next;
