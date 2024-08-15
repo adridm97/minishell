@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/14 23:03:37 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 15:31:00 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,10 +83,12 @@ void	handle_redir(t_data *data, int heredoc_processed)
 void	handle_parent_process(t_exec_vars *vars, int fd[2], \
 pid_t pid, t_data **data)
 {
+	printf("1 handle_parent_process sce = %d y el otro %d\n", *(*data)->stat_code, *(*data)->next->stat_code);
 	close_input_fd(&(vars->input_fd));
 	update_input_fd(&(vars->input_fd), fd, *data);
 	close_heredoc_fd(&(vars->heredoc_fd));
 	update_heredoc_status(data, pid, &(vars->heredoc_processed));
+	printf("2 handle_parent_process sce = %d y el otro %d\n", *(*data)->stat_code, *(*data)->next->stat_code);
 }
 
 void	handle_child_pipes(t_data **current, t_exec_vars *vars, int fd[2])
@@ -103,9 +105,11 @@ void	handle_child_pipes(t_data **current, t_exec_vars *vars, int fd[2])
 		handle_redir((*current), vars->heredoc_processed);
 	if (!is_valid_command(current, vars->heredoc_processed))
 	{
+		printf("1handle_child_pipes data stat = %i\n", *(*current)->stat_code);
 		sc_error(SC_KEY_HAS_EXPIRED, current);
 		exit(*(*current)->stat_code);
 	}
+	printf("2handle_child_pipes data stat = %i\n", *(*current)->stat_code);
 	sc_error(SC_SUCCESS, current);
 	exit(*(*current)->stat_code);
 }

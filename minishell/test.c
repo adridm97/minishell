@@ -87,33 +87,10 @@ int main() {
         "pwd",
         "echo $USER",
         "echo \"$USER\"",
-        "echo \"Hello",
-        "echo 'Hello'",
-        "echo \"Hello'",
-        "echo 'Hello\"",
-        "cat \"file",
-        "cat 'file'",
-        "echo \"Hello > file",
-        "echo 'Hello > file'",
-        "echo Hello > \"file\"",
-        "echo Hello > 'file'",
-        "echo \"Hello > 'file'\"",
-        "echo 'Hello > \"file\"'",
-        "echo > file,",                      // Redirect output to file
-        "echo >> file,",                     // Append output to file
-        "echo >> \"file\"",
-        "echo >> 'file'",
-        "cat < \"file\"",
-        "cat < 'file'",
-        "cat < file,",                       // Redirect input from file
-        "echo \"Hello\" | cat,",             // Pipe output to cat command
-        "echo 'Hello' | cat,",               // Same as above with single quotes
-        "echo \"Hello >\" > file,",          // Redirect output with an embedded symbol
-        "echo 'Hello >' > file,",            // Same as above with single quotes
-        "echo $var > file,",                 // Redirect variable output to file
-        "echo $var >> file,",                // Append variable output to file
-        "echo $var | cat,",                  // Pipe variable output to cat command
-        "echo | cat,",                       // Pipe empty output to cat command
+        "echo '$USER'",
+        "echo \"Hello, $USER\"",
+        "echo 'Hello, $USER'",
+        "echo \"\"$USER\" $USER\"",
         NULL // Este NULL marca el final de la lista de comandos
     };
 
@@ -128,14 +105,14 @@ int main() {
         run_custom_shell("./minishell", command, minishell_result, sizeof(minishell_result));
 
         // Ejecutar el comando en Bash
-        run_command("/bin/bash", command, bash_result, sizeof(bash_result));
+        // run_command("/bin/bash", command, bash_result, sizeof(bash_result));
 
         // Imprimir los resultados para cada comando
         printf("----------------%s----------------\n", command);
-        printf("\x1b[32m""++++Minishell++++\n""\x1b[0m");
+        // printf("\x1b[32m""++++Minishell++++\n""\x1b[0m");
         printf("%s", minishell_result);
-        printf("\x1b[35m""++++Bash++++\n""\x1b[0m");
-        printf("%s", bash_result);
+        // printf("\x1b[35m""++++Bash++++\n""\x1b[0m");
+        // printf("%s", bash_result);
     }
 
     return 0;
