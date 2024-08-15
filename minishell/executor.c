@@ -83,7 +83,7 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 			if (WIFEXITED(status))
 				g_stat_code = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
-				g_stat_code = WTERMSIG(status);
+				g_stat_code = WTERMSIG(status) + 128;
 			pid = wait(&status);
 		}
 	}

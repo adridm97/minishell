@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/08 13:25:05 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/09 12:26:30 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void	child_handler(int signal)
 	{
 		printf("Quit: (Core dumped)\n");
 		g_stat_code = 131;
+		printf("dentro: %i", g_stat_code);
 	}
 }
 
@@ -63,10 +64,13 @@ void	wait_signal(int i)
 	{
 		sa_int.sa_handler = &child_handler;
 		sa_quit.sa_handler = &child_handler;
+		printf("1\n");
 	}
 	sa_int.sa_flags = SA_RESTART;
 	sa_quit.sa_flags = SA_RESTART;
+	printf("2 : %i\n", g_stat_code);
 	sigaction(SIGINT, &sa_int, NULL);
 	sigaction(SIGQUIT, &sa_quit, NULL);
 	sigaction(SIGTERM, &sa_int, NULL);
+	printf("3 : %i\n", g_stat_code);
 }
