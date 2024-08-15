@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 21:03:16 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 22:04:52 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,11 @@ void	handle_missing_command(t_data *data, int heredoc_processed)
 void	handle_dups(int fd, t_redir *redir, t_data *data, int heredoc_processed)
 {
 	if (fd == -1)
-		return (ft_putstr_fd(data->redir->path, 2), \
-		ft_putstr_fd(" No such file or directory\n", 2));
+	{
+		if (data->redir->path)
+			ft_putstr_fd(data->redir->path, 2);
+		return (ft_putstr_fd(" No such file or directory\n", 2));
+	}
 	if ((redir->type == MAJOR || redir->type == D_MAJOR) \
 	&& data->comand != NULL)
 	{
