@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 00:29:12 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 12:59:37 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void	handle_heredoc(t_data *current, t_exec_vars *vars)
 	if (*current->stat_code == SC_HEREDOC)
 	{
 		sc_error(2 + 128, &current);
-		exit(current->stat_code);
+		exit(*(current->stat_code));
 	}
 	close(vars->heredoc_fd);
 	vars->heredoc_processed = 1;
