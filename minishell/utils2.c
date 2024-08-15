@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:27:50 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 00:11:08 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 14:18:16 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ void	is_double_string(t_token **token, char **env, char **str, t_data **data)
 {
 	char	*res;
 
+	printf("1is_double_string\n");
 	res = NULL;
 	if (*str)
 		res = ft_strdup(*str);
@@ -95,13 +96,14 @@ void	is_double_string(t_token **token, char **env, char **str, t_data **data)
 	{
 		if ((*token)->value == '$')
 		{
+			printf("2is_double_string\n");
 			is_expandsor(token, &res, env, data);
-			if(*token && (*token)->next && (*token)->value == '"')
+			if(*token && (*token)->next && (*token)->value != '"')
 				(*token) = (*token)->next;
 		}
-		if (*token)
+		if (*token && (*token)->value != '"')
 			res = new_str(&res, (*token)->value);
-		if (*token)
+		if (*token && (*token)->value != '"')
 			*token = (*token)->next;
 	}
 	if (*token && (*token)->type == D_QUOTE)
