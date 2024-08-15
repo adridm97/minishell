@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 12:59:37 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/15 14:58:39 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,11 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 	else
 	{
 		if (!command_path)
-			exit(SC_KEY_HAS_EXPIRED);
+		{
+			if (data->redir->type != D_MINOR)
+				exit(SC_KEY_HAS_EXPIRED);
+			exit(SC_SUCCESS);
+		}
 		if (execve(command_path, data->args, data->env) == -1)
 		{
 			perror("execve");
@@ -49,7 +53,7 @@ void	handle_heredoc(t_data *current, t_exec_vars *vars)
 	if (*current->stat_code == SC_HEREDOC)
 	{
 		sc_error(2 + 128, &current);
-		exit(*(current->stat_code));
+		exit(*current->stat_code);
 	}
 	close(vars->heredoc_fd);
 	vars->heredoc_processed = 1;

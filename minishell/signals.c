@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/15 13:26:48 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/15 15:39:04 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	handle_sigint_heredoc(int sig)
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
-	exit(SC_HEREDOC);
+	exit(130);
 }
 
 void	handle_sigquit(int sig)
@@ -40,11 +40,10 @@ void	handle_sigquit(int sig)
 
 void	child_handler(int signal)
 {
-	// if (signal == SIGINT)
-	// 	g_stat_code = 130;
 	if (signal == SIGQUIT)
 	{
 		printf("Quit: (Core dumped)\n");
+		return ;
 	}
 }
 

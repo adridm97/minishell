@@ -90,4 +90,5 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 			pid = wait(&status);
 		}
 	}
+	wait_signal(0);
 }
