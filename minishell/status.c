@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:23:30 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 14:54:04 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 20:22:00 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,10 @@ void	update_status(pid_t pid, int *last_pid, int status, t_data **data)
 	if (pid > *last_pid && WIFEXITED(status))
 	{
 		*(*data)->stat_code = WEXITSTATUS(status);
-		printf("1Terminado por señal %d\n", *(*data)->stat_code);
 	}
 	else if (pid > *last_pid && WIFSIGNALED(status))
 	{
 		*(*data)->stat_code = WTERMSIG(status) + 128;
-		printf("2Terminado por señal %d\n", *(*data)->stat_code);
 	}
 	*last_pid = pid;
 }

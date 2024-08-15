@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/15 00:10:55 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 20:39:35 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,9 @@ int	switch_case(t_token **token, char **env, t_data **data, char **str)
 	if ((*token)->value == '\'')
 		is_simple_string(token, env, str);
 	else if ((*token)->value == '"')
+	{
 		is_double_string(token, env, str, data);
+	}
 	else if ((*token)->value == '<')
 		return (is_redir_input(token, data, str, env));
 	else if ((*token)->value == '>')

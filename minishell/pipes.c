@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:27:48 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 15:36:55 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/15 20:21:17 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,15 +43,11 @@ void	execute_pipeline(t_data **data)
 		else if (pid == 0)
 		{
 			handle_child_pipes(&current, &vars, fd);
-			printf("1execute pipeline exit status: %d\n", *current->stat_code);
 		}
 		else
 		{
-			printf("5execute pipeline exit status: %d\n", *current->stat_code);
 			handle_parent_process(&vars, fd, pid, data);
-			printf("2execute pipeline exit status: %d\n", *current->stat_code);
 		}
-		printf("8execute pipeline exit status: %d\n", *current->stat_code);
 		current = current->next;
 	}
 	wait_for_remaining_processes(vars.last_pid, data);
