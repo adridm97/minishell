@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:52:55 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 13:08:11 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/16 15:39:13 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void	b_echo(t_data *data)
 	int	fd;
 
 	i = 1;
+	// printf("ft_is_n res %i\n", ft_is_n(data->args, &i));
 	if (data->args[i] && !ft_is_n(data->args, &i))
 	{
 		fd = open("/tmp/echoafjnaifsnk", O_WRONLY | O_CREAT | O_APPEND, 0777);
@@ -54,7 +55,7 @@ int	ft_is_n(char **str, int *j)
 			if (res == -1 && str[*j][i] != 'n')
 				return (1);
 			else if (res == 0 && str[*j][i] != 'n')
-				return (res);
+				return (1);
 			res = 0;
 		}
 		*j = *j + 1;

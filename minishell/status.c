@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   status.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:23:30 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 15:10:58 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/16 15:37:21 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ void	wait_for_remaining_processes(int last_pid, t_data **data)
 {
 	int		status;
 	pid_t	pid;
-
 	pid = wait(&status);
 	while (pid > 0)
 	{

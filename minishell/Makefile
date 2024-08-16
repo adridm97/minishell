@@ -6,12 +6,12 @@
 #    By: adrian <adrian@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/04 16:50:24 by adrian            #+#    #+#              #
-#    Updated: 2024/08/15 15:45:32 by aduenas-         ###   ########.fr        #
+#    Updated: 2024/08/16 15:38:09 by adrian           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME            = minishell
-CC              = gcc
+CC              = cc
 CFLAGS          = -Wall -Wextra -Werror -fPIE
 SOURCES         =	minishell.c \
 					lexer.c \

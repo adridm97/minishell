@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/14 23:03:37 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/16 10:35:43 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,38 @@
 
 void	handle_missing_command(t_data *data, int heredoc_processed)
 {
-	if (data->redir != NULL && data->redir->type == D_MINOR)
-		execute_command(&data, data->comand, heredoc_processed);
-	else if (data->redir != NULL)
+	int	fd;
+
+	if (data->redir != NULL)
 		handle_redir(data, heredoc_processed);
 	else
 	{
-		if (data->comand)
+		fd = open(data->comand, O_EXCL);
+		if (!data->comand)
 		{
-			ft_putstr_fd(data->comand, 2);
-			ft_putstr_fd(": No such file or directory\n", 2);
+			sc_error(SC_KEY_HAS_EXPIRED, &data);
+			ft_putstr_fd(": command not found\n", 2);
 		}
+		else if (data->comand && !is_valid_file(data->comand, fd, "X", &data))
+			execute_command(&data, data->comand, heredoc_processed);
+		else if (data->comand)
+		{
+			sc_error(SC_KEY_HAS_EXPIRED, &data);
+			ft_putstr_fd(data->comand, 2);
+			ft_putstr_fd(": command not found\n", 2);
+		}
+		close(fd);
 	}
 }
 
 void	handle_dups(int fd, t_redir *redir, t_data *data, int heredoc_processed)
 {
 	if (fd == -1)
-		return (ft_putstr_fd(data->redir->path, 2), \
-		ft_putstr_fd(" No such file or directory\n", 2));
+	{
+		if (data->redir->path)
+			ft_putstr_fd(data->redir->path, 2);
+		return (ft_putstr_fd(" No such file or directory\n", 2));
+	}
 	if ((redir->type == MAJOR || redir->type == D_MAJOR) \
 	&& data->comand != NULL)
 	{

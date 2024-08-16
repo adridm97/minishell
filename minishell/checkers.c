@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   checkers.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 17:39:20 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 13:02:35 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/16 15:38:58 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ int	check_error(t_token *token, char type, int flag)
 		{
 			/*TODO, antes era esta, si falla el lexer es por este if if (token->type >= PIPE && token->type <= MINOR && (type == PIPE \
 			&& !(token->type > PIPE && token->type <= MINOR)))*/
+			if ((token->type >= MAJOR && token->type <= MINOR) && type == PIPE )
+				return (0);
 			if (token->type >= PIPE && token->type <= MINOR)
 				return (1);
 			else

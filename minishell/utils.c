@@ -3,15 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:33:06 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/15 16:18:13 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/16 15:40:36 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+/*
+	t_data	*tmp;
 
+	tmp = *data;
+	if (*data)
+	{
+		while(tmp->next)
+			tmp = tmp->next;
+		*sce = *tmp->stat_code;
+		free_data(data);
+		*data = NULL;
+	}
+*/
 void	ft_free_resources(t_data **data, char **input, char ***mat,  int *sce)
 {
 	if (*data)

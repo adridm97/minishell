@@ -3,14 +3,33 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:26:22 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 13:13:32 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/16 15:39:41 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	eof_check(char *line, t_redir *aux)
+{
+	if ((ft_strcmp(aux->path, "\"\"") == 0 && line[0] == '\0'))
+		return (1);
+	else if (aux->path[0] == '"' && aux->path[ft_strlen(aux->path) - 1] == '"')
+	{
+		if(ft_strncmp(line + 1, aux->path, ft_strlen(line) - 1) == 0)
+			return (1);
+	}
+	else if ((aux->path[0] == '\'' && aux->path[ft_strlen(aux->path) - 1] == '\''))
+	{
+		if(ft_strncmp(line + 1, aux->path, ft_strlen(line) - 1) == 0)
+			return (1);
+	}	
+	else if(ft_strcmp(line, aux->path) == 0)
+		return (1);
+	return (0);
+}
 
 int	heredoc(t_redir	*aux, t_data *data)
 {
@@ -29,7 +48,7 @@ int	heredoc(t_redir	*aux, t_data *data)
 		if (*data->stat_code == SC_HEREDOC)
 			(close(fd), exit(SC_HEREDOC));
 		line = readline("> ");
-		if (line == NULL || ft_strcmp(line, aux->path) == 0)
+		if (line == NULL || eof_check(line, aux))
 		{
 			free(line);
 			break ;
@@ -42,7 +61,10 @@ int	heredoc(t_redir	*aux, t_data *data)
 
 int	expand_line(char **expanded_line, char **line, int fd, t_data *data)
 {
-	*expanded_line = heredoc_tokenizer(*line, data);
+	if(ft_strchr(data->redir->path, '"' ) || ft_strchr(data->redir->path, '\''))
+		*expanded_line = ft_strdup(*line);
+	else
+		*expanded_line = heredoc_tokenizer(*line, data);
 	if (!*expanded_line)
 	{
 		close(fd);
@@ -50,7 +72,7 @@ int	expand_line(char **expanded_line, char **line, int fd, t_data *data)
 		return (1);
 	}
 	ft_putstr_fd(*expanded_line, fd);
-	if (!(ft_strlen(*expanded_line) == 1 && (*expanded_line)[0] != '\0'))
+	if (((*expanded_line)[0] != '\0'))
 		ft_putstr_fd("\n", fd);
 	free(*line);
 	free(*expanded_line);

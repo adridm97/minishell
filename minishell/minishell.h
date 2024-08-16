@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/15 13:23:34 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/16 15:40:15 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include <signal.h>
-# include <bits/sigaction.h>
+//# include <bits/sigaction.h>
 
 // Signals
 # define CTRL_C SIGINT
@@ -45,7 +45,7 @@
 # define NO_QUOTE	6 // string sin comillas
 # define D_MAJOR	7 // >>
 # define D_MINOR	8 // <<
-# define SA_RESTART   0x10000000
+//# define SA_RESTART   0x10000000
 # define ERROR		0
 
 typedef struct s_mini
@@ -266,7 +266,7 @@ void	print_args_echo(t_data *data, int *i, int fd);
 int		ft_is_n(char **str, int *j);
 
 //exit.c
-void	b_exit(t_data *data);
+void	b_exit(t_data **data);
 void	check_numeric_argument(char *arg, t_data **data);
 void	try_max_num(char *arg, t_data **data);
 

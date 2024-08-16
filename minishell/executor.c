@@ -84,9 +84,13 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 		while (pid > 0)
 		{
 			if (WIFEXITED(status))
+			{
 				*(*ddata)->stat_code = WEXITSTATUS(status);
+			}
 			else if (WIFSIGNALED(status))
+			{
 				*(*ddata)->stat_code = WTERMSIG(status) + 128;
+			}
 			pid = wait(&status);
 		}
 	}
