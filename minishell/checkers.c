@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 17:39:20 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 17:23:40 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/16 23:08:05 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ int	check_error(t_token *token, char type, int flag)
 		token = token->next;
 	while (token)
 	{
-		// printf("check err = %c\n", token->value);
 		token = token->next;
 		if (token && token->type != SPACES)
 		{

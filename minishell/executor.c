@@ -66,7 +66,10 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 	pid_t	pid;
 	int		status;
 
-	wait_signal(0);
+	if ((*ddata)->redir && (*ddata)->redir->type == D_MINOR)
+		wait_signal(1);
+	else
+		wait_signal(0);
 	pid = fork();
 	if (pid == -1)
 	{
@@ -91,4 +94,5 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 			pid = wait(&status);
 		}
 	}
+	wait_signal(0);
 }
