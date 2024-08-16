@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:32:19 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 13:35:08 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/16 10:09:02 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	switch_builtin(t_data **ddata)
 	else if (!ft_strcmp(data->comand, "env"))
 		b_env(data);
 	else if (!ft_strcmp(data->comand, "exit"))
-		b_exit(data);
+		b_exit(ddata);
 	return ;
 }
 

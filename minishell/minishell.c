@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/15 19:46:07 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/16 10:49:43 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,10 @@ int	main(int argc, char *argv[], char *env[])
 			continue ;
 		}
 		handle_input(&d, &mat, input, &sce);
-		print_data(d);
+		// print_data(d);
 		if (ft_is_exit(d) == 1)
 			break ;
 		(handle_env_file(&d), ft_free_resources(&d, &input, &mat, &sce));
 	}
-	return (ft_free_resources(&d, &input, &mat, &sce), argc);
+	return (ft_free_resources(&d, &input, &mat, &sce), sce);
 }

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/14 23:46:34 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/16 10:09:15 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,7 +266,7 @@ void	print_args_echo(t_data *data, int *i, int fd);
 int		ft_is_n(char **str, int *j);
 
 //exit.c
-void	b_exit(t_data *data);
+void	b_exit(t_data **data);
 void	check_numeric_argument(char *arg, t_data **data);
 void	try_max_num(char *arg, t_data **data);
 

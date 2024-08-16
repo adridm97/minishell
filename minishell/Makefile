@@ -3,15 +3,15 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: adrian <adrian@student.42.fr>              +#+  +:+       +#+         #
+#    By: kevin <kevin@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/04 16:50:24 by adrian            #+#    #+#              #
-#    Updated: 2024/08/07 17:39:39 by adrian           ###   ########.fr        #
+#    Updated: 2024/08/16 10:32:33 by kevin            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME            = minishell
-CC              = gcc
+CC              = cc
 CFLAGS          = -Wall -Wextra -Werror -fPIE
 SOURCES         =	minishell.c \
 					lexer.c \

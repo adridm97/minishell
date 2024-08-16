@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:27:48 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 20:21:17 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/16 10:45:31 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	execute_pipeline(t_data **data)
 		}
 		else
 		{
-			handle_parent_process(&vars, fd, pid, data);
+			handle_parent_process(&vars, fd, pid, &current);
 		}
 		current = current->next;
 	}

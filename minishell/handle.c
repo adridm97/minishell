@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 22:04:52 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/16 10:35:43 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,23 @@ void	handle_missing_command(t_data *data, int heredoc_processed)
 {
 	int	fd;
 
-	if (data->redir != NULL && data->redir->type == D_MINOR)
-		execute_command(&data, data->comand, heredoc_processed);
-	else if (data->redir != NULL)
+	if (data->redir != NULL)
 		handle_redir(data, heredoc_processed);
 	else
 	{
 		fd = open(data->comand, O_EXCL);
-		if (data->comand && !is_valid_file(data->comand, fd, "X", &data))
+		if (!data->comand)
+		{
+			sc_error(SC_KEY_HAS_EXPIRED, &data);
+			ft_putstr_fd(": command not found\n", 2);
+		}
+		else if (data->comand && !is_valid_file(data->comand, fd, "X", &data))
 			execute_command(&data, data->comand, heredoc_processed);
 		else if (data->comand)
 		{
+			sc_error(SC_KEY_HAS_EXPIRED, &data);
 			ft_putstr_fd(data->comand, 2);
-			ft_putstr_fd(": No such file or directory\n", 2);
+			ft_putstr_fd(": command not found\n", 2);
 		}
 		close(fd);
 	}
