@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/16 10:35:43 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/18 17:21:19 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,9 @@ void	handle_missing_command(t_data *data, int heredoc_processed)
 	int	fd;
 
 	if (data->redir != NULL)
+	{
 		handle_redir(data, heredoc_processed);
+	}
 	else
 	{
 		fd = open(data->comand, O_EXCL);
@@ -58,7 +60,7 @@ void	handle_dups(int fd, t_redir *redir, t_data *data, int heredoc_processed)
 			(perror("dup2"), exit(EXIT_FAILURE));
 	}
 	else if (!heredoc_processed && !redir->next && \
-	redir->type == D_MINOR && data->comand != NULL)
+	redir->type == D_MINOR )
 	{
 		if (dup2(fd, STDIN_FILENO) == -1)
 			(perror("dup2"), exit(EXIT_FAILURE));

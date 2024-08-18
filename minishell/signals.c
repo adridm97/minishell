@@ -6,13 +6,19 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/16 16:11:51 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/17 22:23:43 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//TODO hemos roto las señales
+int g_sigint_received = 0;
+
+void handle_sigint_global(int sig)
+{
+    (void)sig;
+    g_sigint_received = 1;
+}
 
 void	handle_sigint(int sig)
 {
@@ -26,7 +32,7 @@ void	handle_sigint(int sig)
 void	handle_sigint_heredoc(int sig)
 {
 	(void)sig;
-	// g_stat_code = SC_HEREDOC;
+	g_sigint_received = 1;
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();

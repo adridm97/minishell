@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:33:06 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/16 15:40:36 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/17 20:38:38 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ char	*get_input(void)
 	char	*prompt;
 	char	*input;
 
+	g_sigint_received = 0;
 	if (!access("/tmp/echoafjnaifsnk", F_OK))
 	{
 		fd = open("/tmp/echoafjnaifsnk", O_RDONLY);

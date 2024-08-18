@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:27:48 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/16 10:45:31 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/17 22:31:00 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void	initialize_pipe_vars(t_exec_vars *vars)
 	vars->heredoc_fd = -1;
 	vars->heredoc_processed = 0;
 	vars->last_pid = 0;
+	signal(SIGINT, handle_sigint_global);
 }
 
 void	execute_pipeline(t_data **data)
@@ -37,20 +38,24 @@ void	execute_pipeline(t_data **data)
 			(perror("pipe"), exit(EXIT_FAILURE));
 		pid = fork();
 		if (pid == -1)
-		{
 			(perror("fork"), exit(EXIT_FAILURE));
-		}
 		else if (pid == 0)
-		{
 			handle_child_pipes(&current, &vars, fd);
-		}
 		else
 		{
 			handle_parent_process(&vars, fd, pid, &current);
+			if (g_sigint_received)
+			{
+				sc_error(130, *(&data));
+				kill(pid, SIGINT);
+				break;
+			}
 		}
 		current = current->next;
 	}
 	wait_for_remaining_processes(vars.last_pid, data);
+	if (g_sigint_received)
+		kill(0, SIGINT);
 }
 
 int	is_pipe(t_token **token, t_data **data, char **str, int *sce)

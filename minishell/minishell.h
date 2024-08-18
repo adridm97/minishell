@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/16 15:40:15 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/17 22:22:11 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -309,7 +309,8 @@ void	ft_pwd(char **pwd, char **res, t_data **data, int size);
 
 void	ft_free_char(char **f);
 void	sc_error_int(int err, int *sce);
-int	save_env_mat(char **env, int *stat_code);
+int		save_env_mat(char **env, int *stat_code);
+void	handle_sigint_global(int sig);
 
 // Regular Colors
 # define BLACK "\x1b[0m"
@@ -320,6 +321,8 @@ int	save_env_mat(char **env, int *stat_code);
 # define MAGENTA "\x1b[35m"
 # define CYAN "\x1b[36m"
 # define WHITE "\x1b[37m"
+
+extern int	g_sigint_received;
 
 # define SC_SUCCESS												0
 # define SC_OPERATION_NOT_PERMITTED								1
