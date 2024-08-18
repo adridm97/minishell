@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:23:30 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/17 22:31:33 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/18 20:42:26 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void	update_status(pid_t pid, int *last_pid, int status, t_data **data)
 	{
 		*(*data)->stat_code = WEXITSTATUS(status);
 	}
-	else if (WIFSIGNALED(status))
+	else if (pid > *last_pid && WIFSIGNALED(status))
 	{
 		*(*data)->stat_code = WTERMSIG(status) + 128;
 		if (*(*data)->stat_code == 130)
