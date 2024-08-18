@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_fd.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:16:53 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/07 15:57:10 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/18 22:08:53 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,5 +38,7 @@ void	close_heredoc_fd(int *heredoc_fd)
 void	close_input_fd(int *input_fd)
 {
 	if (*input_fd != STDIN_FILENO)
+	{
 		close(*input_fd);
+	}
 }

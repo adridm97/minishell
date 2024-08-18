@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/18 17:37:20 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/18 21:37:52 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,7 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 	{
 		if (!data->comand || !command_path || !*data->comand)
 		{
-			handle_missing_command(data, processed);
-			exit(SC_KEY_HAS_EXPIRED);
+			exit(handle_missing_command(data, processed));
 		}
 		if (execve(command_path, data->args, data->env) == -1)
 		{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/17 22:22:11 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/18 19:56:55 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,7 @@ int		ft_matsize(char **mat);
 char	**ft_matcpy(char **mat);
 
 //handle.c
-void	handle_missing_command(t_data *data, int heredoc_processed);
+int		handle_missing_command(t_data *data, int heredoc_processed);
 void	handle_dups(int fd, t_redir *redir, t_data *data, \
 int heredoc_processed);
 void	handle_redir(t_data *data, int heredoc_processed);
