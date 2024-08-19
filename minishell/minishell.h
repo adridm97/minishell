@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/16 23:07:59 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/19 07:57:13 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include <signal.h>
-# include <bits/sigaction.h>
+//# include <bits/sigaction.h>
 
 // Signals
 # define CTRL_C SIGINT
@@ -45,7 +45,7 @@
 # define NO_QUOTE	6 // string sin comillas
 # define D_MAJOR	7 // >>
 # define D_MINOR	8 // <<
-# define SA_RESTART   0x10000000
+//# define SA_RESTART   0x10000000
 # define ERROR		0
 
 typedef struct s_mini
@@ -148,7 +148,7 @@ int		ft_matsize(char **mat);
 char	**ft_matcpy(char **mat);
 
 //handle.c
-void	handle_missing_command(t_data *data, int heredoc_processed);
+int		handle_missing_command(t_data *data, int heredoc_processed);
 void	handle_dups(int fd, t_redir *redir, t_data *data, \
 int heredoc_processed);
 void	handle_redir(t_data *data, int heredoc_processed);
@@ -309,7 +309,8 @@ void	ft_pwd(char **pwd, char **res, t_data **data, int size);
 
 void	ft_free_char(char **f);
 void	sc_error_int(int err, int *sce);
-int	save_env_mat(char **env, int *stat_code);
+int		save_env_mat(char **env, int *stat_code);
+void	handle_sigint_global(int sig);
 
 // Regular Colors
 # define BLACK "\x1b[0m"
@@ -320,6 +321,8 @@ int	save_env_mat(char **env, int *stat_code);
 # define MAGENTA "\x1b[35m"
 # define CYAN "\x1b[36m"
 # define WHITE "\x1b[37m"
+
+extern int	g_sigint_received;
 
 # define SC_SUCCESS												0
 # define SC_OPERATION_NOT_PERMITTED								1

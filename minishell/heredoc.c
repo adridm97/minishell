@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:26:22 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/16 23:08:03 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/19 07:56:58 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,11 @@ int	heredoc(t_redir	*aux, t_data *data)
 		exit(EXIT_FAILURE));
 	while (1)
 	{
-		if (*data->stat_code == SC_HEREDOC)
+		if (g_sigint_received == 1)
+		{
+			printf("llega\n");
 			(close(fd), exit(SC_HEREDOC));
+		}
 		line = readline("> ");
 		if (line == NULL || eof_check(line, aux))
 		{

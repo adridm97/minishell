@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:23:30 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/16 23:07:57 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/19 07:57:17 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ void	sc_error_int(int err, int *sce)
 void	update_heredoc_status(t_data **data, pid_t pid, int *processed)
 {
 	int	status;
-
 	if ((*data)->heredoc == 1)
 	{
 		pid = wait(&status);
@@ -53,6 +52,8 @@ void	update_status(pid_t pid, int *last_pid, int status, t_data **data)
 	else if (pid > *last_pid && WIFSIGNALED(status))
 	{
 		*(*data)->stat_code = WTERMSIG(status) + 128;
+		if (*(*data)->stat_code == 130)
+			g_sigint_received = 1;
 	}
 	*last_pid = pid;
 }

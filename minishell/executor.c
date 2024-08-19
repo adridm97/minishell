@@ -20,7 +20,10 @@ int	is_valid_command(t_data **data, int heredoc_processed)
 	path = key_to_res(&path, (*data)->env);
 	if ((!path || !(*data)->comand) && !is_builtin((*data)->comand))
 	{
-		handle_missing_command(*data, heredoc_processed);
+		if((*data) && (*data)->redir && (*data)->redir->type == D_MINOR)
+			execute_command(*(&data), NULL, heredoc_processed);
+		else
+			handle_missing_command(*data, heredoc_processed);
 		free(path);
 		return (0);
 	}
@@ -65,8 +68,9 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 {
 	pid_t	pid;
 	int		status;
-
-	if ((*ddata)->redir && (*ddata)->redir->type == D_MINOR)
+	if (ft_strcmp((*ddata)->comand, "./minishell") == 0)
+		wait_signal(2);
+	else if (((*ddata)->redir && (*ddata)->redir->type == D_MINOR))
 		wait_signal(1);
 	else
 		wait_signal(0);

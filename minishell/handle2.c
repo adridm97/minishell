@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/16 23:08:04 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/19 07:56:54 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,10 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 	t_data	*data;
 
 	data = *ddata;
-	if (data->redir != NULL)
+	if (data->redir != NULL && data->comand && *data->comand)
+	{
 		handle_redir(data, processed);
+	}
 	if (ft_strcmp(command_path, "is_builtinOMG") == 0)
 	{
 		switch_builtin(ddata);
@@ -28,8 +30,7 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 	{
 		if (!data->comand || !command_path || !*data->comand)
 		{
-			handle_missing_command(data, processed);
-			exit(SC_KEY_HAS_EXPIRED);
+			exit(handle_missing_command(data, processed));
 		}
 		if (execve(command_path, data->args, data->env) == -1)
 		{
@@ -49,7 +50,7 @@ void	handle_heredoc(t_data *current, t_exec_vars *vars)
 		perror("dup2");
 		exit(EXIT_FAILURE);
 	}
-	if (*current->stat_code == SC_HEREDOC)
+	if (g_sigint_received == 1)
 	{
 		sc_error(2 + 128, &current);
 		exit(*current->stat_code);
