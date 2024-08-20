@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/17 20:13:04 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/18 19:38:52 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,19 @@ int	ft_is_exit(t_data *d)
 	return (0);
 }
 
+int	ft_isspace(char *str)
+{
+	if (!str)
+		return (0);
+	while (*str)
+	{
+		if (*str != ' ')
+			return (0);
+		str++;
+	}
+	return (1);
+}
+
 //ls -l > a < a < a > b > b < a | ls -la < a << eof > c >> c < | ls
 int	main(int argc, char *argv[], char *env[])
 {
@@ -57,7 +70,7 @@ int	main(int argc, char *argv[], char *env[])
 			printf("\nexit\n");
 			break ;
 		}
-		if (input && *input)
+		if ((input && *input) && !ft_isspace(input))
 			add_history(input);
 		else if (input)
 		{

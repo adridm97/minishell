@@ -68,8 +68,9 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 {
 	pid_t	pid;
 	int		status;
-
-	if ((*ddata)->redir && (*ddata)->redir->type == D_MINOR)
+	if (ft_strcmp((*ddata)->comand, "./minishell") == 0)
+		wait_signal(2);
+	else if (((*ddata)->redir && (*ddata)->redir->type == D_MINOR))
 		wait_signal(1);
 	else
 		wait_signal(0);

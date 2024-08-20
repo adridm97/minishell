@@ -6,19 +6,20 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/19 23:54:55 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/20 10:58:16 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	handle_missing_command(t_data *data, int heredoc_processed)
+int	handle_missing_command(t_data *data, int heredoc_processed)
 {
 	int	fd;
 
 	if (data->redir != NULL)
 	{
 		handle_redir(data, heredoc_processed);
+		return (*data->stat_code);
 	}
 	else
 	{
@@ -26,17 +27,17 @@ void	handle_missing_command(t_data *data, int heredoc_processed)
 		if (!data->comand)
 		{
 			sc_error(SC_KEY_HAS_EXPIRED, &data);
-			ft_putstr_fd(": command not found\n", 2);
+			return (ft_putstr_fd(": command not found\n", 2), *data->stat_code);
 		}
 		else if (data->comand && !is_valid_file(data->comand, fd, "X", &data))
-			execute_command(&data, data->comand, heredoc_processed);
+			return (execute_command(&data, data->comand, heredoc_processed), *data->stat_code);
 		else if (data->comand)
 		{
 			sc_error(SC_KEY_HAS_EXPIRED, &data);
 			ft_putstr_fd(data->comand, 2);
-			ft_putstr_fd(": command not found\n", 2);
+			return (ft_putstr_fd(": command not found\n", 2), *data->stat_code);
 		}
-		close(fd);
+		return (close(fd), *data->stat_code);
 	}
 }
 
@@ -46,7 +47,7 @@ void	handle_dups(int fd, t_redir *redir, t_data *data, int heredoc_processed)
 	{
 		if (data->redir->path)
 			ft_putstr_fd(data->redir->path, 2);
-		return (ft_putstr_fd(" No such file or directory\n", 2));
+		return (ft_putstr_fd(" No such file or directory\n", 2), sc_error(SC_KEY_HAS_EXPIRED, &data));
 	}
 	if ((redir->type == MAJOR || redir->type == D_MAJOR) \
 	&& data->comand != NULL)
@@ -128,7 +129,7 @@ void	handle_child_pipes(t_data **current, t_exec_vars *vars, int fd[2])
 	handle_output_redirection((*current), fd);
 	close(fd[0]);
 	close(fd[1]);
-	if ((*current)->redir != NULL)
+	if ((*current)->redir != NULL && (*current)->redir->type != D_MINOR)
 		handle_redir((*current), vars->heredoc_processed);
 	if (!is_valid_command(current, vars->heredoc_processed))
 	{

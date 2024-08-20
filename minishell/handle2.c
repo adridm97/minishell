@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/19 23:26:29 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/20 10:58:23 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,7 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 	{
 		if (!data->comand || !command_path || !*data->comand)
 		{
-			handle_missing_command(data, processed);
-			exit(SC_KEY_HAS_EXPIRED);
+			exit(handle_missing_command(data, processed));
 		}
 		if (execve(command_path, data->args, data->env) == -1)
 		{
