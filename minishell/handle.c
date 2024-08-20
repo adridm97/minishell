@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/20 10:58:16 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/20 11:14:05 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,10 +121,10 @@ pid_t pid, t_data **data)
 
 void	handle_child_pipes(t_data **current, t_exec_vars *vars, int fd[2])
 {
-	// if ((*current)->redir != NULL && (*current)->redir->type == D_MINOR && \
-	// 	!(vars->heredoc_processed))
-	// 	handle_heredoc((*current), vars);
-	// else
+	if ((*current)->redir != NULL && (*current)->redir->type == D_MINOR && \
+		!(vars->heredoc_processed))
+		handle_heredoc((*current), vars);
+	else
 		handle_input_redirection(&(vars->input_fd));
 	handle_output_redirection((*current), fd);
 	close(fd[0]);
