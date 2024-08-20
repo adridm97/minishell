@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/18 17:37:20 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/19 23:26:29 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,7 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 
 	data = *ddata;
 	if (data->redir != NULL && data->comand && *data->comand)
-	{
 		handle_redir(data, processed);
-	}
 	if (ft_strcmp(command_path, "is_builtinOMG") == 0)
 	{
 		switch_builtin(ddata);
@@ -45,7 +43,10 @@ void	handle_heredoc(t_data *current, t_exec_vars *vars)
 {
 	vars->heredoc_fd = heredoc(current->redir, current);
 	if (vars->heredoc_fd == -1)
+	{
 		vars->heredoc_processed = 1;
+		return ;
+	}
 	if (dup2(vars->heredoc_fd, STDIN_FILENO) == -1)
 	{
 		perror("dup2");
@@ -82,5 +83,6 @@ void	handle_output_redirection(t_data *current, int fd[2])
 			perror("dup2");
 			exit(EXIT_FAILURE);
 		}
+		close(fd[1]);
 	}
 }

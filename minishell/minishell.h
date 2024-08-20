@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/17 22:22:11 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/19 22:55:51 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ void	handle_input_redirection(int *input_fd);
 void	handle_heredoc(t_data *current, t_exec_vars *vars);
 
 //handle_fd.c
-void	update_input_fd(int *input_fd, int fd[2], t_data *current);
+void	update_input_fd(int *input_fd, int fd[2], t_data *current, t_exec_vars *vars);
 void	close_heredoc_fd(int *heredoc_fd);
 void	close_input_fd(int *input_fd);
 
