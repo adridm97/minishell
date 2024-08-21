@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/20 10:58:23 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/21 18:14:34 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,21 +40,28 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 
 void	handle_heredoc(t_data *current, t_exec_vars *vars)
 {
-	vars->heredoc_fd = heredoc(current->redir, current);
-	if (vars->heredoc_fd == -1)
+	t_redir	*redir;
+
+	redir = current->redir;
+	while(redir != NULL)
 	{
-		vars->heredoc_processed = 1;
-		return ;
+		if (redir->type == D_MINOR)
+		{
+			vars->heredoc_fd = heredoc(redir, current);
+			if (vars->heredoc_fd == -1)
+			{
+				vars->heredoc_processed = 1;
+				return ;
+			}
+			if (g_sigint_received == 1)
+				exit((sc_error(2 + 128, &current), *current->stat_code));
+		}
+		redir = redir->next;
 	}
 	if (dup2(vars->heredoc_fd, STDIN_FILENO) == -1)
 	{
 		perror("dup2");
 		exit(EXIT_FAILURE);
-	}
-	if (g_sigint_received == 1)
-	{
-		sc_error(2 + 128, &current);
-		exit(*current->stat_code);
 	}
 	close(vars->heredoc_fd);
 	vars->heredoc_processed = 1;
