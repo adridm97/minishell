@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/22 08:44:12 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 09:20:00 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,14 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 	t_data	*data;
 
 	data = *ddata;
-	if (data->redir != NULL && data->comand && *data->comand)
+	if ((*ddata)->pipe && data->redir != NULL && data->comand && *data->comand)
+	{
 		handle_redir(data, processed);
+	}
+	else if (data->redir != NULL && data->comand && *data->comand)
+	{
+		handle_redir_simple(data, processed);
+	}
 	if (ft_strcmp(command_path, "is_builtinOMG") == 0)
 	{
 		switch_builtin(ddata);

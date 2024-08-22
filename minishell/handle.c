@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/21 17:54:36 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/22 09:18:11 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,30 @@ int	handle_missing_command(t_data *data, int heredoc_processed)
 	}
 }
 
+void	handle_dups_simple(int fd, t_redir *redir, t_data *data, int heredoc_processed)
+{
+	if (fd == -1)
+		return (ft_putstr_fd(data->redir->path, 2), \
+		ft_putstr_fd(" No such file or directory\n", 2));
+	if ((redir->type == MAJOR || redir->type == D_MAJOR) \
+	&& data->comand != NULL)
+	{
+		if (dup2(fd, STDOUT_FILENO) == -1)
+			(perror("dup2"), exit(EXIT_FAILURE));
+	}
+	else if (redir->type == MINOR && data->comand != NULL)
+	{
+		if (dup2(fd, STDIN_FILENO) == -1)
+			(perror("dup2"), exit(EXIT_FAILURE));
+	}
+	else if (!heredoc_processed && !redir->next && \
+	redir->type == D_MINOR && data->comand != NULL)
+	{
+		if (dup2(fd, STDIN_FILENO) == -1)
+			(perror("dup2"), exit(EXIT_FAILURE));
+	}
+}
+
 void	handle_dups(int fd, t_redir *redir, t_data *data)
 {
 	if (fd == -1)
@@ -62,19 +86,47 @@ void	handle_dups(int fd, t_redir *redir, t_data *data)
 	}
 }
 
+void	handle_redir_simple(t_data *data, int heredoc_processed)
+{
+	int		fd;
+	t_redir	*redir;
+
+	redir = data->redir;
+	while (redir != NULL)
+	{
+		if (data && (data->redir != NULL && redir->type == D_MINOR) \
+				&& heredoc_processed == 0)
+			fd = heredoc(redir, data);
+		else if (redir->type == MAJOR)
+			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		else if (redir->type == D_MAJOR)
+			fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		else if (redir->type == MINOR)
+			fd = open(redir->path, O_RDONLY);
+		else
+		{
+			redir = redir->next;
+			continue ;
+		}
+		handle_dups_simple(fd, redir, data, heredoc_processed);
+		close(fd);
+		redir = redir->next;
+	}
+}
+
 void	handle_redir(t_data *data, int heredoc_processed)
 {
 	int			fd;
 	t_redir		*redir;
-	t_exec_vars	vars;
+	// t_exec_vars	vars;
 		
-	initialize_pipe_vars(&vars);
+	// initialize_pipe_vars(&vars);
 	redir = data->redir;
 	while (redir != NULL)
 	{
 		if (data && (redir != NULL && redir->type == D_MINOR) \
 				&& heredoc_processed == 0)
-					handle_heredoc(data, &vars);
+			fd = heredoc(redir, data);
 		else if (redir->type == MAJOR)
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		else if (redir->type == D_MAJOR)

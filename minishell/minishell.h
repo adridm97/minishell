@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/22 08:44:08 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 09:02:21 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,6 +160,8 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed);
 void	handle_output_redirection(t_data *current, int fd[2]);
 void	handle_input_redirection(int *input_fd);
 void	handle_heredoc(t_data *current, t_exec_vars *vars);
+void	handle_redir_simple(t_data *data, int heredoc_processed);
+void	handle_dups_simple(int fd, t_redir *redir, t_data *data, int heredoc_processed);
 
 //handle_fd.c
 void	update_input_fd(int *input_fd, int fd[2], t_data *current, t_exec_vars *vars);

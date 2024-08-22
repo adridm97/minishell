@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 17:21:05 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 00:11:21 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 20:15:54 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,16 @@ int	take_key(t_token **token, char **key, char *str)
 	t_token	*ctoken;
 
 	ctoken = *token;
+	if (!is_special(ctoken->value, str) && ctoken->value == '?')
+	{
+		*key = new_str(key, ctoken->value);
+		ctoken = ctoken->next;
+		(*token) = ctoken;
+		if (*key)
+			return (1);
+		else
+			return (0);
+	}
 	while (ctoken && !is_special(ctoken->value, str))
 	{
 		*key = new_str(key, ctoken->value);
