@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/15 20:39:35 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 22:07:12 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,9 @@ int	is_expandsor(t_token **token, char **str, char **env, t_data **data)
 }
 
 // TODO hay que meter el sce
+// printf("switch case = %c\n", (*token)->value);
 int	switch_case(t_token **token, char **env, t_data **data, char **str)
 {
-	// printf("switch case = %c\n", (*token)->value);
 	if ((*token)->value == '\'')
 		is_simple_string(token, env, str);
 	else if ((*token)->value == '"')

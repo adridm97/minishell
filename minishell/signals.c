@@ -6,18 +6,18 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/18 20:23:42 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 22:04:18 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int g_sigint_received = 0;
+int	g_sigint_received = 0;
 
-void handle_sigint_global(int sig)
+void	handle_sigint_global(int sig)
 {
-    (void)sig;
-    g_sigint_received = 1;
+	(void)sig;
+	g_sigint_received = 1;
 }
 
 void	handle_sigint(int sig)
@@ -65,7 +65,7 @@ void	wait_signal(int i)
 
 	ft_memset(&sa_int, 0, sizeof(sa_int));
 	ft_memset(&sa_quit, 0, sizeof(sa_quit));
-	if(i == 2)
+	if (i == 2)
 	{
 		sa_int.sa_handler = &handle_sigint_minishell;
 		sa_quit.sa_handler = &handle_sigquit;

@@ -6,12 +6,15 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 17:39:20 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/19 07:56:38 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 22:02:35 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*TODO, antes era esta, si falla el lexer es por este if if 
+(token->type >= PIPE && token->type <= MINOR && (type == PIPE \
+&& !(token->type > PIPE && token->type <= MINOR)))*/
 int	check_error(t_token *token, char type, int flag)
 {
 	if (flag == -1)
@@ -24,9 +27,7 @@ int	check_error(t_token *token, char type, int flag)
 		token = token->next;
 		if (token && token->type != SPACES)
 		{
-			/*TODO, antes era esta, si falla el lexer es por este if if (token->type >= PIPE && token->type <= MINOR && (type == PIPE \
-			&& !(token->type > PIPE && token->type <= MINOR)))*/
-			if ((token->type >= MAJOR && token->type <= MINOR) && type == PIPE )
+			if ((token->type >= MAJOR && token->type <= MINOR) && type == PIPE)
 				return (0);
 			if (token->type >= PIPE && token->type <= MINOR)
 				return (1);

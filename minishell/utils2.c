@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:27:50 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/22 21:23:52 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 22:17:06 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,13 +83,24 @@ void	is_simple_string(t_token **token, char **env, char **str)
 	*str = res;
 }
 
+void	manage_early_is_double_string(char **res, char **str)
+{
+	*res = NULL;
+	if (*str)
+		*res = ft_strdup(*str);
+}
+
+/*if ((*token)->value == '$' && (*token)->next->value != '"')
+{
+	is_expandsor(token, &res, env, data);
+	// if(*token && (*token)->next && (*token)->value != '"')
+	// 	(*token) = (*token)->next;
+}*/
 void	is_double_string(t_token **token, char **env, char **str, t_data **data)
 {
 	char	*res;
 
-	res = NULL;
-	if (*str)
-		res = ft_strdup(*str);
+	manage_early_is_double_string(&res, str);
 	*token = (*token)->next;
 	if (*token && (*token)->value == '"')
 	{
@@ -102,11 +113,7 @@ void	is_double_string(t_token **token, char **env, char **str, t_data **data)
 	while (*token && (*token)->value != '"')
 	{
 		if ((*token)->value == '$' && (*token)->next->value != '"')
-		{
 			is_expandsor(token, &res, env, data);
-			// if(*token && (*token)->next && (*token)->value != '"')
-			// 	(*token) = (*token)->next;
-		}
 		if (*token && (*token)->value != '"')
 			res = new_str(&res, (*token)->value);
 		if (*token && (*token)->value != '"')

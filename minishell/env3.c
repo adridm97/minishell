@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:36:08 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/11 23:12:05 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 22:06:13 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,6 @@ void	update_env(t_data *cdata, char *key, char *arg, int i)
 		cdata->env = ft_matadd(&(cdata)->env, arg, &cdata);
 		if (!cdata->env)
 			exit(*cdata->stat_code);
-
 	}
 }
 

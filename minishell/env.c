@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:35:01 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/14 23:46:08 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 22:09:18 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,8 @@ int	save_env(t_data *data)
 	unlink("/tmp/env.env");
 	fd = open("/tmp/env.env", O_WRONLY | O_CREAT | O_TRUNC, 777);
 	if (fd < 0)
-		return (sc_error(SC_FILE_DESCRIPTOR_IN_BAD_STATE, &data), *data->stat_code);
+		return (sc_error(SC_FILE_DESCRIPTOR_IN_BAD_STATE, &data),
+			*data->stat_code);
 	env = data->env;
 	while (env[i])
 	{

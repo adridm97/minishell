@@ -20,7 +20,7 @@ int	is_valid_command(t_data **data, int heredoc_processed)
 	path = key_to_res(&path, (*data)->env);
 	if ((!path || !(*data)->comand) && !is_builtin((*data)->comand))
 	{
-		if((*data) && (*data)->redir && (*data)->redir->type == D_MINOR)
+		if ((*data) && (*data)->redir && (*data)->redir->type == D_MINOR)
 			execute_command(*(&data), NULL, heredoc_processed);
 		else
 			handle_missing_command(*data, heredoc_processed);
@@ -64,22 +64,25 @@ int	is_valid_file(char *filename, int fd, char *check, t_data **data)
 	return (0);
 }
 
-void	execute_command(t_data **ddata, char *command_path, int processed)
+void	wating_signal(t_data **ddata)
 {
-	pid_t	pid;
-	int		status;
 	if (ft_strcmp((*ddata)->comand, "./minishell") == 0)
 		wait_signal(2);
 	else if (((*ddata)->redir && (*ddata)->redir->type == D_MINOR))
 		wait_signal(1);
 	else
 		wait_signal(0);
+}
+
+void	execute_command(t_data **ddata, char *command_path, int processed)
+{
+	pid_t	pid;
+	int		status;
+
+	wating_signal(ddata);
 	pid = fork();
 	if (pid == -1)
-	{
-		perror("fork");
-		return ;
-	}
+		return (perror("fork"));
 	else if (pid == 0)
 		handle_child_process(ddata, command_path, processed);
 	else
@@ -88,13 +91,9 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 		while (pid > 0)
 		{
 			if (WIFEXITED(status))
-			{
 				*(*ddata)->stat_code = WEXITSTATUS(status);
-			}
 			else if (WIFSIGNALED(status))
-			{
 				*(*ddata)->stat_code = WTERMSIG(status) + 128;
-			}
 			pid = wait(&status);
 		}
 	}

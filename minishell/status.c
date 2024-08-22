@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:23:30 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/22 08:44:06 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 22:02:59 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	sc_error_int(int err, int *sce)
 {
 	if (sce)
 	{
-		*sce= err;
+		*sce = err;
 	}
 }
 
@@ -63,6 +63,7 @@ void	wait_for_remaining_processes(int last_pid, t_data **data)
 {
 	int		status;
 	pid_t	pid;
+
 	pid = wait(&status);
 	while (pid > 0)
 	{

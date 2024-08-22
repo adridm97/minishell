@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:33:06 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/22 20:12:36 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 22:09:50 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 		*data = NULL;
 	}
 */
-void	ft_free_resources(t_data **data, char **input, char ***mat,  int *sce)
+void	ft_free_resources(t_data **data, char **input, char ***mat, int *sce)
 {
 	if (*data)
 	{

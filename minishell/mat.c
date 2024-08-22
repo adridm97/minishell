@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:25:11 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/11 22:40:22 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 22:10:28 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@ char	**ft_matadd(char ***mat, char *str, t_data **data)
 	size = ft_matsize(*mat);
 	new_mat = (char **)malloc(sizeof(char **) * (size + 2));
 	if (!new_mat)
-		return (free_args(mat), sc_error(SC_CANNOT_ALLOCATE_MEMORY, data), NULL);
+		return (free_args(mat),
+			sc_error(SC_CANNOT_ALLOCATE_MEMORY, data), NULL);
 	c_mat = *mat;
 	while (c_mat[++i])
 	{

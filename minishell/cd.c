@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:21:28 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/15 22:00:40 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 22:05:33 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,8 +78,8 @@ void	b_cd(t_data **data, char *home)
 	if (!chdir(pwd))
 		(ft_pwd(&pwd, &res, data, 0), ft_oldpwd(data, &last_pwd, &res));
 	else
-		(ft_putstr_fd("cd error\n", 2), \
-		ft_free_char(&pwd), sc_error(EXIT_FAILURE, data), exit(*(*data)->stat_code));
+		(ft_putstr_fd("cd error\n", 2), ft_free_char(&pwd),
+			sc_error(EXIT_FAILURE, data), exit(*(*data)->stat_code));
 	(free_args(&(*data)->env), sc_error(SC_SUCCESS, data));
 	exit(*(*data)->stat_code);
 }

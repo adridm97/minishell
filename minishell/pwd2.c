@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:08:03 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/11 23:14:12 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 22:06:56 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,10 @@ void	ft_free_char(char **f)
 void	managing_env(char **res, int i, char **last_pwd, t_data **data)
 {
 	if (i == -2)
-		(sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE, data), exit(*(*data)->stat_code));
+	{
+		sc_error(SC_RESOURCE_TEMPORARILY_UNAVAILABLE, data);
+		exit(*(*data)->stat_code);
+	}
 	*res = ft_strjoin("OLDPWD=", *last_pwd);
 	if (!*res)
 		(sc_error(SC_CANNOT_ALLOCATE_MEMORY, data), exit(*(*data)->stat_code));
