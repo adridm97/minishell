@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   handle_fd.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:16:53 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/18 22:08:53 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/20 10:58:41 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	update_input_fd(int *input_fd, int fd[2], t_data *current)
+void	update_input_fd(int *input_fd, int fd[2], t_data *current, t_exec_vars *vars)
 {
-	if (current->next != NULL)
+	if (current->next && vars->heredoc_processed != 1)
 	{
 		close(fd[1]);
 		*input_fd = fd[0];
@@ -40,5 +40,6 @@ void	close_input_fd(int *input_fd)
 	if (*input_fd != STDIN_FILENO)
 	{
 		close(*input_fd);
+		*input_fd = -1;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/19 07:56:54 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 08:44:12 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,7 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 
 	data = *ddata;
 	if (data->redir != NULL && data->comand && *data->comand)
-	{
 		handle_redir(data, processed);
-	}
 	if (ft_strcmp(command_path, "is_builtinOMG") == 0)
 	{
 		switch_builtin(ddata);
@@ -42,18 +40,28 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 
 void	handle_heredoc(t_data *current, t_exec_vars *vars)
 {
-	vars->heredoc_fd = heredoc(current->redir, current);
-	if (vars->heredoc_fd == -1)
-		vars->heredoc_processed = 1;
+	t_redir	*redir;
+
+	redir = current->redir;
+	while(redir != NULL)
+	{
+		if (redir->type == D_MINOR)
+		{
+			vars->heredoc_fd = heredoc(redir, current);
+			if (vars->heredoc_fd == -1)
+			{
+				vars->heredoc_processed = 1;
+				return ;
+			}
+			if (g_sigint_received == 1)
+				exit((sc_error(2 + 128, &current), *current->stat_code));
+		}
+		redir = redir->next;
+	}
 	if (dup2(vars->heredoc_fd, STDIN_FILENO) == -1)
 	{
 		perror("dup2");
 		exit(EXIT_FAILURE);
-	}
-	if (g_sigint_received == 1)
-	{
-		sc_error(2 + 128, &current);
-		exit(*current->stat_code);
 	}
 	close(vars->heredoc_fd);
 	vars->heredoc_processed = 1;
@@ -81,5 +89,6 @@ void	handle_output_redirection(t_data *current, int fd[2])
 			perror("dup2");
 			exit(EXIT_FAILURE);
 		}
+		close(fd[1]);
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/19 07:57:13 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/22 08:44:08 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,8 +149,7 @@ char	**ft_matcpy(char **mat);
 
 //handle.c
 int		handle_missing_command(t_data *data, int heredoc_processed);
-void	handle_dups(int fd, t_redir *redir, t_data *data, \
-int heredoc_processed);
+void	handle_dups(int fd, t_redir *redir, t_data *data);
 void	handle_redir(t_data *data, int heredoc_processed);
 void	handle_parent_process(t_exec_vars *vars, int fd[2], \
 pid_t pid, t_data **data);
@@ -163,7 +162,7 @@ void	handle_input_redirection(int *input_fd);
 void	handle_heredoc(t_data *current, t_exec_vars *vars);
 
 //handle_fd.c
-void	update_input_fd(int *input_fd, int fd[2], t_data *current);
+void	update_input_fd(int *input_fd, int fd[2], t_data *current, t_exec_vars *vars);
 void	close_heredoc_fd(int *heredoc_fd);
 void	close_input_fd(int *input_fd);
 
