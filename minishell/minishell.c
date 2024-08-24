@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/24 14:39:29 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/24 17:26:50 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,21 @@ int	file_exist(char *file)
 	return (1);
 }
 
+int check_puti(t_data *d)
+{
+	if (d->args[1] && !d->args[2] && ft_atoi(d->args[1]) == 235)
+		return (1);
+	return (0);
+}
+
 int	ft_is_exit(t_data *d)
 {
 	if (d && d->comand && !ft_strcmp(d->comand, "exit") && !d->pipe)
 	{
-		if (*d->stat_code != 235)
+		if (check_puti(d) || *d->stat_code != 235)
 			return (1);
-		else if (!(count_args(d->args) > 2))
-			(ft_putstr_fd("exit\n", 2), sc_error(1, &d));
+		else if ((count_args(d->args) > 2))
+			sc_error(1, &d);
 	}
 	return (0);
 }
