@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   status.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:23:30 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/22 22:02:59 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 00:10:57 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ void	update_heredoc_status(t_data **data, pid_t pid, int *processed)
 {
 	int	status;
 
-	if (*processed != 1)
+	printf("heredoc processed = %d\n", *processed);
+	if (*processed != 1 && (*data)->heredoc == 1)
 	{
 		pid = wait(&status);
 		while (pid > 0)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/24 16:04:48 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/24 23:35:42 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,8 +162,7 @@ void	handle_input_redirection(int *input_fd);
 void	handle_heredoc(t_data *current, t_exec_vars *vars);
 
 //handle_fd.c
-void	update_input_fd(int *input_fd, int fd[2], t_data *current,
-			t_exec_vars *vars);
+void	update_input_fd(int *input_fd, int fd[2], t_data *current);
 void	close_heredoc_fd(int *heredoc_fd);
 void	close_input_fd(int *input_fd);
 
