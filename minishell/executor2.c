@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/21 18:05:51 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/24 19:48:38 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ int	search_and_execute_command(t_data **data, char *path, int heredoc_processed)
 {
 	char	**token;
 
+	ft_putstr_fd("search_and_execute_command MIERDA\n", 2);
 	token = ft_split(path, ':');
 	free(path);
 	if (access((*data)->comand, F_OK) == 0)
@@ -71,5 +72,5 @@ int	search_and_execute_command(t_data **data, char *path, int heredoc_processed)
 		else
 			sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE, data);
 	}
-	return (find_command_in_paths(data, token, heredoc_processed));
+	return (ft_putstr_fd("search_and_execute_command entro\n", 2), find_command_in_paths(data, token, heredoc_processed));
 }

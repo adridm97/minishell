@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 17:21:05 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/22 20:15:54 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/24 20:15:05 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ int	take_key(t_token **token, char **key, char *str)
 		ctoken = ctoken->next;
 		(*token) = ctoken;
 	}
+	printf("ctoken->value = %c\n", ctoken->value);
 	if (*key)
 		return (1);
 	else
