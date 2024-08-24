@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/22 22:04:18 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/24 14:49:49 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,6 @@ void	handle_sigint(int sig)
 	rl_redisplay();
 }
 
-void	handle_sigint_minishell(int sig)
-{
-	(void)sig;
-}
-
 void	handle_sigint_heredoc(int sig)
 {
 	(void)sig;
@@ -42,11 +37,6 @@ void	handle_sigint_heredoc(int sig)
 	rl_replace_line("", 0);
 	rl_redisplay();
 	exit(130);
-}
-
-void	handle_sigquit(int sig)
-{
-	(void)sig;
 }
 
 void	child_handler(int signal)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/23 16:20:36 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/24 14:40:09 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,12 @@ int	handle_missing_command(t_data *data, int heredoc_processed)
 			return (ft_putstr_fd(": command not found\n", 2), *data->stat_code);
 		}
 		else if (data->comand && !is_valid_file(data->comand, fd, "X", &data))
-			return (execute_command(&data, data->comand, heredoc_processed), *data->stat_code);
+			return (execute_command(&data, data->comand, heredoc_processed),
+				*data->stat_code);
 		else if (data->comand)
-		{
-			sc_error(SC_KEY_HAS_EXPIRED, &data);
-			ft_putstr_fd(data->comand, 2);
-			return (ft_putstr_fd(": command not found\n", 2), *data->stat_code);
-		}
+			return (sc_error(SC_KEY_HAS_EXPIRED, &data),
+				ft_putstr_fd(data->comand, 2),
+				ft_putstr_fd(": command not found\n", 2), *data->stat_code);
 		return (close(fd), *data->stat_code);
 	}
 }
@@ -65,7 +64,8 @@ void	handle_dups(int fd, t_redir *redir, t_data *data)
 	{
 		if (data->redir->path)
 			ft_putstr_fd(data->redir->path, 2);
-		return (ft_putstr_fd(" No such file or directory\n", 2), sc_error(SC_KEY_HAS_EXPIRED, &data));
+		return (ft_putstr_fd(" No such file or directory\n", 2),
+			sc_error(SC_KEY_HAS_EXPIRED, &data));
 	}
 	if ((redir->type == MAJOR || redir->type == D_MAJOR) \
 	&& data->comand != NULL)
@@ -80,30 +80,31 @@ void	handle_dups(int fd, t_redir *redir, t_data *data)
 	}
 }
 
-void	handle_redir_simple(t_data *data, int heredoc_processed)
+/*		
+// if (data && (redir->type == D_MINOR && heredoc_processed == 0))
+// {
+// 	fd = heredoc(redir, data);
+// 	if (fd == -1)
+// 	{
+// 		perror("heredoc");
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	if (last_heredoc != -1)
+// 		close(last_heredoc);
+// 	last_heredoc = fd;
+// }
+*/
+
+void	handle_redir_simple(t_data *data)
 {
 	int		fd;
-	int		last_heredoc;
 	t_redir	*redir;
 
-	last_heredoc = -1;
 	redir = data->redir;
 	while (redir != NULL)
 	{
 		fd = -1;
-		if (data && (redir->type == D_MINOR && heredoc_processed == 0))
-		{
-			fd = heredoc(redir, data);
-			if (fd == -1)
-			{
-				perror("heredoc");
-				exit(EXIT_FAILURE);
-			}
-			if (last_heredoc != -1)
-				close(last_heredoc);
-				last_heredoc = fd;
-		}
-		else if (redir->type == MAJOR)
+		if (redir->type == MAJOR)
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		else if (redir->type == D_MAJOR)
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
@@ -118,15 +119,6 @@ void	handle_redir_simple(t_data *data, int heredoc_processed)
 		if (redir->type != D_MINOR)
 			close(fd);
 		redir = redir->next;
-	}
-	if (last_heredoc != -1)
-	{
-		if (dup2(last_heredoc, STDIN_FILENO) == -1)
-		{
-			perror("dup2");
-			exit(EXIT_FAILURE);
-		}
-		close(last_heredoc);
 	}
 }
 
@@ -151,36 +143,4 @@ void	handle_redir(t_data *data, int heredoc_processed)
 		redir = redir->next;
 		close(fd);
 	}
-}
-
-void	handle_parent_process(t_exec_vars *vars, int fd[2], \
-pid_t pid, t_data **data)
-{
-	if (vars->heredoc_processed == 0)
-	{
-		close_input_fd(&(vars->input_fd));
-		update_input_fd(&(vars->input_fd), fd, *data, vars);
-	}
-	close_heredoc_fd(&(vars->heredoc_fd));
-	update_heredoc_status(data, pid, &(vars->heredoc_processed));
-}
-
-void	handle_child_pipes(t_data **current, t_exec_vars *vars, int fd[2])
-{
-	if ((*current)->redir != NULL && !(vars->heredoc_processed))
-		handle_heredoc((*current), vars);
-	else
-		handle_input_redirection(&(vars->input_fd));
-	handle_output_redirection((*current), fd);
-	close(fd[0]);
-	close(fd[1]);
-	if ((*current)->redir != NULL)
-		handle_redir((*current), vars->heredoc_processed);
-	if (!is_valid_command(current, vars->heredoc_processed))
-	{
-		sc_error(SC_KEY_HAS_EXPIRED, current);
-		exit(*(*current)->stat_code);
-	}
-	sc_error(SC_SUCCESS, current);
-	exit(*(*current)->stat_code);
 }

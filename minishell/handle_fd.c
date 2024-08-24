@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   handle_fd.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:16:53 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/20 10:58:41 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/24 12:33:21 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	update_input_fd(int *input_fd, int fd[2], t_data *current, t_exec_vars *vars)
+void	update_input_fd(int *input_fd, int fd[2], t_data *current,
+			t_exec_vars *vars)
 {
 	if (current->next && vars->heredoc_processed != 1)
 	{

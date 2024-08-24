@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:33:06 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/22 22:09:50 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/24 14:38:45 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ char	*get_input(void)
 	}
 	else
 		input = readline(BLUE"Minishell: "BLACK);
+	if (!input)
+		printf("\nexit\n");
 	return (input);
 }
 
@@ -85,7 +87,7 @@ void	handle_input(t_data **data, char ***mat, char *input, int *sce)
 		check_pwd(*data);
 	if (*data && (*data)->next)
 	{
-		execute_pipeline(data);
+		execute_pipeline(data, (t_exec_vars){0, 0, 0, 0}, 0);
 		if (*(*data)->stat_code == SC_HEREDOC)
 			sc_error(1, data);
 	}

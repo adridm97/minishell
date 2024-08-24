@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:26:22 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/22 08:44:11 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/24 14:56:15 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,16 @@ int	eof_check(char *line, t_redir *aux)
 		return (1);
 	else if (aux->path[0] == '"' && aux->path[ft_strlen(aux->path) - 1] == '"')
 	{
-		if(ft_strncmp(line + 1, aux->path, ft_strlen(line) - 1) == 0)
+		if (ft_strncmp(line + 1, aux->path, ft_strlen(line) - 1) == 0)
 			return (1);
 	}
-	else if ((aux->path[0] == '\'' && aux->path[ft_strlen(aux->path) - 1] == '\''))
+	else if ((aux->path[0] == '\''
+			&& aux->path[ft_strlen(aux->path) - 1] == '\''))
 	{
-		if(ft_strncmp(line + 1, aux->path, ft_strlen(line) - 1) == 0)
+		if (ft_strncmp(line + 1, aux->path, ft_strlen(line) - 1) == 0)
 			return (1);
-	}	
-	else if(ft_strcmp(line, aux->path) == 0)
+	}
+	else if (ft_strcmp(line, aux->path) == 0)
 		return (1);
 	return (0);
 }
@@ -41,15 +42,11 @@ int	heredoc(t_redir	*aux, t_data *data)
 	if (is_valid_file("/tmp/heredoc", fd, "FRW", &data))
 		exit(*data->stat_code);
 	if (signal(SIGINT, handle_sigint_heredoc) == SIG_ERR)
-		(perror("Error al configurar el manejador de SIGINT"), \
-		exit(EXIT_FAILURE));
+		(perror("Error al configurar el manejador de SIGINT"), exit(1));
 	while (1)
 	{
 		if (g_sigint_received == 1)
-		{
-			printf("llega\n");
 			(close(fd), exit(SC_HEREDOC));
-		}
 		line = readline("> ");
 		if (line == NULL || eof_check(line, aux))
 		{
@@ -64,7 +61,8 @@ int	heredoc(t_redir	*aux, t_data *data)
 
 int	expand_line(char **expanded_line, char **line, int fd, t_data *data)
 {
-	if(ft_strchr(data->redir->path, '"' ) || ft_strchr(data->redir->path, '\''))
+	if (ft_strchr(data->redir->path, '"' )
+		|| ft_strchr(data->redir->path, '\''))
 		*expanded_line = ft_strdup(*line);
 	else
 		*expanded_line = heredoc_tokenizer(*line, data);
@@ -128,25 +126,6 @@ int	manage_token_heredoc(t_token **token, char **input, int *i, t_data **data)
 			return (is_error(&(t_error){"Memory error", 1}), \
 			free((*input)) \
 			, free_token(token), sc_error(SC_CANNOT_ALLOCATE_MEMORY, data), 0);
-	}
-	return (1);
-}
-
-int	token_to_str(t_token **token, char **res, t_data **data)
-{
-	if (is_special((*token)->value, "$") && \
-	(!is_special((*token)->next->value, "\"'")))
-	{
-		if (!is_expandsor(token, res, (*data)->env, data))
-			return (free_token(token), sc_error(SC_CANNOT_ALLOCATE_MEMORY, data), 0);
-	}
-	else
-	{
-		if ((*token))
-		{
-			*res = new_str(res, (*token)->value);
-			(*token) = (*token)->next;
-		}
 	}
 	return (1);
 }

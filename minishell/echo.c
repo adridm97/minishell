@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:52:55 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/19 07:56:42 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/24 12:39:35 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ void	b_echo(t_data *data)
 	int	fd;
 
 	i = 1;
-	// printf("ft_is_n res %i\n", ft_is_n(data->args, &i));
 	if (data->args[i] && !ft_is_n(data->args, &i))
 	{
 		fd = open("/tmp/echoafjnaifsnk", O_WRONLY | O_CREAT | O_APPEND, 0777);
@@ -34,7 +33,9 @@ void	b_echo(t_data *data)
 	}
 	else
 		printf("\n");
-	(sc_error(SC_SUCCESS, &data), free_args(&data->args), exit(*data->stat_code));
+	sc_error(SC_SUCCESS, &data);
+	free_args(&data->args);
+	exit(*data->stat_code);
 }
 
 int	ft_is_n(char **str, int *j)

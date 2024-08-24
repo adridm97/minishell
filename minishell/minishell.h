@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/23 12:08:57 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/24 14:58:44 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,7 @@ void	wait_for_remaining_processes(int last_pid, t_data **data);
 void	sc_error(int sce, t_data **data);
 void	update_heredoc_status(t_data **data, pid_t pid, int *processed);
 void	update_status(pid_t pid, int *last_pid, int status, t_data **data);
+void	sc_error_int(int err, int *sce);
 
 //print.c
 void	print_redir(t_redir *redir);
@@ -151,22 +152,25 @@ char	**ft_matcpy(char **mat);
 int		handle_missing_command(t_data *data, int heredoc_processed);
 void	handle_dups(int fd, t_redir *redir, t_data *data);
 void	handle_redir(t_data *data, int heredoc_processed);
-void	handle_parent_process(t_exec_vars *vars, int fd[2], \
-pid_t pid, t_data **data);
-void	handle_child_pipes(t_data **current, t_exec_vars *vars, int fd[2]);
+void	handle_redir_simple(t_data *data);
+void	handle_dups_simple(int fd, t_redir *redir, t_data *data);
 
 //handle2.c
 void	handle_child_process(t_data **ddata, char *command_path, int processed);
-void	handle_output_redirection(t_data *current, int fd[2]);
+void	handle_output_redirection(t_data *current, int fd[2], int file_fd);
 void	handle_input_redirection(int *input_fd);
 void	handle_heredoc(t_data *current, t_exec_vars *vars);
-void	handle_redir_simple(t_data *data, int heredoc_processed);
-void	handle_dups_simple(int fd, t_redir *redir, t_data *data);
 
 //handle_fd.c
-void	update_input_fd(int *input_fd, int fd[2], t_data *current, t_exec_vars *vars);
+void	update_input_fd(int *input_fd, int fd[2], t_data *current,
+			t_exec_vars *vars);
 void	close_heredoc_fd(int *heredoc_fd);
 void	close_input_fd(int *input_fd);
+
+//handle_child.c
+void	handle_parent_process(t_exec_vars *vars, int fd[2],
+			pid_t pid, t_data **data);
+void	handle_child_pipes(t_data **current, t_exec_vars *vars, int fd[2]);
 
 //executor2.c
 int		search_and_execute_command(t_data **data, char *path, \
@@ -193,7 +197,7 @@ int		is_valid_key(char *key);
 char	*extract_key(char *arg, t_data **data);
 
 //pipes.c
-void	execute_pipeline(t_data **data);
+void	execute_pipeline(t_data **data, t_exec_vars	vars, pid_t pid);
 void	initialize_pipe_vars(t_exec_vars *vars);
 int		is_pipe(t_token **token, t_data **data, char **str, int *sce);
 
@@ -220,7 +224,8 @@ void	redirs(t_data **c_data, char **str, t_redir **redir, t_redir **l_redir);
 int		init_redir(t_token **token, t_data **data, char **env, int type);
 int		is_redir_input(t_token **token, t_data **data, char **str, char **env);
 int		is_redir_output(t_token **token, t_data **data, char **str, char **env);
-void	switch_case_redir(t_token **token, char **str, char **env, t_data **data);
+void	switch_case_redir(t_token **token, char **str, char **env,
+			t_data **data);
 
 //redirs2.c
 int		set_redir(int type, t_redir **redir, t_data **data);
@@ -230,22 +235,27 @@ void	manage_redirs(t_data **data, t_redir **credir, char *str);
 int		heredoc(t_redir	*aux, t_data *data);
 int		expand_line(char **expanded_line, char **line, int fd, t_data *data);
 char	*heredoc_tokenizer(char *str, t_data *data);
-int		manage_token_heredoc(t_token **token, char **input, int *i, t_data **data);
-int		token_to_str(t_token **token, char **res, t_data **data);
+int		manage_token_heredoc(t_token **token, char **input, int *i,
+			t_data **data);
+int		eof_check(char *line, t_redir *aux);
 
 //signals.c
 void	handle_sigint_heredoc(int sig);
 void	wait_signal(int i);
 void	child_handler(int signal);
 void	handle_sigint(int sig);
+void	handle_sigint_global(int sig);
+
+//signals2.c
 void	handle_sigquit(int sig);
+void	handle_sigint_minishell(int sig);
 
 //env.c
 int		set_env(char *key, char *val, char ***env, t_data **data);
-char	**create_env_first(char **cenv, t_data **data);
 int		index_env_env(char **env, char *str);
 int		save_env(t_data *data);
 char	**set_env_i(char ***env, t_data **data);
+int		save_env_mat(char **env, int *stat_code);
 
 //env2.c
 void	check_shlvl(int *n);
@@ -288,7 +298,13 @@ char	*charstr(char c);
 char	*new_str(char **str, char c);
 int		is_special(char c, char *comp);
 void	is_simple_string(t_token **token, char **env, char **str);
-void	is_double_string(t_token **token, char **env, char **str, t_data **data);
+void	is_double_string(t_token **token, char **env, char **str,
+			t_data **data);
+
+//utils3.c
+void	manage_early_is_double_string(char **res, char **str);
+char	**create_env_first(char **cenv, t_data **data);
+int		token_to_str(t_token **token, char **res, t_data **data);
 
 //key.c
 int		take_key(t_token **token, char **key, char *str);
@@ -307,11 +323,7 @@ void	b_pwd(t_data *data);
 void	managing_env(char **res, int i, char **last_pwd, t_data **data);
 void	ft_oldpwd(t_data **data, char **last_pwd, char **res);
 void	ft_pwd(char **pwd, char **res, t_data **data, int size);
-
 void	ft_free_char(char **f);
-void	sc_error_int(int err, int *sce);
-int		save_env_mat(char **env, int *stat_code);
-void	handle_sigint_global(int sig);
 
 // Regular Colors
 # define BLACK "\x1b[0m"

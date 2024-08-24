@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:08:03 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/22 22:01:17 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/24 12:28:25 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,8 @@ int	is_redir_output(t_token **token, t_data **data, char **str, char **env)
 	return (1);
 }
 
-void	switch_case_redir(t_token **token, char **str, char **env, t_data **data)
+void	switch_case_redir(t_token **token,
+		char **str, char **env, t_data **data)
 {
 	if ((*token)->value == '\'')
 		is_simple_string(token, env, str);

@@ -6,7 +6,7 @@
 #    By: kevin <kevin@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/04 16:50:24 by adrian            #+#    #+#              #
-#    Updated: 2024/08/19 07:57:01 by kevin            ###   ########.fr        #
+#    Updated: 2024/08/24 14:54:49 by kevin            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,6 +20,7 @@ SOURCES         =	minishell.c \
 					special_split.c \
 					split_token.c \
 					signals.c \
+					signals2.c \
 					env.c \
 					env2.c \
 					env3.c \
@@ -34,6 +35,7 @@ SOURCES         =	minishell.c \
 					handle.c \
 					handle2.c \
 					handle_fd.c \
+					handle_child.c \
 					pipes.c \
 					exit.c \
 					builtins.c \
@@ -47,7 +49,8 @@ SOURCES         =	minishell.c \
 					token.c \
 					checkers.c \
 					utils.c \
-					utils2.c
+					utils2.c \
+					utils3.c
 
 OBJS_PATH       = ./build
 HEADER          = minishell.h

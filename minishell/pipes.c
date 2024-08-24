@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:27:48 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/20 11:10:16 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/24 14:38:13 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,34 +21,35 @@ void	initialize_pipe_vars(t_exec_vars *vars)
 	signal(SIGINT, handle_sigint_global);
 }
 
-void	execute_pipeline(t_data **data)
+void	pipeing(t_data **current, int (*fd)[2], pid_t *pid)
+{
+	(*current)->pipe = 1;
+	if (pipe(*fd) == -1)
+		(perror("pipe"), exit(EXIT_FAILURE));
+	*pid = fork();
+	if (*pid == -1)
+		(perror("fork"), exit(EXIT_FAILURE));
+}
+
+void	execute_pipeline(t_data **data, t_exec_vars	vars, pid_t pid)
 {
 	int			fd[2];
-	pid_t		pid;
-	t_exec_vars	vars;
 	t_data		*current;
 
 	current = *data;
 	initialize_pipe_vars(&vars);
-	pid = 0;
 	while (current != NULL)
 	{
-		current->pipe = 1;
-		if (pipe(fd) == -1)
-			(perror("pipe"), exit(EXIT_FAILURE));
-		pid = fork();
-		if (pid == -1)
-			(perror("fork"), exit(EXIT_FAILURE));
-		else if (pid == 0)
+		pipeing(&current, &fd, &pid);
+		if (pid == 0)
 			handle_child_pipes(&current, &vars, fd);
 		else
 		{
 			handle_parent_process(&vars, fd, pid, &current);
 			if (g_sigint_received)
 			{
-				sc_error(130, *(&data));
-				kill(pid, SIGINT);
-				break;
+				(sc_error(130, *(&data)), kill(pid, SIGINT));
+				break ;
 			}
 		}
 		current = current->next;
