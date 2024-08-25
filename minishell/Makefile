@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: kevin <kevin@student.42.fr>                +#+  +:+       +#+         #
+#    By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/04 16:50:24 by adrian            #+#    #+#              #
-#    Updated: 2024/08/24 14:54:49 by kevin            ###   ########.fr        #
+#    Updated: 2024/08/25 12:40:26 by aduenas-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME            = minishell
 CC              = cc
-CFLAGS          = -Wall -Wextra -Werror -fPIE
+CFLAGS          = -Wall -Wextra -Werror
 SOURCES         =	minishell.c \
 					lexer.c \
 					executor.c \
@@ -73,7 +73,7 @@ makes:
 OBJS = $(addprefix $(OBJS_PATH)/, ${SOURCES:.c=.o})
 
 $(NAME): $(OBJS) $(LIBFT) $(LIBREADLINE)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(LIBREADLINE) -o $@ $(OSFLAG)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(LIBREADLINE) $(LIBHISTORY)
 
 $(LIBFT):
 	make -C $(LIBFT_PATH)
@@ -121,7 +121,7 @@ ifeq ($(OS),Windows_NT)
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
-		OSFLAG = -L$(ABS_READLINEDIR)/lib -I$(ABS_READLINEDIR)/include -lreadline -lncurses
+		OSFLAG = -L$(ABS_READLINEDIR)/lib -I$(ABS_READLINEDIR)/include -lreadline -lhistory -lncurses
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		OSFLAG = -L$(ABS_READLINEDIR)/lib -I$(ABS_READLINEDIR)/include -lreadline -lncurses
