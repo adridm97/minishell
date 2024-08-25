@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:50:35 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/24 17:33:22 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 09:07:49 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ void	check_numeric_argument(char *arg, t_data **data)
 	}
 	while (arg[j])
 	{
-		if (!((arg[0] == '+' || arg[0] == '-') && ft_isdigit(arg[j + 1])) &&!ft_isdigit(arg[j]))
+		if (!((arg[0] == '+' || arg[0] == '-') && ft_isdigit(arg[j + 1]))
+			&&!ft_isdigit(arg[j]))
 		{
 			sc_error(SC_NO_SUCH_FILE_OR_DIRECTORY, data);
 			printf("exit\n");

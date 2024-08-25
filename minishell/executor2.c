@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/25 00:02:37 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/25 09:10:46 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,8 @@ int	find_command_in_paths(t_data **data, char **token, int heredoc_processed)
 		if (access(comand_path, F_OK) == 0)
 		{
 			if (access(comand_path, X_OK) == 0)
-			{
-				execute_command(data, comand_path, heredoc_processed);
-				(free(comand_path), free_args(&token));
-				return (1);
-			}
+				return (execute_command(data, comand_path, heredoc_processed),
+					free(comand_path), free_args(&token), 1);
 			(sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE, data), exit(126));
 		}
 		free(comand_path);

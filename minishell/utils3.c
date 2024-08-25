@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/24 14:51:41 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/24 14:56:20 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 09:10:09 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,4 +62,11 @@ int	token_to_str(t_token **token, char **res, t_data **data)
 		}
 	}
 	return (1);
+}
+
+int	check_puti(t_data *d)
+{
+	if (d->args[1] && !d->args[2] && ft_atoi(d->args[1]) == 235)
+		return (1);
+	return (0);
 }
