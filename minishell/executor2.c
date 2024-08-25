@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:17:14 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/24 19:48:38 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 00:02:37 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,9 @@ int	find_command_in_paths(t_data **data, char **token, int heredoc_processed)
 		free(comand_path);
 	}
 	if ((*data)->redir != NULL)
+	{
 		execute_command(data, (*data)->path, heredoc_processed);
+	}
 	(free_args(&token), printf("%s: command not found\n", (*data)->comand));
 	return (sc_error(SC_KEY_HAS_EXPIRED, data), 0);
 }
@@ -58,7 +60,6 @@ int	search_and_execute_command(t_data **data, char *path, int heredoc_processed)
 {
 	char	**token;
 
-	ft_putstr_fd("search_and_execute_command MIERDA\n", 2);
 	token = ft_split(path, ':');
 	free(path);
 	if (access((*data)->comand, F_OK) == 0)
@@ -72,5 +73,5 @@ int	search_and_execute_command(t_data **data, char *path, int heredoc_processed)
 		else
 			sc_error(SC_REQUIRED_KEY_NOT_AVAILABLE, data);
 	}
-	return (ft_putstr_fd("search_and_execute_command entro\n", 2), find_command_in_paths(data, token, heredoc_processed));
+	return (find_command_in_paths(data, token, heredoc_processed));
 }

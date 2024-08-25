@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:27:48 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/25 08:21:56 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 08:29:39 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	execute_pipeline(t_data **data, t_exec_vars	vars, pid_t pid)
 
 	current = *data;
 	initialize_pipe_vars(&vars);
-	print_data(*data);
+	pid = 0;
 	while (current != NULL)
 	{
 		pipeing(&current, &fd, &pid);
