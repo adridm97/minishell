@@ -6,7 +6,7 @@
 #    By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/04 16:50:24 by adrian            #+#    #+#              #
-#    Updated: 2024/08/25 12:40:26 by aduenas-         ###   ########.fr        #
+#    Updated: 2024/08/25 12:45:34 by aduenas-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -73,7 +73,7 @@ makes:
 OBJS = $(addprefix $(OBJS_PATH)/, ${SOURCES:.c=.o})
 
 $(NAME): $(OBJS) $(LIBFT) $(LIBREADLINE)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(LIBREADLINE) $(LIBHISTORY)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(LIBREADLINE) $(LIBHISTORY) -lncurses -Wl,-rpath,$(READLINEDIR)/lib -o $@
 
 $(LIBFT):
 	make -C $(LIBFT_PATH)
