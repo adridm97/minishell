@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:21:28 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/22 22:05:33 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 16:28:13 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	find_home(char **res, char **pwd, t_data *data)
 		(sc_error(SC_CANNOT_ALLOCATE_MEMORY, &data), exit(*data->stat_code));
 	*res = key_to_res(res, data->env);
 	if (!*res)
-		(sc_error(EXIT_FAILURE, &data), perror("HOME no está definido"), \
+		(sc_error(EXIT_FAILURE, &data), perror("HOME not defined"), \
 		exit(*data->stat_code));
 	*pwd = ft_strdup(*res);
 	ft_free_char(res);

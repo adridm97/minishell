@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/25 09:10:56 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 13:06:35 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include <signal.h>
-//# include <bits/sigaction.h>
+# include <bits/sigaction.h>
 
 // Signals
 # define CTRL_C SIGINT
@@ -45,7 +45,7 @@
 # define NO_QUOTE	6 // string sin comillas
 # define D_MAJOR	7 // >>
 # define D_MINOR	8 // <<
-//# define SA_RESTART   0x10000000
+# define SA_RESTART   0x10000000
 # define ERROR		0
 
 typedef struct s_mini

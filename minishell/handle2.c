@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/25 09:04:30 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 18:40:12 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,6 @@ void	handle_heredoc(t_data *current, t_exec_vars *vars)
 		if (redir->type == D_MINOR)
 		{
 			vars->heredoc_fd = heredoc(redir, current);
-			if (vars->heredoc_fd == -1)
-			{
-				vars->heredoc_processed = 1;
-			}
 			if (g_sigint_received == 1)
 				exit((sc_error(2 + 128, &current), *current->stat_code));
 		}
@@ -59,8 +55,8 @@ void	handle_heredoc(t_data *current, t_exec_vars *vars)
 	{
 		if (dup2(vars->heredoc_fd, STDIN_FILENO) == -1)
 			exit((perror("dup2"), EXIT_FAILURE));
+		close(vars->heredoc_fd);
 	}
-	close(vars->heredoc_fd);
 	vars->heredoc_processed = 1;
 }
 
@@ -103,5 +99,5 @@ void	handle_output_redirection(t_data *current, int fd[2], int file_fd)
 		if (dup2(fd[1], STDOUT_FILENO) == -1)
 			exit((perror("dup2 pipe"), EXIT_FAILURE));
 	}
-	(close(fd[0]), close(fd[1]));
+	(close(fd[1]), close(fd[0]));
 }

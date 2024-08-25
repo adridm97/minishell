@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:26:22 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/24 14:56:15 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 18:43:47 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ int	heredoc(t_redir	*aux, t_data *data)
 		if (line == NULL || eof_check(line, aux))
 		{
 			free(line);
+			line = NULL;
 			break ;
 		}
 		if (expand_line(&expanded_line, &line, fd, data))

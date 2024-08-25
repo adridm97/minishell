@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   print.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:46:17 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/13 08:05:14 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 18:22:20 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ void	print_data(t_data *data)
 			printf("arg[%i]: %s|\nnext = %p\n", j, data->args[j], data->next);
 		j = -1;
 		printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+		printf("data.heredoc es = %i\n", data->heredoc);
 		print_redir(data->redir);
 		data = data->next;
 		j = -1;

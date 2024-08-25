@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirs.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:08:03 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/24 12:28:25 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 18:40:32 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,6 @@ int	is_redir_input(t_token **token, t_data **data, char **str, char **env)
 		*token = (*token)->next;
 		if (!init_redir(token, data, env, D_MINOR))
 			return (0);
-		(*data)->heredoc = 1;
 	}
 	else if ((*token)->value == '>')
 	{

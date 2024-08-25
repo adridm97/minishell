@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/25 09:10:27 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 18:36:17 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,9 @@ int	ft_isspace(char *str)
 	}
 	return (1);
 }
+// Handle the history after every input.
 
-int	a(char **input)
+int	ft_add_history(char **input)
 {
 	if ((*input && **input) && !ft_isspace(*input))
 		add_history(*input);
@@ -79,7 +80,7 @@ int	main(int argc, char *argv[], char *env[])
 		input = get_input();
 		if (input == NULL)
 			break ;
-		if (a(&input))
+		if (ft_add_history(&input))
 			continue ;
 		handle_input(&d, &mat, input, &sce);
 		if (ft_is_exit(d) == 1)

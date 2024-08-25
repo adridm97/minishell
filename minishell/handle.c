@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/24 14:40:09 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 17:14:24 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,20 +127,24 @@ void	handle_redir(t_data *data, int heredoc_processed)
 	int			fd;
 	t_redir		*redir;
 
+	fd = -2;
+	(void)heredoc_processed;
 	redir = data->redir;
 	while (redir != NULL)
 	{
 		if (data && (redir != NULL && redir->type == D_MINOR) \
 				&& heredoc_processed == 0)
 			fd = heredoc(redir, data);
-		else if (redir->type == MAJOR)
+		if (redir->type == MAJOR)
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		else if (redir->type == D_MAJOR)
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		else if (redir->type == MINOR)
 			fd = open(redir->path, O_RDONLY);
-		handle_dups(fd, redir, data);
+		if (fd != -2)
+			handle_dups(fd, redir, data);
 		redir = redir->next;
-		close(fd);
+		if (fd != -2)
+			close(fd);
 	}
 }
