@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/25 18:48:40 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:52:11 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	child_handler(int signal)
 	}
 }
 
-void	wait_signal(int i)
+void	wait_signal(int i, t_data **data)
 {
 	struct sigaction	sa_int;
 	struct sigaction	sa_quit;
@@ -64,6 +64,7 @@ void	wait_signal(int i)
 	{
 		sa_int.sa_handler = &handle_sigint;
 		sa_quit.sa_handler = &handle_sigquit;
+		sc_error(130, data);
 	}
 	else
 	{

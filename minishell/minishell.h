@@ -6,7 +6,7 @@
 /*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/25 13:06:35 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:49:03 by aduenas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,7 +240,7 @@ int		eof_check(char *line, t_redir *aux);
 
 //signals.c
 void	handle_sigint_heredoc(int sig);
-void	wait_signal(int i);
+void	wait_signal(int i, t_data **data);
 void	child_handler(int signal);
 void	handle_sigint(int sig);
 void	handle_sigint_global(int sig);

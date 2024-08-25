@@ -67,11 +67,11 @@ int	is_valid_file(char *filename, int fd, char *check, t_data **data)
 void	wating_signal(t_data **ddata)
 {
 	if (ft_strcmp((*ddata)->comand, "./minishell") == 0)
-		wait_signal(2);
+		wait_signal(2, ddata);
 	else if (((*ddata)->redir && (*ddata)->redir->type == D_MINOR))
-		wait_signal(1);
+		wait_signal(1, ddata);
 	else
-		wait_signal(0);
+		wait_signal(0, ddata);
 }
 
 void	execute_command(t_data **ddata, char *command_path, int processed)
@@ -97,5 +97,5 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 			pid = wait(&status);
 		}
 	}
-	wait_signal(0);
+	wait_signal(0, ddata);
 }
