@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 13:27:48 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/24 20:05:51 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 08:21:56 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,9 @@ void	execute_pipeline(t_data **data, t_exec_vars	vars, pid_t pid)
 	{
 		pipeing(&current, &fd, &pid);
 		if (pid == 0)
-		{
-			printf("soy child A EXECUTE PIPELINE\n");
 			handle_child_pipes(&current, &vars, fd);
-		}
 		else
 		{
-			printf("soy parent A EXECUTE PIPELINE\n");
 			handle_parent_process(&vars, fd, pid, &current);
 			if (g_sigint_received)
 			{
@@ -59,7 +55,6 @@ void	execute_pipeline(t_data **data, t_exec_vars	vars, pid_t pid)
 		}
 		current = current->next;
 	}
-	printf("CASI SALGO A EXECUTE PIPELINE\n");
 	wait_for_remaining_processes(vars.last_pid, data);
 	if (g_sigint_received)
 		kill(0, SIGINT);

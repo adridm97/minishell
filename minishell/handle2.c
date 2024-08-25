@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/24 19:59:14 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 08:25:38 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 {
 	t_data	*data;
 
-	ft_putstr_fd("handle_child_process\n", 2);
 	data = *ddata;
 	if ((*ddata)->pipe && data->redir != NULL && data->comand && *data->comand)
 		handle_redir(data, processed);
@@ -32,8 +31,6 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 	{
 		if (!data->comand || !command_path || !*data->comand)
 			exit(handle_missing_command(data, processed));
-		ft_putstr_fd(command_path, 2);
-		ft_putstr_fd("\n", 2);
 		if (execve(command_path, data->args, data->env) == -1)
 			exit((perror("execve"), EXIT_FAILURE));
 	}
@@ -85,7 +82,6 @@ void	handle_output_redirection(t_data *current, int fd[2], int file_fd)
 {
 	t_redir	*redir;
 
-	ft_putstr_fd("handle_output_redirection inicio\n", 1);
 	if (current->redir != NULL)
 	{
 		redir = current->redir;
@@ -103,12 +99,9 @@ void	handle_output_redirection(t_data *current, int fd[2], int file_fd)
 			redir = redir->next;
 		}
 	}
-	ft_putstr_fd("handle_output_redirection mitar\n", 1);
 	if (current->next != NULL)
 	{
 		if (dup2(fd[1], STDOUT_FILENO) == -1)
 			exit((perror("dup2 pipe"), EXIT_FAILURE));
 	}
-	ft_putstr_fd("handle_output_redirection fin\n", 1);
-	// (close(fd[0]), close(fd[1]));
 }

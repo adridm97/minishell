@@ -79,7 +79,6 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 	pid_t	pid;
 	int		status;
 
-	ft_putstr_fd("execute_command\n", 2);
 	wating_signal(ddata);
 	pid = fork();
 	if (pid == -1)

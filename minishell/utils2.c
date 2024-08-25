@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:27:50 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/24 20:24:52 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/25 08:16:37 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ void	is_double_string(t_token **token, char **env, char **str, t_data **data)
 			is_expandsor(token, &res, env, data);
 		if (*token && (*token)->value != '"' && (*token)->value != '$')
 			res = new_str(&res, (*token)->value);
-		if (*token && (*token)->value != '"')
+		if (*token && (*token)->value != '"' && (*token)->value != '$')
 			*token = (*token)->next;
 	}
 	if (*token && (*token)->type == D_QUOTE)
