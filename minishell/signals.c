@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/25 19:52:11 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/26 16:30:13 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	handle_sigint_global(int sig)
 
 void	handle_sigint(int sig)
 {
+	g_sigint_received = 1;
 	(void)sig;
 	printf("\n");
 	rl_on_new_line();
@@ -48,7 +49,7 @@ void	child_handler(int signal)
 	}
 }
 
-void	wait_signal(int i, t_data **data)
+void	wait_signal(int i)
 {
 	struct sigaction	sa_int;
 	struct sigaction	sa_quit;
@@ -57,17 +58,19 @@ void	wait_signal(int i, t_data **data)
 	ft_memset(&sa_quit, 0, sizeof(sa_quit));
 	if (i == 2)
 	{
+		printf("entra1\n");
 		sa_int.sa_handler = &handle_sigint_minishell;
 		sa_quit.sa_handler = &handle_sigquit;
 	}
 	else if (i)
 	{
+		printf("entra2\n");
 		sa_int.sa_handler = &handle_sigint;
 		sa_quit.sa_handler = &handle_sigquit;
-		sc_error(130, data);
 	}
 	else
 	{
+		printf("entra3\n");
 		sa_int.sa_handler = &child_handler;
 		sa_quit.sa_handler = &child_handler;
 	}

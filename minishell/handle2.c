@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:46:45 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/25 18:40:12 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/27 07:44:35 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	handle_child_process(t_data **ddata, char *command_path, int processed)
 	{
 		if (data->redir != NULL)
 			handle_heredoc(data, &(t_exec_vars){STDIN_FILENO, -1, 0, 0});
-		handle_redir_simple(data);
+		handle_redir_simple(&data);
 	}
 	if (ft_strcmp(command_path, "is_builtinOMG") == 0)
 		exit((switch_builtin(ddata), *data->stat_code));

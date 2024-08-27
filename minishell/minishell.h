@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/25 19:49:03 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/27 07:43:59 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include <signal.h>
-# include <bits/sigaction.h>
+// # include <bits/sigaction.h>
 
 // Signals
 # define CTRL_C SIGINT
@@ -45,7 +45,7 @@
 # define NO_QUOTE	6 // string sin comillas
 # define D_MAJOR	7 // >>
 # define D_MINOR	8 // <<
-# define SA_RESTART   0x10000000
+// # define SA_RESTART   0x10000000
 # define ERROR		0
 
 typedef struct s_mini
@@ -152,8 +152,8 @@ char	**ft_matcpy(char **mat);
 int		handle_missing_command(t_data *data, int heredoc_processed);
 void	handle_dups(int fd, t_redir *redir, t_data *data);
 void	handle_redir(t_data *data, int heredoc_processed);
-void	handle_redir_simple(t_data *data);
-void	handle_dups_simple(int fd, t_redir *redir, t_data *data);
+void	handle_redir_simple(t_data **data);
+void	handle_dups_simple(int fd, t_redir *redir, t_data **data);
 
 //handle2.c
 void	handle_child_process(t_data **ddata, char *command_path, int processed);
@@ -240,7 +240,7 @@ int		eof_check(char *line, t_redir *aux);
 
 //signals.c
 void	handle_sigint_heredoc(int sig);
-void	wait_signal(int i, t_data **data);
+void	wait_signal(int i);
 void	child_handler(int signal);
 void	handle_sigint(int sig);
 void	handle_sigint_global(int sig);
