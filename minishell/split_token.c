@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/28 23:11:23 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/29 00:50:29 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	add_last_data(t_data **data, char **str)
 				return (free_args(&mat), 0);
 			i++;
 		}
-		free(mat);
+		(free(mat), free(*str));
 		*str = NULL;
 	}
 	else if (!add_args(&n_data->args, str))

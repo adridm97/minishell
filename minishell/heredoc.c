@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 11:26:22 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/26 20:46:01 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/29 00:50:53 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,11 +102,8 @@ char	*heredoc_tokenizer(char *str, t_data *data)
 			return (NULL);
 	}
 	free(input);
-	while (token)
-	{
-		if (!token_to_str(&token, &res, &data))
-			return (free_token(&token), sc_error(12, &data), NULL);
-	}
+	if (transform_token_to_string(&token, &res, &data))
+		return (sc_error(12, &data), NULL);
 	return (free_token(&token), res);
 }
 

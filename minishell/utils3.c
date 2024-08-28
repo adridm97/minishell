@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/24 14:51:41 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/28 23:08:19 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/29 00:51:07 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,5 +69,18 @@ int	check_puti(t_data *d)
 {
 	if (d->args[1] && !d->args[2] && ft_atoi(d->args[1]) == 235)
 		return (1);
+	return (0);
+}
+
+int	transform_token_to_string(t_token **dtoken, char **res, t_data **data)
+{
+	t_token	*token;
+
+	token = *dtoken;
+	while (token)
+	{
+		if (!token_to_str(&token, res, data))
+			return (free_token(&token), sc_error(12, data), 1);
+	}
 	return (0);
 }

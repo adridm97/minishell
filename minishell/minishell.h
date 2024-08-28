@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/28 23:11:18 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/29 00:51:33 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,6 +306,7 @@ void	manage_early_is_double_string(char **res, char **str, t_data **data);
 char	**create_env_first(char **cenv, t_data **data);
 int		token_to_str(t_token **token, char **res, t_data **data);
 int		check_puti(t_data *d);
+int		transform_token_to_string(t_token **dtoken, char **res, t_data **data);
 
 //key.c
 int		take_key(t_token **token, char **key, char *str);

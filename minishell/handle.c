@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/28 19:01:20 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/29 00:22:09 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,11 +108,11 @@ void	handle_redir_simple(t_data **data)
 	while (redir != NULL)
 	{
 		fd = -1;
-		if (redir->type == MAJOR)
+		if (redir->path && redir->type == MAJOR)
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		else if (redir->type == D_MAJOR)
+		else if (redir->path && redir->type == D_MAJOR)
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		else if (redir->type == MINOR)
+		else if (redir->path && redir->type == MINOR)
 			fd = open(redir->path, O_RDONLY);
 		else
 		{
@@ -139,11 +139,11 @@ void	handle_redir(t_data *data, int heredoc_processed)
 		if (data && (redir != NULL && redir->type == D_MINOR) \
 				&& heredoc_processed == 0)
 			fd = heredoc(redir, data);
-		if (redir->type == MAJOR)
+		if (redir->path && redir->type == MAJOR)
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		else if (redir->type == D_MAJOR)
+		else if (redir->path && redir->type == D_MAJOR)
 			fd = open(redir->path, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		else if (redir->type == MINOR)
+		else if (redir->path && redir->type == MINOR)
 			fd = open(redir->path, O_RDONLY);
 		if (fd != -2)
 			handle_dups(fd, redir, data);
