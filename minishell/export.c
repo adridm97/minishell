@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 14:12:39 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/27 16:16:29 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/28 23:59:16 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ char	*extract_key(char *arg, t_data **data)
 
 int	is_valid_key(char *key)
 {
-	if(key && (key[0] != '_' && !ft_isalpha(key[0])))
+	if (key && (key[0] != '_' && !ft_isalpha(key[0])))
 		return (0);
 	return (*key && !is_special_string(key, " <>|'\".,-+*!¡?¿%%=·@$#ªº¬€"));
 }
