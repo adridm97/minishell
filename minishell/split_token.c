@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   split_token.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/25 08:23:48 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/27 15:49:34 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,6 @@ int	is_expandsor(t_token **token, char **str, char **env, t_data **data)
 	return (1);
 }
 
-// TODO hay que meter el sce
-// printf("switch case = %c\n", (*token)->value);
 int	switch_case(t_token **token, char **env, t_data **data, char **str)
 {
 	if ((*token)->value == '\'')

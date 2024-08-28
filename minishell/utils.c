@@ -6,30 +6,17 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 12:33:06 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/27 07:55:52 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/27 16:15:53 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-/*
-	t_data	*tmp;
 
-	tmp = *data;
-	if (*data)
-	{
-		while(tmp->next)
-			tmp = tmp->next;
-		*sce = *tmp->stat_code;
-		free_data(data);
-		*data = NULL;
-	}
-*/
 void	ft_free_resources(t_data **data, char **input, char ***mat, int *sce)
 {
 	if (*data)
 	{
 		*sce = *(*data)->stat_code;
-		printf("ft_free_resources: %i\n", *((*data)->stat_code));
 		free_data(data);
 		*data = NULL;
 	}

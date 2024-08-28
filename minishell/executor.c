@@ -87,22 +87,13 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 		handle_child_process(ddata, command_path, processed);
 	else
 	{
-		printf("entra al wait y vale: %i\n", *(*ddata)->stat_code);
 		pid = wait(&status);
 		while (pid > 0)
 		{
 			if (WIFEXITED(status))
-			{
-				printf("en el wifexited antes: %i\n", *(*ddata)->stat_code);
 				*(*ddata)->stat_code = WEXITSTATUS(status);
-				printf("en el wifexited despues: %i\n", *(*ddata)->stat_code);
-			}
 			else if (WIFSIGNALED(status))
-			{
-				printf("en el wifsignaled antes: %i\n", *(*ddata)->stat_code);
 				*(*ddata)->stat_code = WTERMSIG(status) + 128;
-				printf("en el wifsignaled despues: %i\n", *(*ddata)->stat_code);
-			}
 			pid = wait(&status);
 		}
 	}
