@@ -6,7 +6,7 @@
 /*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:42:09 by aduenas-          #+#    #+#             */
-/*   Updated: 2024/08/26 16:30:13 by adrian           ###   ########.fr       */
+/*   Updated: 2024/08/27 15:49:32 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,19 +58,16 @@ void	wait_signal(int i)
 	ft_memset(&sa_quit, 0, sizeof(sa_quit));
 	if (i == 2)
 	{
-		printf("entra1\n");
 		sa_int.sa_handler = &handle_sigint_minishell;
 		sa_quit.sa_handler = &handle_sigquit;
 	}
 	else if (i)
 	{
-		printf("entra2\n");
 		sa_int.sa_handler = &handle_sigint;
 		sa_quit.sa_handler = &handle_sigquit;
 	}
 	else
 	{
-		printf("entra3\n");
 		sa_int.sa_handler = &child_handler;
 		sa_quit.sa_handler = &child_handler;
 	}

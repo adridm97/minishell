@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/28 23:08:00 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/28 23:11:18 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,6 +248,7 @@ void	handle_sigint_global(int sig);
 //signals2.c
 void	handle_sigquit(int sig);
 void	handle_sigint_minishell(int sig);
+int		ft_signal_handler(int sce);
 
 //env.c
 int		set_env(char *key, char *val, char ***env, t_data **data);
