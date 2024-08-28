@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 12:37:58 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/25 17:14:24 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/27 07:43:46 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,18 +40,21 @@ int	handle_missing_command(t_data *data, int heredoc_processed)
 	}
 }
 
-void	handle_dups_simple(int fd, t_redir *redir, t_data *data)
+void	handle_dups_simple(int fd, t_redir *redir, t_data **data)
 {
 	if (fd == -1)
-		return (ft_putstr_fd(data->redir->path, 2), \
-		ft_putstr_fd(" No such file or directory\n", 2));
+	{
+		if (redir->path)
+			ft_putstr_fd(redir->path, 2);
+		return (sc_error(1, data), ft_putstr_fd(" No such file or directory\n", 2));
+	}
 	if ((redir->type == MAJOR || redir->type == D_MAJOR) \
-	&& data->comand != NULL)
+	&& (*data)->comand != NULL)
 	{
 		if (dup2(fd, STDOUT_FILENO) == -1)
 			(perror("dup2"), exit(EXIT_FAILURE));
 	}
-	else if (redir->type == MINOR && data->comand != NULL)
+	else if (redir->type == MINOR && (*data)->comand != NULL)
 	{
 		if (dup2(fd, STDIN_FILENO) == -1)
 			(perror("dup2"), exit(EXIT_FAILURE));
@@ -65,7 +68,7 @@ void	handle_dups(int fd, t_redir *redir, t_data *data)
 		if (data->redir->path)
 			ft_putstr_fd(data->redir->path, 2);
 		return (ft_putstr_fd(" No such file or directory\n", 2),
-			sc_error(SC_KEY_HAS_EXPIRED, &data));
+			sc_error(1, &data));
 	}
 	if ((redir->type == MAJOR || redir->type == D_MAJOR) \
 	&& data->comand != NULL)
@@ -95,12 +98,12 @@ void	handle_dups(int fd, t_redir *redir, t_data *data)
 // }
 */
 
-void	handle_redir_simple(t_data *data)
+void	handle_redir_simple(t_data **data)
 {
 	int		fd;
 	t_redir	*redir;
 
-	redir = data->redir;
+	redir = (*data)->redir;
 	while (redir != NULL)
 	{
 		fd = -1;
@@ -112,9 +115,11 @@ void	handle_redir_simple(t_data *data)
 			fd = open(redir->path, O_RDONLY);
 		else
 		{
+			printf("avanza path\n");
 			redir = redir->next;
 			continue ;
 		}
+		print_redir(redir);
 		handle_dups_simple(fd, redir, data);
 		if (redir->type != D_MINOR)
 			close(fd);

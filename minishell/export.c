@@ -80,5 +80,7 @@ char	*extract_key(char *arg, t_data **data)
 
 int	is_valid_key(char *key)
 {
+	if(key && (key[0] != '_' && !ft_isalpha(key[0])))
+		return (0);
 	return (*key && !is_special_string(key, " <>|'\".,-+*!¡?¿%%=·@$#ªº¬€"));
 }

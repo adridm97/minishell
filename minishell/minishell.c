@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/25 19:49:27 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/27 07:59:43 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,12 +76,18 @@ int	main(int argc, char *argv[], char *env[])
 	ft_set_shell(env, &mat, &d);
 	while (1)
 	{
-		(wait_signal(1, &d), ft_handle_env_file(&mat, &d));
+		printf("wait1\n");
+		(wait_signal(1), ft_handle_env_file(&mat, &d));
 		input = get_input();
 		if (input == NULL)
 			break ;
 		if (ft_add_history(&input))
 			continue ;
+		if (g_sigint_received)
+		{
+			sce = 130;
+			g_sigint_received = 0;
+		}
 		handle_input(&d, &mat, input, &sce);
 		if (ft_is_exit(d) == 1)
 			break ;

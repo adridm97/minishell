@@ -67,11 +67,11 @@ int	is_valid_file(char *filename, int fd, char *check, t_data **data)
 void	wating_signal(t_data **ddata)
 {
 	if (ft_strcmp((*ddata)->comand, "./minishell") == 0)
-		wait_signal(2, ddata);
+		wait_signal(2);
 	else if (((*ddata)->redir && (*ddata)->redir->type == D_MINOR))
-		wait_signal(1, ddata);
+		wait_signal(1);
 	else
-		wait_signal(0, ddata);
+		wait_signal(0);
 }
 
 void	execute_command(t_data **ddata, char *command_path, int processed)
@@ -87,15 +87,24 @@ void	execute_command(t_data **ddata, char *command_path, int processed)
 		handle_child_process(ddata, command_path, processed);
 	else
 	{
+		printf("entra al wait y vale: %i\n", *(*ddata)->stat_code);
 		pid = wait(&status);
 		while (pid > 0)
 		{
 			if (WIFEXITED(status))
+			{
+				printf("en el wifexited antes: %i\n", *(*ddata)->stat_code);
 				*(*ddata)->stat_code = WEXITSTATUS(status);
+				printf("en el wifexited despues: %i\n", *(*ddata)->stat_code);
+			}
 			else if (WIFSIGNALED(status))
+			{
+				printf("en el wifsignaled antes: %i\n", *(*ddata)->stat_code);
 				*(*ddata)->stat_code = WTERMSIG(status) + 128;
+				printf("en el wifsignaled despues: %i\n", *(*ddata)->stat_code);
+			}
 			pid = wait(&status);
 		}
 	}
-	wait_signal(0, ddata);
+	wait_signal(0);
 }

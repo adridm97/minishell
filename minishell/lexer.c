@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: adrian <adrian@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 13:20:02 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/22 21:55:18 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/26 21:17:08 by adrian           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ t_data	*lexer(char *input, t_data **data, char **env, int *sce)
 	if (error.is_error)
 		return (is_error(&(t_error){"Syntax error", 1}), free(error.error),
 			save_env_mat(env, sce), free_data(data), free_token(&token),
-			sc_error_int(12, sce), NULL);
+			sc_error_int(2, sce), NULL);
 	else if (!split_token(token, env, data, sce))
 		return (is_error(&(t_error){"Memory error", 1}), save_env_mat(env, sce),
 			free_data(data), free_token(&token), sc_error_int(12, sce), NULL);
