@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aduenas- <aduenas-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 10:01:34 by kluna-bo          #+#    #+#             */
-/*   Updated: 2024/08/25 19:49:03 by aduenas-         ###   ########.fr       */
+/*   Updated: 2024/08/28 20:26:57 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -301,7 +301,7 @@ void	is_double_string(t_token **token, char **env, char **str,
 			t_data **data);
 
 //utils3.c
-void	manage_early_is_double_string(char **res, char **str);
+void	manage_early_is_double_string(char **res, char **str, t_data **data);
 char	**create_env_first(char **cenv, t_data **data);
 int		token_to_str(t_token **token, char **res, t_data **data);
 int		check_puti(t_data *d);

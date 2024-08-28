@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 21:09:21 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/25 08:23:48 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/28 20:29:50 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@ int	is_expandsor(t_token **token, char **str, char **env, t_data **data)
 	*token = (*token)->next;
 	if (!*token || is_special((*token)->value, "<> |\0"))
 		*str = new_str(str, '$');
-	else if ((*token)->value == '"')
+	else if ((*token)->value == '"' && (*token)->next)
 		is_double_string(token, env, str, data);
-	else if ((*token)->value == '\'')
+	else if ((*token)->value == '\'' && (*token)->next)
 		is_simple_string(token, env, str);
 	else
 		return (process_token(token, str, env, data));
@@ -42,8 +42,8 @@ int	switch_case(t_token **token, char **env, t_data **data, char **str)
 		return (is_pipe(token, data, str, (*data)->stat_code));
 	else if ((*token)->value == '$')
 	{
-		is_expandsor(token, str, env, data);
 		(*data)->is_ex = 1;
+		is_expandsor(token, str, env, data);
 	}
 	else if ((*token)->value == ' ')
 		is_space(token, data, str);

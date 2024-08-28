@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 16:27:50 by adrian            #+#    #+#             */
-/*   Updated: 2024/08/25 08:16:37 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/28 20:27:11 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void	is_double_string(t_token **token, char **env, char **str, t_data **data)
 {
 	char	*res;
 
-	manage_early_is_double_string(&res, str);
+	manage_early_is_double_string(&res, str, data);
 	*token = (*token)->next;
 	if (*token && (*token)->value == '"')
 	{
@@ -105,7 +105,7 @@ void	is_double_string(t_token **token, char **env, char **str, t_data **data)
 	}
 	while (*token && (*token)->value != '"')
 	{
-		if ((*token)->value == '$' && (*token)->next->value != '"')
+		if ((*token)->value == '$')
 			is_expandsor(token, &res, env, data);
 		if (*token && (*token)->value != '"' && (*token)->value != '$')
 			res = new_str(&res, (*token)->value);

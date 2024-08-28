@@ -6,7 +6,7 @@
 /*   By: kevin <kevin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/24 14:51:41 by kevin             #+#    #+#             */
-/*   Updated: 2024/08/25 09:10:09 by kevin            ###   ########.fr       */
+/*   Updated: 2024/08/28 20:26:43 by kevin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,9 @@ char	**create_env_first(char **cenv, t_data **data)
 	return (env);
 }
 
-void	manage_early_is_double_string(char **res, char **str)
+void	manage_early_is_double_string(char **res, char **str, t_data **data)
 {
+	(*data)->is_ex = 0;
 	*res = NULL;
 	if (*str)
 		*res = ft_strdup(*str);
